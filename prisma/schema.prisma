@@ -8,6 +8,33 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Visibility {
+  PUBLIC
+  FOLLOWERS
+  PRIVATE
+}
+
+enum AttachmentType {
+  IMAGE
+  VIDEO
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum MatchStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum MatchType {
+  WALL
+  ONE_ON_ONE
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -18,12 +45,27 @@ model User {
   bio           String?
   isPrivate     Boolean   @default(false)
 
+  accounts         Account[]
+  sessions         Session[]
+  Authenticator    Authenticator[]
+  goals            Goal[]
+  reports          DailyReport[]
+  reactions        Reaction[]
+  followedBy       Follow[]               @relation("FollowedBy")
+  following        Follow[]               @relation("Following")
+  communities      CommunityMember[]
+  threads          Thread[]
+  comments         Comment[]
+  matchesSent      Match[]                @relation("MatchesSent")
+  matchesReceived  Match[]                @relation("MatchesReceived")
+  pomodoroSessions PomodoroSession[]
+  futureMessages   FutureMessage[]
+  notifications    Notification[]
+  contributions    LearningContribution[]
+  UserInterest     UserInterest[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  Account       Account[]
-  Session       Session[]
-  Authenticator Authenticator[]
 }
 
 model Account {
@@ -78,4 +120,240 @@ model Authenticator {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@id([userId, credentialID])
+}
+
+model Interest {
+  id           String         @id @default(cuid())
+  name         String         @unique
+  UserInterest UserInterest[]
+}
+
+model UserInterest {
+  userId     String
+  interestId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, interestId])
+}
+
+model Goal {
+  id       String  @id @default(cuid())
+  userId   String
+  text     String
+  isPublic Boolean @default(true)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  DailyReport DailyReport[]
+}
+
+model ReportFormat {
+  id          String  @id @default(cuid())
+  name        String
+  description String?
+  isDefault   Boolean @default(false)
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  DailyReport DailyReport[]
+}
+
+model DailyReport {
+  id            String       @id @default(cuid())
+  userId        String
+  goalId        String?
+  formatId      String
+  text          String
+  visibility    Visibility
+  learningTime  Int
+  pomodoroCount Int
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal          Goal?        @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  format        ReportFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
+  attachments   Attachment[]
+  reactions     Reaction[]
+  aiFeedbacks   AIFeedback[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Attachment {
+  id       String         @id @default(cuid())
+  reportId String
+  url      String
+  type     AttachmentType
+  report   DailyReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ReactionType {
+  id       String     @id @default(cuid())
+  name     String     @unique
+  Reaction Reaction[]
+}
+
+model Reaction {
+  id       String       @id @default(cuid())
+  typeId   String
+  userId   String
+  reportId String
+  type     ReactionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
+  user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report   DailyReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Follow {
+  followerId  String
+  followingId String
+  follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User   @relation("FollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([followerId, followingId])
+}
+
+model Community {
+  id             String            @id @default(cuid())
+  name           String
+  description    String?
+  isPublic       Boolean           @default(true)
+  allowAnonymous Boolean           @default(false)
+  members        CommunityMember[]
+  threads        Thread[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CommunityMember {
+  communityId String
+  userId      String
+  role        Role
+  joinedAt    DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([communityId, userId])
+}
+
+model Thread {
+  id          String    @id @default(cuid())
+  communityId String
+  title       String
+  content     String
+  isAnonymous Boolean   @default(false)
+  authorId    String
+  comments    Comment[]
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Comment {
+  id          String  @id @default(cuid())
+  threadId    String
+  authorId    String
+  text        String
+  isAnonymous Boolean @default(false)
+
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Match {
+  id          String      @id @default(cuid())
+  requestId   String
+  responderId String
+  status      MatchStatus @default(PENDING)
+  matchType   MatchType
+
+  requestUser   User @relation("MatchesSent", fields: [requestId], references: [id], onDelete: Cascade)
+  responderUser User @relation("MatchesReceived", fields: [responderId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([requestId, responderId])
+}
+
+model PomodoroSession {
+  id        String   @id @default(cuid())
+  userId    String
+  startTime DateTime
+  endTime   DateTime
+  duration  Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LearningContribution {
+  id            String   @id @default(cuid())
+  userId        String
+  activityDate  DateTime
+  pomodoroCount Int
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AIFeedback {
+  id           String @id @default(cuid())
+  reportId     String
+  sentiment    String
+  feedbackText String
+
+  report DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FutureMessage {
+  id          String   @id @default(cuid())
+  userId      String
+  text        String
+  deliverDate DateTime
+  isDelivered Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id           String  @id @default(cuid())
+  userId       String
+  sourceUserId String
+  type         String
+  message      String
+  isRead       Boolean @default(false)
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
