@@ -1,11 +1,12 @@
-import { Login } from "@/app/_features/Login/Login";
+"use client";
 import { Header } from "@/app/_features/Navigate/Header/Header";
+import { NotificationModal } from "@/app/_features/Notification/Notification";
 
 export default function page() {
   return (
     <>
       <Header />
-      <Login />
+      <NotificationModal onClose={() => {}} />
     </>
   );
 }
