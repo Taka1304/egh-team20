@@ -1,29 +1,23 @@
 "use client";
-import { RichEditor } from "@/app/_features/RichEditor/RichEditor";
+import RichEditorContainer from "@/app/_features/RichEditor/RichEditorContainer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
-import { useCallback, useRef, useState } from "react";
+import { useState } from "react";
 
-export default function NewPost() {
+export default function page() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
-
   /**
    * 下書き保存処理
    */
-  const handleSaveDraft = useCallback(() => {
-    console.log("下書き保存:", { title, content });
-  }, [title, content]);
+  const handleSaveDraft = () => {};
 
   /**
    * 公開処理
    */
-  const handlePublish = useCallback(() => {
-    console.log("公開:", { title, content });
-  }, [title, content]);
+  const handlePublish = () => {};
 
   return (
     <div className="min-h-screen bg-white">
@@ -56,7 +50,7 @@ export default function NewPost() {
             />
           </div>
 
-          <RichEditor onChange={setContent} initialContent="" />
+          <RichEditorContainer onChange={setContent} />
         </div>
       </main>
     </div>
