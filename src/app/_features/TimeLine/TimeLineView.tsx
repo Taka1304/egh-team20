@@ -40,10 +40,19 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
   const isLongContent = tweet.content.length > maxLength;
   const displayedContent = showFullContent ? tweet.content : `${tweet.content.slice(0, maxLength)}...`;
 
+  // 📌 日付を分割（例: "2024/02/23" → 年: 2024, 月: 2, 日: 23, 曜日: 金）
+  const dateObj = new Date(tweet.createdAt);
+  const year = dateObj.getFullYear();
+  const month = dateObj.getMonth() + 1;
+  const day = dateObj.getDate();
+  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+  const weekday = weekdays[dateObj.getDay()];
+
   return (
     <Card className="p-4 mb-4 border border-border w-full bg-card text-card-foreground rounded-[var(--radius)]">
       {/* ユーザー情報 + 日付 */}
       <div className="flex items-center justify-between">
+        {/* ユーザー情報 */}
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
             <AvatarImage src={tweet.user.avatar} alt={`${tweet.user.name}のアイコン`} />
@@ -54,8 +63,22 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
             <p className="text-sm text-muted-foreground">{tweet.user.handle}</p>
           </div>
         </div>
-        {/* 日付表示 */}
-        <p className="text-2xl text-muted-foreground">{tweet.createdAt}</p>
+
+        {/* 📌 日付表示をカスタマイズ */}
+        <div className="flex flex-col items-end">
+          {/* 年（上・左寄せ） */}
+          <p className="text-sm text-muted-foreground self-start">{year}</p>
+
+          {/* 月・日・曜日（横並び） */}
+          <div className="flex items-center space-x-2">
+            <p className="text-4xl font-bold text-card-foreground">
+              {month}.{day}
+            </p>
+            <div className="border border-card-foreground rounded-md px-2 py-0.5 text-sm text-card-foreground">
+              {weekday}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 📌 投稿内容 */}
@@ -88,19 +111,24 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
       )}
 
       {/* アクションボタン（返信 & いいね & がんばれ & 参考になった） */}
-      <div className="mt-3 flex space-x-4 text-muted-foreground">
+      <div className="mt-3 flex justify-between text-muted-foreground">
+        {/* 💬 コメントボタン（左寄せ） */}
         <Button variant="ghost" size="icon" aria-label="返信" className="hover:text-secondary">
           <MessageCircle className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" aria-label="いいね" className="hover:text-secondary">
-          <Heart className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon" aria-label="がんばれ" className="hover:text-secondary">
-          <Flame className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon" aria-label="参考になった" className="hover:text-secondary">
-          <CheckCircle className="h-5 w-5" />
-        </Button>
+
+        {/* ❤️🔥✅ リアクションボタン（右寄せ） */}
+        <div className="flex space-x-4">
+          <Button variant="ghost" size="icon" aria-label="いいね" className="hover:text-secondary">
+            <Heart className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="がんばれ" className="hover:text-secondary">
+            <Flame className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="参考になった" className="hover:text-secondary">
+            <CheckCircle className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
     </Card>
   );
