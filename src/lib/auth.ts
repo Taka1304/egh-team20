@@ -36,16 +36,11 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async signIn({ profile, user, account }) {
-      console.log("signIn", { profile, user, account });
-
-      return true;
-    },
   },
   pages: {
     signIn: "/auth/signin",
     // signOut: "/auth/signout",
     // error: "/auth/error",
-    // newUser: '/auth/new-user',
+    // newUser: '/auth/welcome',
   },
 };
