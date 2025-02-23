@@ -6,14 +6,16 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogContent } from "@radix-ui/react-dialog";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function ReportAddDialogView() {
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [selectedTemtemplate, setSelectedTemplate] = useState("");
   const [isComposing, setIsComposing] = useState(false);
-
   const [open, setOpen] = useState(true);
+  const [previewMode, setPreviewMode] = useState(false);
+
   const templates = [
     { id: "daily", name: "日報", content: "## 今日の学習内容\n\n## 気づき\n\n## 次のアクション\n" },
     { id: "weekly", name: "週報", content: "## 今週の達成事項\n\n## 来週の目標\n\n## 振り返り\n" },
@@ -26,15 +28,27 @@ export default function ReportAddDialogView() {
           <DialogTitle className="text-primary-foreground">学習ログを投稿</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <Textarea
-            placeholder="学んだこと、気づき、次のアクションなどを共有しましょう..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            onCompositionStart={() => setIsComposing(true)}
-            onCompositionEnd={() => setIsComposing(false)}
-            rows={6}
-            className="border-primary text-primary-foreground"
-          />
+          <div className="flex justify-between items-center">
+            <Label className="text-primary-foreground">本文</Label>
+            <Button className="bg-primary hover:scale-95" onClick={() => setPreviewMode(!previewMode)}>
+              {previewMode ? "編集モード" : "プレビューモード"}
+            </Button>
+          </div>
+          {previewMode ? (
+            <div className="prose max-w-full border border-primary p-4 rounded-md text-primary-foreground">
+              <ReactMarkdown>{content || "プレビューする内容がありません"}</ReactMarkdown>
+            </div>
+          ) : (
+            <Textarea
+              placeholder="学んだこと、気づき、次のアクションなどを共有しましょう..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={() => setIsComposing(false)}
+              rows={6}
+              className="border-primary text-primary-foreground"
+            />
+          )}
           <TagSelector
             tags={tags}
             onTagsChange={setTags}
@@ -67,7 +81,7 @@ export default function ReportAddDialogView() {
             ))}
           </select>
         </div>
-        <DialogFooter className="pt-2">
+        <DialogFooter className="pt-2 flex justify-end gap-2">
           <Button className="bg-destructive hover:scale-95 duration-150">キャンセル</Button>
           <Button className="hover:scale-95 duration-150">投稿</Button>
         </DialogFooter>
