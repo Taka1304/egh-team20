@@ -5,31 +5,31 @@
 @layer base {
   :root {
     /* purple: デフォルトテーマ */
-    --background: #1e202c;
-    --foreground: #bfc0d1;
-    --card: #31323e;
-    --card-foreground: #bfc0d1;
-    --popover: #31323e;
-    --popover-foreground: #bfc0d1;
-    --primary: #60519b;
-    --primary-foreground: #ffffff;
-    --secondary: #bfc0d1;
-    --secondary-foreground: #1e202c;
-    --muted: #31323e;
-    --muted-foreground: #bfc0d1;
-    --accent: #31323e;
-    --accent-foreground: #bfc0d1;
-    --destructive: #dc2626;
-    --destructive-foreground: #ffffff;
-    --border: #31323e;
-    --input: #31323e;
-    --ring: #60519b;
-    --chart-1: #60519b;
-    --chart-2: #31323e;
-    --chart-3: #bfc0d1;
-    --chart-4: #ffffff;
-    --chart-5: #1e202c;
-    --radius: 0.5rem;
+    --background: #1e202c; /* 背景色 */
+    --foreground: #bfc0d1; /* 文字色 */
+    --card: #31323e; /* カード背景色 */
+    --card-foreground: #bfc0d1; /* カード文字色 */
+    --popover: #31323e; /* ポップオーバー背景色 */
+    --popover-foreground: #bfc0d1; /* ポップオーバー文字色 */
+    --primary: #60519b; /* プライマリカラー */
+    --primary-foreground: #ffffff; /* プライマリカラーの文字色 */
+    --secondary: #bfc0d1; /* セカンダリカラー */
+    --secondary-foreground: #1e202c; /* セカンダリカラーの文字色 */
+    --muted: #31323e; /* 控えめカラー */
+    --muted-foreground: #bfc0d1; /* 控えめカラーの文字色 */
+    --accent: #31323e; /* アクセントカラー */
+    --accent-foreground: #bfc0d1; /* アクセントカラーの文字色 */
+    --destructive: #dc2626; /* エラーカラー */
+    --destructive-foreground: #ffffff; /* エラーカラーの文字色 */
+    --border: #31323e; /* ボーダーカラー */
+    --input: #31323e; /* インプットカラー */
+    --ring: #60519b; /* リングカラー */
+    --chart-1: #60519b; /* チャートカラー1 */
+    --chart-2: #31323e; /* チャートカラー2 */
+    --chart-3: #bfc0d1; /* チャートカラー3 */
+    --chart-4: #ffffff; /* チャートカラー4 */
+    --chart-5: #1e202c; /* チャートカラー5 */
+    --radius: 0.5rem; /* ボーダーの角丸 */
   }
 
   .red {
