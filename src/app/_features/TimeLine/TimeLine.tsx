@@ -10,6 +10,7 @@ type Tweet = {
     avatar: string;
   };
   content: string;
+  createdAt: string;
   image?: string;
   link?: string;
 };
@@ -24,6 +25,7 @@ const tweets: Tweet[] = [
       avatar: "/avatar.jpg",
     },
     content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
+    createdAt: "2024/02/23",
     link: "https://note.com/yamamotokoki/n...",
   },
   {
@@ -33,7 +35,9 @@ const tweets: Tweet[] = [
       handle: "@yamamotoVn",
       avatar: "/avatar.jpg",
     },
-    content: "今日は新しいプロジェクトの発表！楽しみ！🚀",
+    content:
+      "今日は新しいプロジェクトの発表！楽しみ！🚀aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    createdAt: "2024/02/22",
   },
 ];
 
