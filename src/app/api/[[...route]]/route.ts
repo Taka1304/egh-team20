@@ -4,7 +4,7 @@ import sample from "./sample"
 
 export const runtime = "edge"
 
-export const app = new Hono().basePath("/api")
+const app = new Hono().basePath("/api")
 const sampleRoute = app.route("/sample", sample)
 
 export type AppType = typeof sampleRoute
