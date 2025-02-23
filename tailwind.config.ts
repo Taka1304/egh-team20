@@ -50,6 +50,20 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        colorTheme: {
+          purple: {
+            tertiary: "#1e202c", // 背景色
+            primary: "#60519b",
+            secondary: "#bfc0d1",
+            sub: "#31323e",
+          },
+          red: {
+            tertiary: "#19171b",
+            primary: "#75020f",
+            secondary: "#51080d",
+            suh: "#2b0307",
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
