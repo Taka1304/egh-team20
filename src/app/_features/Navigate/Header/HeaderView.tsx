@@ -13,13 +13,13 @@ export function HeaderView({ onOpenPostModal }: HeaderViewProps) {
     <div className="fixed top-0 left-0 right-0 h-14 bg-background border-b border-secondary z-50">
       <div className="container mx-auto h-full flex items-center justify-between px-4">
         <nav className="flex items-center space-x-8">
-          <Link href="/" className="text-primary-foreground hover:text-secondary">
+          <Link href="/" className="text-foreground hover:text-secondary">
             <Home className="h-5 w-5" />
           </Link>
-          <Link href="/notifications" className="text-primary-foreground hover:text-secondary">
+          <Link href="/notifications" className="text-foreground hover:text-secondary">
             <Bell className="h-5 w-5" />
           </Link>
-          <Link href="/profile" className="text-primary-foreground hover:text-secondary">
+          <Link href="/profile" className="text-foreground hover:text-secondary">
             <User className="h-5 w-5" />
           </Link>
         </nav>
