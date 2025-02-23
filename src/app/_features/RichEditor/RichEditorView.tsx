@@ -1,4 +1,5 @@
-import { MARKDOWN_TEMPLATES } from "@/app/_features/RichEditor/constants";
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -6,45 +7,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
-import Image from "@tiptap/extension-image";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import type { Editor } from "@tiptap/react";
+import { EditorContent } from "@tiptap/react";
 import { Bold, FileText, Heading2, ImageIcon, Italic, List, ListOrdered, Minus, Quote, Redo, Undo } from "lucide-react";
 
-type RichEditorProps = {
-  onChange: (content: string) => void;
-  initialContent?: string;
-};
+export interface MarkdownTemplate {
+  label: string;
+  template: string;
+}
 
-export function RichEditor({ onChange, initialContent }: RichEditorProps) {
-  const editor = useEditor({
-    extensions: [StarterKit, Image],
-    content: initialContent || "",
-    editorProps: {
-      attributes: {
-        class: "prose prose-lg max-w-none focus:outline-none min-h-[500px]",
-      },
-    },
-    onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
-    },
-  });
+export interface RichEditorViewProps {
+  editor: Editor;
+  addImage: () => void;
+  insertTemplate: (template: string) => void;
+  markdownTemplates: MarkdownTemplate[];
+}
 
+export function RichEditorView({ editor, addImage, insertTemplate, markdownTemplates }: RichEditorViewProps) {
+  // editor未生成の場合は早期return
   if (!editor) {
     return null;
   }
-
-  const addImage = () => {
-    const url = window.prompt("URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
-
-  const insertTemplate = (template: string) => {
-    editor.commands.setContent(template);
-  };
-
   return (
     <div className="border rounded-lg bg-white">
       <div className="border-b p-2 flex flex-wrap gap-1">
@@ -110,7 +93,7 @@ export function RichEditor({ onChange, initialContent }: RichEditorProps) {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
-            {MARKDOWN_TEMPLATES.map((template) => (
+            {markdownTemplates.map((template) => (
               <DropdownMenuItem key={template.label} onClick={() => insertTemplate(template.template)}>
                 {template.label}
               </DropdownMenuItem>
