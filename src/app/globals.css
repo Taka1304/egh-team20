@@ -4,116 +4,59 @@
 
 @layer base {
   :root {
-
-    --background: 0 0% 100%;
-
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-
-    --input: 214.3 31.8% 91.4%;
-
-    --ring: 222.2 84% 4.9%;
-
-    --chart-1: 12 76% 61%;
-
-    --chart-2: 173 58% 39%;
-
-    --chart-3: 197 37% 24%;
-
-    --chart-4: 43 74% 66%;
-
-    --chart-5: 27 87% 67%;
-
-    --radius: 0.5rem
+    /* ライトモード */
+    --background: #1e202c; /* tertiary, 背景色 */
+    --foreground: #bfc0d1; /* secondary, 文字色 */
+    --card: #31323e; /* sub, カード背景色 */
+    --card-foreground: #bfc0d1;
+    --popover: #31323e;
+    --popover-foreground: #bfc0d1;
+    --primary: #60519b; /* primary, 主要な色 */
+    --primary-foreground: #ffffff; /* primary, 白などコントラストが強い色 */
+    --secondary: #bfc0d1; /* secondary */
+    --secondary-foreground: #1e202c; /* tertiary, 背景色 */
+    --muted: #31323e; /* sub, 控えめな背景色 */
+    --muted-foreground: #bfc0d1; /* secondary, 控えめな文字色 */
+    --accent: #31323e;
+    --accent-foreground: #bfc0d1;
+    --destructive: #dc2626; /* Tailwind Red 600 */
+    --destructive-foreground: #ffffff;
+    --border: #31323e; /* sub,  */
+    --input: #31323e; /* sub,  */
+    --ring: #60519b; /* primary, フォーカス時の色 */
+    --chart-1: #60519b; /* 例: 主要な色をチャートに */
+    --chart-2: #31323e; /* 例: 控えめな色をチャートに */
+    --chart-3: #bfc0d1;
+    --chart-4: #ffffff;
+    --chart-5: #1e202c;
+    --radius: 0.5rem;
   }
+
   .dark {
-
-    --background: 222.2 84% 4.9%;
-
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-
-    --input: 217.2 32.6% 17.5%;
-
-    --ring: 212.7 26.8% 83.9%;
-
-    --chart-1: 220 70% 50%;
-
-    --chart-2: 160 60% 45%;
-
-    --chart-3: 30 80% 55%;
-
-    --chart-4: 280 65% 60%;
-
-    --chart-5: 340 75% 55%
-  }
-}
-
-
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
+    /* ダークモード (必要に応じて調整) */
+    --background: #0d1117; /* 例: より暗い背景色 */
+    --foreground: #c6c6c6; /* 例: より明るい文字色 */
+    --card: #161b22; /* 例: より暗いカード背景色 */
+    --card-foreground: #c6c6c6;
+    --popover: #161b22;
+    --popover-foreground: #c6c6c6;
+    --primary: #a28bfa; /* 例: 紫色を少し明るく */
+    --primary-foreground: #0d1117;
+    --secondary: #b0b0b0;
+    --secondary-foreground: #0d1117;
+    --muted: #161b22;
+    --muted-foreground: #b0b0b0;
+    --accent: #161b22;
+    --accent-foreground: #b0b0b0;
+    --destructive: #f87171;
+    --destructive-foreground: #0d1117;
+    --border: #161b22;
+    --input: #161b22;
+    --ring: #a28bfa;
+    --chart-1: #a28bfa;
+    --chart-2: #161b22;
+    --chart-3: #b0b0b0;
+    --chart-4: #c6c6c6;
+    --chart-5: #0d1117;
   }
 }
