@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Home, Search, User } from "lucide-react";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 type HeaderViewProps = {
@@ -9,6 +10,8 @@ type HeaderViewProps = {
 };
 
 export function HeaderView({ onOpenPostModal }: HeaderViewProps) {
+  const { data: session } = useSession();
+
   return (
     <div className="fixed top-0 left-0 right-0 h-14 bg-background border-b border-secondary z-50">
       <div className="container mx-auto h-full flex items-center justify-between px-4">
@@ -33,8 +36,8 @@ export function HeaderView({ onOpenPostModal }: HeaderViewProps) {
             />
           </div>
           <Avatar className="h-8 w-8">
-            <AvatarImage src="/placeholder-user.jpg" />
-            <AvatarFallback className="text-foreground">ユ</AvatarFallback>
+            <AvatarImage src={session?.user.image ?? ""} />
+            <AvatarFallback className="text-foreground">{session?.user.displayName}</AvatarFallback>
           </Avatar>
           <Button className="bg-primary hover:bg-foreground" onClick={onOpenPostModal}>
             投稿する

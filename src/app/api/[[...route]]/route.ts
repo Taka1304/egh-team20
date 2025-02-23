@@ -9,5 +9,9 @@ const sampleRoute = app.route("/sample", sample)
 
 export type AppType = typeof sampleRoute
 
-export const GET = handle(app)
-export const POST = handle(app)
+const GET = handle(app)
+const POST = handle(app)
+const PUT = handle(app)
+const DELETE = handle(app)
+const PATCH = handle(app)
+export { GET, POST, PUT, DELETE, PATCH }
