@@ -1,7 +1,27 @@
 import { prisma } from "@/lib/prisma";
 import { Hono } from "hono";
+import { z } from "zod";
 
 const app = new Hono();
+
+const userScheme = z.object({
+  id: z.string().optional(),
+  email: z.string().optional(),
+  name: z.string().optional(),
+  profilePicture: z.string().optional(),
+  bio: z.string().optional(),
+  UserInterest: z.array(z.object({ interest: z.string() }).optional()),
+  goals: z.array(
+    z
+      .object({
+        id: z.string(),
+        isPublic: z.boolean(),
+        text: z.string(),
+      })
+      .optional(),
+  ),
+});
+
 app.get("/:id", async (c) => {
   const id = c.req.param("id");
   try {
