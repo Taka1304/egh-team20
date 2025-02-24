@@ -3,7 +3,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CheckCircle, Flame, Heart, X } from "lucide-react";
 
-type Tweet = {
+type Reply = {
+  id: number;
+  user: {
+    name: string;
+    handle: string;
+    avatar: string;
+  };
+  content: string;
+  createdAt: string;
+};
+
+type Report = {
   id: number;
   user: {
     name: string;
@@ -13,18 +24,18 @@ type Tweet = {
   content: string;
   createdAt: string;
   image?: string;
+  replies?: Reply[];
 };
 
-type TweetModalViewProps = {
-  tweet: Tweet;
+type ReportModalViewProps = {
+  report: Report;
   comment: string;
   setComment: (value: string) => void;
   onClose: () => void;
 };
 
-export function TweetModalView({ tweet, comment, setComment, onClose }: TweetModalViewProps) {
-  // 📌 日付を分割（例: "2024/02/23" → 年: 2024, 月: 2, 日: 23, 曜日: 金）
-  const dateObj = new Date(tweet.createdAt);
+export function ReportModalView({ report, comment, setComment, onClose }: ReportModalViewProps) {
+  const dateObj = new Date(report.createdAt);
   const year = dateObj.getFullYear();
   const month = dateObj.getMonth() + 1;
   const day = dateObj.getDate();
@@ -45,24 +56,20 @@ export function TweetModalView({ tweet, comment, setComment, onClose }: TweetMod
 
         {/* ユーザー情報 + 日付 */}
         <div className="flex items-center justify-between">
-          {/* ユーザー情報 */}
           <div className="flex items-center space-x-3">
             <Avatar className="h-12 w-12">
-              <AvatarImage src={tweet.user.avatar} alt={`${tweet.user.name}のアイコン`} />
-              <AvatarFallback className="bg-muted text-muted-foreground">{tweet.user.name.charAt(0)}</AvatarFallback>
+              <AvatarImage src={report.user.avatar} alt={`${report.user.name}のアイコン`} />
+              <AvatarFallback className="bg-muted text-muted-foreground">{report.user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-bold text-card-foreground">{tweet.user.name}</p>
-              <p className="text-sm text-muted-foreground">{tweet.user.handle}</p>
+              <p className="font-bold text-card-foreground">{report.user.name}</p>
+              <p className="text-sm text-muted-foreground">{report.user.handle}</p>
             </div>
           </div>
 
-          {/* 📌 日付表示をカスタマイズ */}
+          {/* 日付表示 */}
           <div className="flex flex-col items-end">
-            {/* 年（上・左寄せ） */}
             <p className="text-sm text-muted-foreground self-start">{year}</p>
-
-            {/* 月・日・曜日（横並び） */}
             <div className="flex items-center space-x-2">
               <p className="text-4xl font-bold text-card-foreground">
                 {month}.{day}
@@ -75,14 +82,13 @@ export function TweetModalView({ tweet, comment, setComment, onClose }: TweetMod
         </div>
 
         {/* 投稿内容 */}
-        <p className="mt-3 text-card-foreground break-words">{tweet.content}</p>
+        <p className="mt-3 text-card-foreground break-words">{report.content}</p>
 
         {/* 画像 */}
-        {tweet.image && <img src={tweet.image} alt="ツイート画像" className="mt-3 rounded-lg border border-border" />}
+        {report.image && <img src={report.image} alt="投稿画像" className="mt-3 rounded-lg border border-border" />}
 
         {/* アクションボタン */}
         <div className="mt-3 flex justify-between text-muted-foreground">
-          {/* ❤️🔥✅ リアクションボタン（右寄せ） */}
           <div className="flex space-x-4">
             <Button variant="ghost" size="icon" aria-label="いいね" className="hover:text-secondary">
               <Heart className="h-5 w-5" />
@@ -96,10 +102,34 @@ export function TweetModalView({ tweet, comment, setComment, onClose }: TweetMod
           </div>
         </div>
 
-        {/* 📌 追加: 区切り線 */}
-        <div className="border-t card-foreground mt-4 pt-4" />
+        {/* 📌 返信一覧 */}
+        {report.replies && report.replies.length > 0 && (
+          <>
+            <div className="border-t card-foreground mt-4 pt-4" />
+            <p className="text-sm text-muted-foreground font-semibold mb-2">返信</p>
+            <div className="space-y-3">
+              {report.replies.map((reply) => (
+                <div key={reply.id} className="flex items-start space-x-3 bg-muted p-3 rounded-md">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={reply.user.avatar} alt={`${reply.user.name}のアイコン`} />
+                    <AvatarFallback className="bg-muted text-muted-foreground">
+                      {reply.user.name.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-bold text-card-foreground">
+                      {reply.user.name} <span className="text-sm text-muted-foreground">{reply.user.handle}</span>
+                    </p>
+                    <p className="text-sm text-card-foreground">{reply.content}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
-        {/* コメント入力 */}
+        {/* 📌 コメント入力 */}
+        <div className="border-t card-foreground mt-4 pt-4" />
         <div className="p-3 bg-muted rounded-md flex items-center space-x-2">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/placeholder-user.jpg" />
@@ -107,7 +137,7 @@ export function TweetModalView({ tweet, comment, setComment, onClose }: TweetMod
           </Avatar>
           <Input
             type="text"
-            placeholder={`返信先 ${tweet.user.handle}`}
+            placeholder={`返信先 ${report.user.handle}`}
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className="flex-1 bg-input border-border text-foreground"

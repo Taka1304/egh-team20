@@ -1,12 +1,12 @@
 "use client";
-import { TweetModal } from "@/app/_features/Modal/TweetModal";
+import { ReportModal } from "@/app/_features/Modal/ReportModal";
 import { Header } from "@/app/_features/Navigate/Header/Header";
 
 export default function page() {
   return (
     <>
       <Header />
-      <TweetModal onClose={() => {}} />
+      <ReportModal onClose={() => {}} />
     </>
   );
 }
