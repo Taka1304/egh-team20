@@ -47,7 +47,11 @@ export default function TemplateDialogView({
           </div>
         </div>
         <div className="flex justify-end space-x-2 mt-4">
-          <Button variant="default" className="border bg-destructive hover:scale-95 duration-100" onClick={onClose}>
+          <Button
+            variant="default"
+            className=" text-black bg-inherit border hover:scale-95 duration-100"
+            onClick={onClose}
+          >
             キャンセル
           </Button>
           <Button className="hover:scale-95 duration-100" onClick={onSelectTemplate} disabled={!selectedTemplate}>
