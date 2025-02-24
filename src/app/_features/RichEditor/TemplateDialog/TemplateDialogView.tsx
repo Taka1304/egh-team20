@@ -1,8 +1,7 @@
 import { MARKDOWN_TEMPLATES } from "@/app/_features/RichEditor/constants";
 import { Button } from "@/components/ui/button";
-import { DialogHeader } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
 
 import type { TemplateType } from "@/app/_features/RichEditor/TemplateDialog/TemplateDialogContainer";
 import { TemplatePreview } from "@/app/_features/RichEditor/TemplateDialog/TemplatePreview/TemplatePreview";
