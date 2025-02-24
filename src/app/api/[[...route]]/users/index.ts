@@ -18,11 +18,7 @@ const app = new Hono().get("/:id", async (c) => {
         },
         UserInterest: {
           select: {
-            interest: {
-              select: {
-                name: true,
-              },
-            },
+            interest: true,
           },
         },
         _count: {
