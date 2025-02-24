@@ -8,42 +8,48 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+// ユーザーが設定できる公開範囲
 enum Visibility {
-  PUBLIC
-  FOLLOWERS
-  PRIVATE
+  PUBLIC // 全体公開
+  FOLLOWERS // フォロワーのみ
+  PRIVATE // 非公開
 }
 
+// 添付ファイルの種類
 enum AttachmentType {
-  IMAGE
-  VIDEO
+  IMAGE // 画像
+  VIDEO // 動画
 }
 
+// コミュニティ内のメンバーの役割
 enum Role {
-  ADMIN
-  MEMBER
+  ADMIN // 管理者
+  MEMBER // 一般メンバー
 }
 
+// マッチングのステータス
 enum MatchStatus {
-  PENDING
-  ACCEPTED
-  REJECTED
+  PENDING // 保留中
+  ACCEPTED // 承認済み
+  REJECTED // 拒否済み
 }
 
+// マッチングの種類
 enum MatchType {
-  WALL
-  ONE_ON_ONE
+  WALL // 壁打ち
+  ONE_ON_ONE // 1on1
 }
 
+// ユーザー情報を管理
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  displayName   String?
-  bio           String?
-  isPrivate     Boolean   @default(false)
+  id            String    @id @default(cuid()) // ユーザーID
+  name          String? // ユーザーの本名（任意）
+  email         String    @unique // ユーザーのメールアドレス（ユニーク）
+  emailVerified DateTime? // メールアドレスの確認日時
+  image         String? // プロフィール画像のURL
+  displayName   String? // 表示名
+  bio           String? // 自己紹介文
+  isPrivate     Boolean   @default(false) // 公開/非公開フラグ
 
   accounts         Account[]
   sessions         Session[]
@@ -122,29 +128,32 @@ model Authenticator {
   @@id([userId, credentialID])
 }
 
+// ユーザーの興味情報
 model Interest {
-  id           String         @id @default(cuid())
-  name         String         @unique
+  id           String         @id @default(cuid()) // 興味ID
+  name         String         @unique // 興味名
   UserInterest UserInterest[]
 }
 
+// ユーザーと興味の関係（多対多）
 model UserInterest {
   userId     String
   interestId String
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   interest   Interest @relation(fields: [interestId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 
   @@id([userId, interestId])
 }
 
+// ユーザーが設定する目標
 model Goal {
-  id       String  @id @default(cuid())
-  userId   String
-  text     String
-  isPublic Boolean @default(true)
+  id       String  @id @default(cuid()) // 目標ID
+  userId   String // ユーザーID
+  text     String // 目標のテキスト
+  isPublic Boolean @default(true) // 公開/非公開フラグ
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt   DateTime      @default(now())
@@ -152,26 +161,28 @@ model Goal {
   DailyReport DailyReport[]
 }
 
+// 日報のフォーマット（テンプレート）
 model ReportFormat {
   id          String  @id @default(cuid())
-  name        String
-  description String?
-  isDefault   Boolean @default(false)
+  name        String // フォーマット名
+  description String? // 説明
+  isDefault   Boolean @default(false) // デフォルトフラグ
 
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   DailyReport DailyReport[]
 }
 
+// ユーザーが作成する日報
 model DailyReport {
-  id            String       @id @default(cuid())
-  userId        String
-  goalId        String?
-  formatId      String
-  text          String
-  visibility    Visibility
-  learningTime  Int
-  pomodoroCount Int
+  id            String       @id @default(cuid()) // 日報ID
+  userId        String // ユーザーID
+  goalId        String? // 目標ID（任意）
+  formatId      String // フォーマットID
+  text          String // 日報本文
+  visibility    Visibility // 公開状態（PUBLIC, FOLLOWERS, PRIVATE）
+  learningTime  Int // 学習時間（分）
+  pomodoroCount Int // ポモドーロ回数
   user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   goal          Goal?        @relation(fields: [goalId], references: [id], onDelete: SetNull)
   format        ReportFormat @relation(fields: [formatId], references: [id], onDelete: Cascade)
@@ -179,70 +190,76 @@ model DailyReport {
   reactions     Reaction[]
   aiFeedbacks   AIFeedback[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// 日報に添付されるファイル情報
 model Attachment {
-  id       String         @id @default(cuid())
-  reportId String
-  url      String
-  type     AttachmentType
+  id       String         @id @default(cuid()) // 添付ID
+  reportId String // 日報ID (FK)
+  url      String // 添付ファイルのURL
+  type     AttachmentType // 添付の種類（画像/動画）
   report   DailyReport    @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// リアクションの種類
 model ReactionType {
-  id       String     @id @default(cuid())
-  name     String     @unique
+  id       String     @id @default(cuid()) // リアクションの種類ID
+  name     String     @unique // リアクションの種類名
   Reaction Reaction[]
 }
 
+// ユーザーが日報に対して行うリアクション
 model Reaction {
-  id       String       @id @default(cuid())
-  typeId   String
-  userId   String
-  reportId String
+  id       String       @id @default(cuid()) // リアクションID
+  typeId   String // リアクションの種類ID (FK)
+  userId   String // ユーザーID (FK)
+  reportId String // 日報ID (FK)
   type     ReactionType @relation(fields: [typeId], references: [id], onDelete: Cascade)
   user     User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   report   DailyReport  @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// ユーザー間のフォロー関係を管理
 model Follow {
-  followerId  String
-  followingId String
+  followerId  String // フォロワーのID (FK)
+  followingId String // フォロー対象のユーザーID (FK)
   follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
   following   User   @relation("FollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 
   @@id([followerId, followingId])
 }
 
+// コミュニティ情報を管理
 model Community {
-  id             String            @id @default(cuid())
-  name           String
-  description    String?
-  isPublic       Boolean           @default(true)
-  allowAnonymous Boolean           @default(false)
+  id             String            @id @default(cuid()) // コミュニティID
+  name           String // コミュニティ名
+  description    String? // 説明文
+  isPublic       Boolean           @default(true) // 公開/非公開設定
+  allowAnonymous Boolean           @default(false) // 匿名投稿を許可するか
   members        CommunityMember[]
   threads        Thread[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// コミュニティのメンバー情報を管理
 model CommunityMember {
-  communityId String
-  userId      String
-  role        Role
-  joinedAt    DateTime @default(now())
+  communityId String // コミュニティID (FK)
+  userId      String // ユーザーID (FK)
+  role        Role // メンバーの役割（管理者/メンバー）
+  joinedAt    DateTime @default(now()) // 参加日時
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -250,110 +267,120 @@ model CommunityMember {
   @@id([communityId, userId])
 }
 
+// コミュニティ内のスレッド（ディスカッション）
 model Thread {
-  id          String    @id @default(cuid())
-  communityId String
-  title       String
-  content     String
-  isAnonymous Boolean   @default(false)
-  authorId    String
+  id          String    @id @default(cuid()) // スレッドID
+  communityId String // コミュニティID (FK)
+  title       String // スレッドタイトル
+  content     String // スレッド本文
+  isAnonymous Boolean   @default(false) // 匿名投稿フラグ
+  authorId    String // 投稿者ID (FK)
   comments    Comment[]
 
   community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
   author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// スレッドへのコメントを管理
 model Comment {
-  id          String  @id @default(cuid())
-  threadId    String
-  authorId    String
-  text        String
-  isAnonymous Boolean @default(false)
+  id          String  @id @default(cuid()) // コメントID
+  threadId    String // スレッドID (FK)
+  authorId    String // 投稿者のユーザーID (FK)
+  text        String // コメント内容
+  isAnonymous Boolean @default(false) // 匿名フラグ
 
   thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
   author User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// ユーザー間のマッチング情報を管理
 model Match {
-  id          String      @id @default(cuid())
-  requestId   String
-  responderId String
-  status      MatchStatus @default(PENDING)
-  matchType   MatchType
+  id          String      @id @default(cuid()) // マッチID
+  requestId   String // リクエスト送信者のユーザーID (FK)
+  responderId String // リクエスト受信者のユーザーID (FK)
+  status      MatchStatus @default(PENDING) // マッチの状態（保留/承認/拒否）
+  matchType   MatchType // マッチの種類（壁打ち/1on1）
 
   requestUser   User @relation("MatchesSent", fields: [requestId], references: [id], onDelete: Cascade)
   responderUser User @relation("MatchesReceived", fields: [responderId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 
   @@unique([requestId, responderId])
 }
 
+// ポモドーロセッションの記録を管理
 model PomodoroSession {
-  id        String   @id @default(cuid())
-  userId    String
-  startTime DateTime
-  endTime   DateTime
-  duration  Int
+  id        String   @id @default(cuid()) // ポモドーロセッションID
+  userId    String // ユーザーID (FK)
+  startTime DateTime // セッション開始時間
+  endTime   DateTime // セッション終了時間
+  duration  Int // セッション時間（秒）
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// 学習貢献データを管理
 model LearningContribution {
-  id            String   @id @default(cuid())
-  userId        String
-  activityDate  DateTime
-  pomodoroCount Int
+  id            String   @id @default(cuid()) // 学習貢献ID
+  userId        String // ユーザーID (FK)
+  activityDate  DateTime // 学習活動日
+  pomodoroCount Int // その日のポモドーロ回数
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// AIによるフィードバック情報を管理
 model AIFeedback {
-  id           String @id @default(cuid())
-  reportId     String
-  sentiment    String
-  feedbackText String
+  id           String @id @default(cuid()) // AIフィードバックID
+  reportId     String // 日報ID (FK)
+  sentiment    String // 感情分析結果
+  feedbackText String // フィードバックの内容
 
   report DailyReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// ユーザーが未来に向けて送るメッセージを管理
 model FutureMessage {
-  id          String   @id @default(cuid())
-  userId      String
-  text        String
-  deliverDate DateTime
-  isDelivered Boolean  @default(false)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid()) // メッセージID
+  userId      String // ユーザーID (FK)
+  text        String // メッセージ内容
+  deliverDate DateTime // 送信予定日時
+  isDelivered Boolean  @default(false) // 配信済みフラグ
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
 
+// ユーザーへの通知情報を管理
 model Notification {
-  id           String  @id @default(cuid())
-  userId       String
-  sourceUserId String
-  type         String
-  message      String
-  isRead       Boolean @default(false)
-  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String  @id @default(cuid()) // 通知ID
+  userId       String // 受信者ユーザーID (FK)
+  sourceUserId String // 通知元ユーザーID (FK)
+  type         String // 通知タイプ
+  message      String // 通知メッセージ
+  isRead       Boolean @default(false) // 既読/未読フラグ
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
 }
