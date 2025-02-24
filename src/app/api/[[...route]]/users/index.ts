@@ -9,6 +9,11 @@ const app = new Hono().get("/:id", async (c) => {
         id: id,
       },
       include: {
+        goals: {
+          select: {
+            text: true,
+          },
+        },
         _count: {
           select: {
             following: true,
