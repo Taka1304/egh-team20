@@ -8,6 +8,14 @@ const app = new Hono().get("/:id", async (c) => {
       where: {
         id: id,
       },
+      include: {
+        _count: {
+          select: {
+            following: true,
+            followedBy: true,
+          },
+        },
+      },
     });
 
     if (!data) {
