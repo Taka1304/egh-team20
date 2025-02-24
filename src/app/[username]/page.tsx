@@ -43,10 +43,6 @@ export default function page() {
     longestStreak: 5,
   };
 
-  if (!user) {
-    notFound();
-  }
-
   return (
     <>
       <div className="container mx-auto px-4 py-8">
