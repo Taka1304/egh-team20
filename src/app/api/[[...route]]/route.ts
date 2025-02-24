@@ -1,19 +1,20 @@
-import users from "@/app/api/[[...route]]/users";
+
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
+import users from "./users";
 import sample from "./sample";
+import assets from "./assets";
 
 export const runtime = "nodejs";
 
 const app = new Hono().basePath("/api");
 const sampleRoute = app.route("/sample", sample);
+
 const usersRoute = app.route("/users", users);
+const assetsRoute = app.route("/assets", assets);
 
-export type AppType = typeof sampleRoute | typeof usersRoute;
+export type AppType = typeof sampleRoute | typeof assetsRoute | typeof usersRoute;
 
-const GET = handle(app);
-const POST = handle(app);
-const PUT = handle(app);
-const DELETE = handle(app);
-const PATCH = handle(app);
-export { GET, POST, PUT, DELETE, PATCH };
+const handlers = handle(app);
+
+export { handlers as GET, handlers as POST, handlers as PUT, handlers as DELETE, handlers as PATCH };
