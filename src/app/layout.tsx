@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { Providers } from "@/app/providers";
 
 const notoSans = localFont({
   src: "./fonts/NotoSansJP-Medium.ttf",
@@ -20,7 +21,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSans.variable} antialiased`}>{children}</body>
+      <body className={`${notoSans.variable} antialiased`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

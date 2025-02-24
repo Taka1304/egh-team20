@@ -11,6 +11,8 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: z.string(),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
+    SUPABASE_URL: z.string().url(),
+    SUPABASE_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -25,5 +27,7 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_KEY: process.env.SUPABASE_KEY,
   },
 });
