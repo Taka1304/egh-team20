@@ -23,16 +23,19 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.email = user.email;
         token.id = user.id;
+        token.email = user.email;
         token.displayName = user.displayName || "";
+        token.isPrivate = user.isPrivate || false;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user.id = token.id;
+        session.user.email = token.email;
         session.user.displayName = token.displayName;
+        session.user.isPrivate = token.isPrivate;
       }
       return session;
     },
