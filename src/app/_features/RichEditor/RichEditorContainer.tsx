@@ -6,10 +6,10 @@ import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { RichEditorView } from "./RichEditorView";
 
-export interface RichEditorContainerProps {
+export type RichEditorContainerProps = {
   onChange: (content: string) => void;
   initialContent?: string;
-}
+};
 
 export default function RichEditorContainer({ onChange, initialContent }: RichEditorContainerProps) {
   const editor = useEditor({
