@@ -11,6 +11,8 @@ const app = new Hono().get("/:id", async (c) => {
       include: {
         goals: {
           select: {
+            id: true,
+            isPublic: true,
             text: true,
           },
         },
