@@ -77,7 +77,5 @@ app.patch("/:id", zValidator("json", userScheme), async (c) => {
     console.error("Error updating user:", error);
     return c.text(error as string);
   }
-
-  // return c.json({ message: 'User updated', user: users[userIndex] })
 });
 export default app;
