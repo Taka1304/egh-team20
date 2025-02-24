@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Header } from "@/app/_features/Navigate/Header/Header";
 
 // ダミーデータ（APIから取得する想定）
 const reports = [
@@ -85,36 +86,41 @@ export default function page() {
   };
 
   return (
-    <div className="container mx-auto px-4 h-screen flex py-8">
+    <div className="container mx-auto px-4 h-screen flex py-8 mt-10">
+      <Header />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full h-full">
         {/* 左側のプロフィール情報（スクロール可 / スクロールバー非表示） */}
-        <div className="md:col-span-1 space-y-2 h-full overflow-y-auto hidden-scrollbar">
+        <div className="md:col-span-1 space-y-1 h-full overflow-y-auto hidden-scrollbar">
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center">
-                <Avatar className="w-24 h-24">
-                  <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
-                  <AvatarFallback>{user.displayName}</AvatarFallback>
-                </Avatar>
-                <div className="mt-4 flex flex-row items-center space-x-2">
-                  <div className="mt-4 items-center space-x-2">
-                    <h1 className="mt-4 text-2xl font-bold">{user.displayName}</h1>
-                    <p className="text-muted-foreground">@{user.username}</p>
+                <div className="flex gap-4">
+                  <div>
+                    <Avatar className="w-24 h-24">
+                      <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
+                      <AvatarFallback>{user.displayName}</AvatarFallback>
+                    </Avatar>
+                    <div className="mt-4 items-center space-x-2">
+                      <h1 className="mt-4 text-2xl font-bold">{user.displayName}</h1>
+                      <p className="text-muted-foreground">@{user.username}</p>
+                    </div>
                   </div>
-                  <div className="mt-4 flex space-x-4">
-                    <div className="text-center">
-                      <p className="font-semibold">{user.followersCount}</p>
-                      <p className="text-sm text-muted-foreground">フォロワー</p>
+                  <div className="flex flex-col justify-end gap-4">
+                    <div className="mt-4 flex space-x-4">
+                      <div className="text-center">
+                        <p className="font-semibold text-xl">{user.followersCount}</p>
+                        <p className="text-sm text-muted-foreground">フォロワー</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-semibold text-xl">{user.followingCount}</p>
+                        <p className="text-sm text-muted-foreground">フォロー中</p>
+                      </div>
                     </div>
-                    <div className="text-center">
-                      <p className="font-semibold">{user.followingCount}</p>
-                      <p className="text-sm text-muted-foreground">フォロー中</p>
-                    </div>
+                    <Button className="mt-4" variant="outline">
+                      プロフィールを編集
+                    </Button>
                   </div>
                 </div>
-                <Button className="mt-4" variant="outline">
-                  プロフィールを編集
-                </Button>
               </div>
             </CardContent>
           </Card>
