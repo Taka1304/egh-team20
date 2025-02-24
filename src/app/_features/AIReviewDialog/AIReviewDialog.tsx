@@ -30,14 +30,14 @@ export function AIReviewDialog({ open, onOpenChange, result }: AIReviewDialogPro
           <div className="absolute inset-0 opacity-0" />
 
           {/* Content */}
-          <div className="relative bg-black/90 p-8 mx-auto mt-20 max-w-3xl border-2 border-white transform -rotate-1">
-            <Button variant="ghost" className="absolute right-2 top-2 text-white hover:bg-white/20">
+          <div className="relative bg-background p-8 mx-auto mt-20 max-w-3xl border-2 border-white transform -rotate-1">
+            <Button variant="ghost" className="absolute right-2 top-2 text-primary-foreground hover:bg-white/20">
               <X className="w-4 h-4" />
             </Button>
 
             {/* Title */}
             <div className="relative mb-6">
-              <div className="absolute -top-12 left-0 w-48 h-12 bg-red-600 transform -rotate-3">
+              <div className="absolute -top-12 left-0 w-48 h-12 bg-primary transform -rotate-3">
                 <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-white">
                   AI添削結果
                 </div>
@@ -45,22 +45,22 @@ export function AIReviewDialog({ open, onOpenChange, result }: AIReviewDialogPro
             </div>
 
             {/* Review Content */}
-            <div className="text-white space-y-6">
+            <div className="space-y-6 text-primary-foreground">
               <div className="loading-section">
                 {result ? (
                   <>
-                    <p className="text-xl mb-4">あなたの日報を分析した結果をお伝えします。</p>
+                    <p className="text-xl mb-4 text-ellipsis">あなたの日報を分析した結果をお伝えします。</p>
                     <div className="space-y-4">
                       <div>
-                        <h3 className="text-red-500 font-bold mb-2">構成評価</h3>
+                        <h3 className="text-primary font-bold mb-2">構成評価</h3>
                         <p>{result.analysisSections.configuration}</p>
                       </div>
                       <div>
-                        <h3 className="text-red-500 font-bold mb-2">内容の充実度</h3>
+                        <h3 className="text-primary font-bold mb-2">内容の充実度</h3>
                         <p>{result.analysisSections.fulfilling}</p>
                       </div>
                       <div>
-                        <h3 className="text-red-500 font-bold mb-2">改善のヒント</h3>
+                        <h3 className="text-primary font-bold mb-2">改善のヒント</h3>
                         <ul className="list-disc list-inside space-y-2">
                           {result.analysisSections.comprehensive.map((hint) => (
                             <li key={hint}>{hint}</li>
@@ -68,10 +68,10 @@ export function AIReviewDialog({ open, onOpenChange, result }: AIReviewDialogPro
                         </ul>
                       </div>
                       <div>
-                        <h3 className="text-red-500 font-bold mb-2">総合評価</h3>
+                        <h3 className="text-primary font-bold mb-2">総合評価</h3>
                         <div className="flex items-center space-x-2">
                           <span className="text-2xl font-bold">{result.score}</span>
-                          <span className="text-sm text-gray-400">/ 10.0</span>
+                          <span className="text-sm text-muted-foreground">/ 10.0</span>
                         </div>
                         <p className="mt-2">{result.comment}</p>
                       </div>
@@ -79,7 +79,7 @@ export function AIReviewDialog({ open, onOpenChange, result }: AIReviewDialogPro
                   </>
                 ) : (
                   <div className="flex items-center justify-center h-40">
-                    <Loader2 className="h-8 w-8 animate-spin text-white" />
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 )}
               </div>
