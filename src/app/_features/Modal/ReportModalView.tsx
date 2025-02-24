@@ -1,3 +1,4 @@
+import { ReportDate } from "@/components/ui/ReportDate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,13 +36,6 @@ type ReportModalViewProps = {
 };
 
 export function ReportModalView({ report, comment, setComment, onClose }: ReportModalViewProps) {
-  const dateObj = new Date(report.createdAt);
-  const year = dateObj.getFullYear();
-  const month = dateObj.getMonth() + 1;
-  const day = dateObj.getDate();
-  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  const weekday = weekdays[dateObj.getDay()];
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-card p-6 rounded-lg shadow-lg w-[600px] max-w-full text-card-foreground relative">
@@ -67,18 +61,8 @@ export function ReportModalView({ report, comment, setComment, onClose }: Report
             </div>
           </div>
 
-          {/* 日付表示 */}
-          <div className="flex flex-col items-end">
-            <p className="text-sm text-muted-foreground self-start">{year}</p>
-            <div className="flex items-center space-x-2">
-              <p className="text-4xl font-bold text-card-foreground">
-                {month}.{day}
-              </p>
-              <div className="border border-card-foreground rounded-md px-2 py-0.5 text-sm text-card-foreground">
-                {weekday}
-              </div>
-            </div>
-          </div>
+          {/* ✅ ここを ReportDate に置き換え */}
+          <ReportDate createdAt={report.createdAt} />
         </div>
 
         {/* 投稿内容 */}
