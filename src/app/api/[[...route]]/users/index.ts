@@ -1,7 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { Hono } from "hono";
 
-const app = new Hono().get("/:id", async (c) => {
+const app = new Hono();
+app.get("/:id", async (c) => {
   const id = c.req.param("id");
   try {
     const data = await prisma.user.findUnique({
