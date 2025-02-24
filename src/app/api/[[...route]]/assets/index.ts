@@ -1,9 +1,9 @@
 import { authOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { zValidator } from "@hono/zod-validator";
-import dayjs from "dayjs";
 import { Hono } from "hono";
 import { getServerSession } from "next-auth";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 const app = new Hono();
@@ -29,7 +29,7 @@ app.post(
         return c.json({ error: "ファイルがありません" }, 400);
       }
 
-      const fileName = `${session.user.id}/${dayjs().format("YYYYMMDD")}-${file.name}`;
+      const fileName = `${session.user.id}/${randomUUID()}`;
 
       // Supabase にアップロード
       const { error } = await supabase.storage.from(type).upload(fileName, file, {
