@@ -4,7 +4,7 @@ type UserStatsProps = {
   user: {
     totalLearningDays: number;
     totalLearningTime: number;
-    averageLearningTime: number;
+    averageLearningTimePerDay: number;
     longestStreak: number;
   };
 };
