@@ -8,19 +8,19 @@ import { EditorContent } from "@tiptap/react";
 import { Bold, FileText, Heading2, ImageIcon, Italic, List, ListOrdered, Minus, Quote, Redo, Undo } from "lucide-react";
 import { useState } from "react";
 
-export interface MarkdownTemplate {
+export type MarkdownTemplate = {
   label: string;
   template: string;
-}
+};
 
-export interface RichEditorViewProps {
+export type RichEditorViewProps = {
   editor: Editor;
   addImage: () => void;
   insertTemplate: (template: string) => void;
   markdownTemplates: MarkdownTemplate[];
-}
+};
 
-export function RichEditorView({ editor, addImage, insertTemplate, markdownTemplates }: RichEditorViewProps) {
+export function RichEditorView({ editor, addImage }: RichEditorViewProps) {
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const handleSelectTemplate = (content: string) => {
     editor.commands.setContent(content);
