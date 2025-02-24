@@ -21,19 +21,27 @@ const app = new Hono().get("/:id", async (c) => {
             interest: true,
           },
         },
-        _count: {
-          select: {
-            following: true,
-            followedBy: true,
-          },
-        },
       },
+    });
+
+    const followerCount = await prisma.follow.count({
+      where: { followerId: id },
+    });
+    const followingCount = await prisma.follow.count({
+      where: { followingId: id },
     });
 
     if (!data) {
       return c.json({ message: "user not found" }, 404);
     }
-    return c.json(data);
+
+    const formattedData = {
+      ...data,
+      followerCount: followerCount,
+      followingCount: followingCount,
+    };
+
+    return c.json(formattedData);
   } catch (error) {
     console.error("Error fetching user:", error);
     return c.text(error as string);
