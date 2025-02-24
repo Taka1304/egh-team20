@@ -1,28 +1,18 @@
 import { prisma } from "@/lib/prisma";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 
 const app = new Hono();
 
 const userScheme = z.object({
-  id: z.string().optional(),
   name: z.string().optional(),
-  email: z.string().optional(),
-  emailVerified: z.string().optional(),
+  email: z.string(),
+  emailVerified: z.date().optional(),
   image: z.string().optional(),
   displayName: z.string().optional(),
   bio: z.string().optional(),
   isPrivate: z.boolean().optional(),
-  UserInterest: z.array(z.object({ interest: z.string() }).optional()),
-  goals: z.array(
-    z
-      .object({
-        id: z.string(),
-        isPublic: z.boolean(),
-        text: z.string(),
-      })
-      .optional(),
-  ),
 });
 
 app.get("/:id", async (c) => {
@@ -70,5 +60,23 @@ app.get("/:id", async (c) => {
     console.error("Error fetching user:", error);
     return c.text(error as string);
   }
+});
+
+app.patch("/:id", zValidator("json", userScheme), async (c) => {
+  const id = c.req.param("id");
+  const body = c.req.valid("json");
+
+  try {
+    const user = await prisma.user.upsert({
+      where: { id: id },
+      update: { ...body, updatedAt: new Date() },
+      create: { ...body, id: id, createdAt: new Date(), updatedAt: new Date() },
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return c.text(error as string);
+  }
+  return c.json({ message: "User updated", date: new Date() });
+  // return c.json({ message: 'User updated', user: users[userIndex] })
 });
 export default app;
