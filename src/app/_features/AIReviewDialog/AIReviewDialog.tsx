@@ -31,7 +31,11 @@ export function AIReviewDialog({ open, onOpenChange, result }: AIReviewDialogPro
 
           {/* Content */}
           <div className="relative bg-background p-8 mx-auto mt-20 max-w-3xl border-2 border-white transform -rotate-1">
-            <Button variant="ghost" className="absolute right-2 top-2 text-primary-foreground hover:bg-white/20">
+            <Button
+              variant="ghost"
+              onClick={() => onOpenChange(false)}
+              className="absolute right-2 top-2 text-primary-foreground"
+            >
               <X className="w-4 h-4" />
             </Button>
 
