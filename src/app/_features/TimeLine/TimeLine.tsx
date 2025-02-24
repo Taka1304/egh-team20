@@ -2,7 +2,7 @@
 
 import { TimelineView } from "@/app/_features/TimeLine/TimeLineView";
 
-type Tweet = {
+type Report = {
   id: number;
   user: {
     name: string;
@@ -16,7 +16,7 @@ type Tweet = {
 };
 
 // ダミーデータ（APIから取得する想定）
-const tweets: Tweet[] = [
+const reports: Report[] = [
   {
     id: 1,
     user: {
@@ -42,5 +42,5 @@ const tweets: Tweet[] = [
 ];
 
 export function Timeline() {
-  return <TimelineView tweets={tweets} />;
+  return <TimelineView reports={reports} />;
 }

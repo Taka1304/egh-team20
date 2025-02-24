@@ -1,3 +1,4 @@
+import { ReportDate } from "@/components/ui/ReportDate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { CheckCircle, Flame, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
-type Tweet = {
+type Report = {
   id: number;
   user: {
     name: string;
@@ -19,34 +20,26 @@ type Tweet = {
 };
 
 type TimelineViewProps = {
-  tweets: Tweet[];
+  reports: Report[];
 };
 
-export function TimelineView({ tweets }: TimelineViewProps) {
+export function TimelineView({ reports }: TimelineViewProps) {
   return (
     <div className="max-w-2xl mx-auto mt-16 p-4">
-      {tweets.map((tweet) => (
-        <TweetCard key={tweet.id} tweet={tweet} />
+      {reports.map((report) => (
+        <ReportCard key={report.id} report={report} />
       ))}
     </div>
   );
 }
 
 // 📌 個別のツイートを描画するコンポーネント
-function TweetCard({ tweet }: { tweet: Tweet }) {
+function ReportCard({ report }: { report: Report }) {
   const [showFullContent, setShowFullContent] = useState(false);
 
   const maxLength = 200;
-  const isLongContent = tweet.content.length > maxLength;
-  const displayedContent = showFullContent ? tweet.content : `${tweet.content.slice(0, maxLength)}...`;
-
-  // 📌 日付を分割（例: "2024/02/23" → 年: 2024, 月: 2, 日: 23, 曜日: 金）
-  const dateObj = new Date(tweet.createdAt);
-  const year = dateObj.getFullYear();
-  const month = dateObj.getMonth() + 1;
-  const day = dateObj.getDate();
-  const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-  const weekday = weekdays[dateObj.getDay()];
+  const isLongContent = report.content.length > maxLength;
+  const displayedContent = showFullContent ? report.content : `${report.content.slice(0, maxLength)}...`;
 
   return (
     <Card className="p-4 mb-4 border border-border w-full bg-card text-card-foreground rounded-[var(--radius)]">
@@ -55,30 +48,17 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
         {/* ユーザー情報 */}
         <div className="flex items-center space-x-3">
           <Avatar className="h-10 w-10">
-            <AvatarImage src={tweet.user.avatar} alt={`${tweet.user.name}のアイコン`} />
-            <AvatarFallback className="bg-muted text-muted-foreground">{tweet.user.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={report.user.avatar} alt={`${report.user.name}のアイコン`} />
+            <AvatarFallback className="bg-muted text-muted-foreground">{report.user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-bold text-card-foreground">{tweet.user.name}</p>
-            <p className="text-sm text-muted-foreground">{tweet.user.handle}</p>
+            <p className="font-bold text-card-foreground">{report.user.name}</p>
+            <p className="text-sm text-muted-foreground">{report.user.handle}</p>
           </div>
         </div>
 
-        {/* 📌 日付表示をカスタマイズ */}
-        <div className="flex flex-col items-end">
-          {/* 年（上・左寄せ） */}
-          <p className="text-sm text-muted-foreground self-start">{year}</p>
-
-          {/* 月・日・曜日（横並び） */}
-          <div className="flex items-center space-x-2">
-            <p className="text-4xl font-bold text-card-foreground">
-              {month}.{day}
-            </p>
-            <div className="border border-card-foreground rounded-md px-2 py-0.5 text-sm text-card-foreground">
-              {weekday}
-            </div>
-          </div>
-        </div>
+        {/* 📌 ReportDate コンポーネントを使う */}
+        <ReportDate createdAt={report.createdAt} />
       </div>
 
       {/* 📌 投稿内容 */}
@@ -95,18 +75,16 @@ function TweetCard({ tweet }: { tweet: Tweet }) {
         </button>
       )}
 
-      {/* 画像 */}
-      {tweet.image && <img src={tweet.image} alt={tweet.content} className="mt-2 rounded-lg border border-border" />}
+      {report.image && <img src={report.image} alt={report.content} className="mt-2 rounded-lg border border-border" />}
 
-      {/* リンク */}
-      {tweet.link && (
+      {report.link && (
         <Link
-          href={tweet.link}
+          href={report.link}
           className="text-primary hover:text-primary-foreground mt-2 block"
           target="_blank"
           rel="noopener noreferrer"
         >
-          {tweet.link}
+          {report.link}
         </Link>
       )}
 
