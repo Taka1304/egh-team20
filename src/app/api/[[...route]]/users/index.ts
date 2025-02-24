@@ -6,10 +6,13 @@ const app = new Hono();
 
 const userScheme = z.object({
   id: z.string().optional(),
-  email: z.string().optional(),
   name: z.string().optional(),
-  profilePicture: z.string().optional(),
+  email: z.string().optional(),
+  emailVerified: z.string().optional(),
+  image: z.string().optional(),
+  displayName: z.string().optional(),
   bio: z.string().optional(),
+  isPrivate: z.boolean().optional(),
   UserInterest: z.array(z.object({ interest: z.string() }).optional()),
   goals: z.array(
     z
