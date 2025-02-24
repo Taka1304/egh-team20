@@ -1,15 +1,12 @@
 "use client";
 
+import TemplateDialog from "@/app/_features/RichEditor/TemplateDialog/TemplateDialogContainer";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import type { Editor } from "@tiptap/react";
 import { EditorContent } from "@tiptap/react";
 import { Bold, FileText, Heading2, ImageIcon, Italic, List, ListOrdered, Minus, Quote, Redo, Undo } from "lucide-react";
+import { useState } from "react";
 
 export interface MarkdownTemplate {
   label: string;
@@ -24,6 +21,10 @@ export interface RichEditorViewProps {
 }
 
 export function RichEditorView({ editor, addImage, insertTemplate, markdownTemplates }: RichEditorViewProps) {
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
+  const handleSelectTemplate = (content: string) => {
+    editor.commands.setContent(content);
+  };
   // editor未生成の場合は早期return
   if (!editor) {
     return null;
@@ -87,18 +88,11 @@ export function RichEditorView({ editor, addImage, insertTemplate, markdownTempl
         </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" onClick={() => setIsTemplateDialogOpen(true)}>
               <FileText className="h-4 w-4 mr-2" />
               テンプレート
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {markdownTemplates.map((template) => (
-              <DropdownMenuItem key={template.label} onClick={() => insertTemplate(template.template)}>
-                {template.label}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
         </DropdownMenu>
         <div className="border-l mx-1" />
         <Button variant="ghost" size="sm" onClick={() => editor.chain().focus().undo().run()}>
@@ -111,6 +105,11 @@ export function RichEditorView({ editor, addImage, insertTemplate, markdownTempl
       <div className="p-4">
         <EditorContent editor={editor} />
       </div>
+      <TemplateDialog
+        isOpen={isTemplateDialogOpen}
+        onClose={() => setIsTemplateDialogOpen(false)}
+        onSelectTemplate={handleSelectTemplate}
+      />
     </div>
   );
 }
