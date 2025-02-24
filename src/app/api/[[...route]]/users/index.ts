@@ -72,7 +72,7 @@ app.patch("/:id", zValidator("json", userScheme), async (c) => {
       update: { ...body, updatedAt: new Date() },
       create: { ...body, id: id, createdAt: new Date(), updatedAt: new Date() },
     });
-    return c.json({ message: "User updated", date: new Date(), user: user });
+    return c.json({ message: "User updated", user: user });
   } catch (error) {
     console.error("Error updating user:", error);
     return c.text(error as string);
