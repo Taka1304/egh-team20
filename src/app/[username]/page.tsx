@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Header } from "@/app/_features/Navigate/Header/Header";
+import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
 
 // ダミーデータ（APIから取得する想定）
 const reports = [
@@ -158,6 +159,11 @@ export default function page() {
           <div className="w-full max-w-2xl">
             <TimelineView reports={reports} />
           </div>
+        </div>
+
+        {/* 右側の「おすすめの人」リスト */}
+        <div className="md:col-span-1 h-full overflow-y-auto hidden-scrollbar">
+          <RecommendedUsers />
         </div>
       </div>
     </div>
