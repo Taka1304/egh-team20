@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 type UserStatsProps = {
   user: {
     totalLearningDays: number;
-    totalLearningTimes: number;
+    totalLearningTime: number;
     averageLearningTime: number;
     longestStreak: number;
   };
@@ -23,11 +23,11 @@ export function UserStats({ user }: UserStatsProps) {
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">総活動時間</p>
-            <p className="text-2xl font-bold">{user.totalLearningTimes}時間</p>
+            <p className="text-2xl font-bold">{user.totalLearningTime}時間</p>
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">1日平均学習時間</p>
-            <p className="text-2xl font-bold">{user.averageLearningTime}分</p>
+            <p className="text-2xl font-bold">{user.averageLearningTimePerDay}時間</p>
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">最長連続隔週日数</p>
