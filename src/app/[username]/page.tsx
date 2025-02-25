@@ -124,18 +124,18 @@ export default function page() {
                 </div>
               </div>
             </CardContent>
-          </Card>
 
-          <Card>
+            <div className="border-t card-foreground mt-4 pt-4 mx-4" />
+            
             <CardHeader>
               <CardTitle>自己紹介</CardTitle>
             </CardHeader>
             <CardContent>
               <p>{user.bio}</p>
             </CardContent>
-          </Card>
 
-          <Card>
+            <div className="border-t card-foreground mt-4 pt-4 mx-4" />
+
             <CardHeader>
               <CardTitle>興味分野</CardTitle>
             </CardHeader>
