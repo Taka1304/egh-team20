@@ -67,10 +67,9 @@ app.patch("/:id", zValidator("json", userScheme), async (c) => {
   const body = c.req.valid("json");
 
   try {
-    const user = await prisma.user.upsert({
+    const user = await prisma.user.update({
       where: { id: id },
-      update: { ...body, updatedAt: new Date() },
-      create: { ...body, id: id, createdAt: new Date(), updatedAt: new Date() },
+      data: body,
     });
     return c.json({ message: "User updated", user: user });
   } catch (error) {
