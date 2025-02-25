@@ -1,19 +1,14 @@
+"use client";
+
+import MarkdownContent from "@/app/_features/MarkdownContent/MarkdownContent";
 import type { Report } from "@/app/types/reports";
 import { ReportDate } from "@/components/ui/ReportDate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { EditorContent, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { cn } from "@/lib/utils";
 import { CheckCircle, ChevronDown, Flame, Heart, MessageCircle } from "lucide-react";
-import { marked } from "marked";
-import { twMerge } from "tailwind-merge";
-import { Markdown } from "tiptap-markdown";
-
-type MarkDownContentProps = {
-  content: string;
-};
 
 type ReportCardViewProps = {
   report: Report;
@@ -23,18 +18,6 @@ type ReportCardViewProps = {
   isExpanded: boolean;
 };
 
-function MarkdownContent({ content }: MarkDownContentProps) {
-  const htmlContent = marked(content);
-  const editor = useEditor({
-    extensions: [StarterKit, Markdown],
-    content: htmlContent,
-    editable: false,
-  });
-
-  if (!editor) return null;
-  return <EditorContent editor={editor} />;
-}
-
 export function ReportCardView({
   report,
   displayedContent,
@@ -43,16 +26,21 @@ export function ReportCardView({
   isExpanded,
 }: ReportCardViewProps) {
   return (
-    <Card className="p-4 mb-4 border border-border w-full max-h-[250px] bg-card text-card-foreground rounded-[var(--radius)]">
+    <Card
+      className={cn(
+        "p-4 mb-4 border hover:border-primary/50 hover:bg-accent/50 transition-all cursor-pointer",
+        !isExpanded && "max-h-[400px]",
+      )}
+    >
       {/* ユーザー情報 + 投稿日 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-3">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-10 w-10 ring-2 ring-background">
             <AvatarImage src={report.user.avatar} alt={`${report.user.name}のアイコン`} />
-            <AvatarFallback className="bg-muted text-muted-foreground">{report.user.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback>{report.user.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-bold text-card-foreground">{report.user.name}</p>
+            <p className="font-bold">{report.user.name}</p>
             <p className="text-sm text-muted-foreground">{report.user.handle}</p>
           </div>
         </div>
@@ -60,23 +48,18 @@ export function ReportCardView({
       </div>
 
       {/* 投稿タイトル */}
-      {/* <div className="pt-3">
-        <h2 className="text-2xl font-bold">{report.title}</h2>
-      </div> */}
+      <div className="pt-3">
+        <h2 className="text-lg font-bold">{report.title}</h2>
+      </div>
 
       {/* 投稿内容 */}
       <div className="mt-2 relative">
-        <div
-          className={twMerge(
-            "prose-container transition-all duration-300 prose",
-            !isExpanded && "max-h-[120px] overflow-hidden",
-          )}
-        >
+        <div className={cn("transition-all duration-300", !isExpanded && "max-h-[160px] overflow-hidden")}>
           <MarkdownContent content={displayedContent} />
         </div>
 
         {shouldShowMoreButton && !isExpanded && (
-          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent flex items-end justify-center pb-2">
+          <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-background to-transparent flex items-end justify-center pb-2">
             <Button
               variant="ghost"
               size="sm"
@@ -95,7 +78,7 @@ export function ReportCardView({
 
       {/* タグ */}
       {report.tags && (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {report.tags.map((tag) => (
             <Badge key={tag} variant="secondary" className="text-xs">
               #{tag}
@@ -105,19 +88,23 @@ export function ReportCardView({
       )}
 
       {/* アクションボタン */}
-      <div className="mt-3 flex justify-between text-muted-foreground">
-        <Button variant="ghost" size="icon" aria-label="返信" className="hover:text-secondary">
-          <MessageCircle className="h-5 w-5" />
+      <div className="mt-4 flex justify-between items-center border-t pt-3">
+        <Button variant="ghost" size="sm" className="space-x-2">
+          <MessageCircle className="h-4 w-4" />
+          <span>{report.comments || 0}</span>
         </Button>
-        <div className="flex space-x-4">
-          <Button variant="ghost" size="icon" aria-label="いいね" className="hover:text-secondary">
-            <Heart className="h-5 w-5" />
+        <div className="flex space-x-2">
+          <Button variant="ghost" size="sm" className="space-x-2">
+            <Heart className="h-4 w-4" />
+            <span>{report.likes || 0}</span>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="がんばれ" className="hover:text-secondary">
-            <Flame className="h-5 w-5" />
+          <Button variant="ghost" size="sm" className="space-x-2">
+            <Flame className="h-4 w-4" />
+            <span>{report.flames || 0}</span>
           </Button>
-          <Button variant="ghost" size="icon" aria-label="参考になった" className="hover:text-secondary">
-            <CheckCircle className="h-5 w-5" />
+          <Button variant="ghost" size="sm" className="space-x-2">
+            <CheckCircle className="h-4 w-4" />
+            <span>{report.checks || 0}</span>
           </Button>
         </div>
       </div>

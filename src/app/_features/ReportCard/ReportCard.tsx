@@ -8,11 +8,9 @@ type ReportCardProps = {
 
 export function ReportCard({ report }: ReportCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
   const maxLength = 200;
   const isLongContent = report.text.length > maxLength;
   const displayedContent = showFullContent ? report.text : report.text;
-
   const handleShowMore = () => setShowFullContent(true);
 
   return (
@@ -22,9 +20,8 @@ export function ReportCard({ report }: ReportCardProps) {
         displayedContent={displayedContent}
         shouldShowMoreButton={isLongContent && !showFullContent}
         onShowMore={handleShowMore}
-        isExpanded
+        isExpanded={showFullContent}
       />
-      {/* <ReportDetailDialog report={report} open={isDetailOpen} onOpenChange={setIsDetailOpen} /> */}
     </>
   );
 }
