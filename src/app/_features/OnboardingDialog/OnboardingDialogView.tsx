@@ -3,14 +3,8 @@
 import { RecommendedUserCard } from "@/app/_features/RecommendedUsers/RecommendedUserCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import type { User } from "@prisma/client";
 import { X } from "lucide-react";
-
-type RecommendedUser = {
-  id: number;
-  name: string;
-  handle: string;
-  avatar: string;
-};
 
 type OnboardingDialogViewProps = {
   currentStep: number;
@@ -18,7 +12,8 @@ type OnboardingDialogViewProps = {
   setName: (value: string) => void;
   interests: string[];
   setInterests: (value: string[]) => void;
-  recommendedUsers: RecommendedUser[];
+  recommendedUsers: User[];
+  isLoading: boolean;
   onNext: () => void;
   onClose: () => void;
 };
@@ -30,6 +25,7 @@ export function OnboardingDialogView({
   interests,
   setInterests,
   recommendedUsers,
+  isLoading,
   onNext,
   onClose,
 }: OnboardingDialogViewProps) {
@@ -88,11 +84,15 @@ export function OnboardingDialogView({
           <>
             <h2 className="text-xl font-bold mb-2">簡単なアンケートにご協力ください（3/3）</h2>
             <p className="text-muted-foreground mb-4">おすすめのフォロワーを選択してください</p>
-            <div className="grid grid-cols-1 gap-2">
-              {recommendedUsers.map((user) => (
-                <RecommendedUserCard key={user.id} user={user} />
-              ))}
-            </div>
+            {isLoading ? (
+              <p>ローディング中...</p>
+            ) : (
+              <div className="grid grid-cols-1 gap-2">
+                {recommendedUsers.map((user) => (
+                  <RecommendedUserCard key={user.id} user={user} />
+                ))}
+              </div>
+            )}
           </>
         )}
 
