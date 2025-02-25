@@ -3,9 +3,9 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { X } from "lucide-react";
 import { useState } from "react";
+import { ProfileTextarea } from "./ProfileTextarea"; // ✅ 新コンポーネントをインポート
 
 type Profile = {
   name: string;
@@ -20,12 +20,12 @@ type Profile = {
   following: number;
 };
 
-type ProfileModalProps = {
+type ProfileDialogProps = {
   profile: Profile;
   onClose: () => void;
 };
 
-export function ProfileModal({ profile, onClose }: ProfileModalProps) {
+export function ProfileDialog({ profile, onClose }: ProfileDialogProps) {
   const [editedProfile, setEditedProfile] = useState(profile);
 
   return (
@@ -101,38 +101,27 @@ export function ProfileModal({ profile, onClose }: ProfileModalProps) {
           </div>
         </div>
 
-        {/* スキルセット */}
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">スキルセット</h3>
-          <Textarea
-            className="border border-foreground"
-            value={editedProfile.skills.join(", ")}
-            onChange={(e) => setEditedProfile({ ...editedProfile, skills: e.target.value.split(", ") })}
-            placeholder="例: JavaScript, React, TypeScript"
-          />
-        </div>
+        {/* ✅ 新コンポーネントを使用 */}
+        <ProfileTextarea
+          title="スキルセット"
+          value={editedProfile.skills.join(", ")}
+          placeholder="例: JavaScript, React, TypeScript"
+          onChange={(value) => setEditedProfile({ ...editedProfile, skills: value.split(", ") })}
+        />
 
-        {/* 学びたいジャンル・目指す分野 */}
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">学びたいジャンル・目指す分野</h3>
-          <Textarea
-            className="border border-foreground"
-            value={editedProfile.learningGoals.join(", ")}
-            onChange={(e) => setEditedProfile({ ...editedProfile, learningGoals: e.target.value.split(", ") })}
-            placeholder="例: Web開発, AI, UXデザイン"
-          />
-        </div>
+        <ProfileTextarea
+          title="学びたいジャンル・目指す分野"
+          value={editedProfile.learningGoals.join(", ")}
+          placeholder="例: Web開発, AI, UXデザイン"
+          onChange={(value) => setEditedProfile({ ...editedProfile, learningGoals: value.split(", ") })}
+        />
 
-        {/* 自己紹介 */}
-        <div className="mt-4">
-          <h3 className="text-lg font-semibold">自己紹介</h3>
-          <Textarea
-            className="border border-foreground"
-            value={editedProfile.bio}
-            onChange={(e) => setEditedProfile({ ...editedProfile, bio: e.target.value })}
-            placeholder="自己紹介を書いてください"
-          />
-        </div>
+        <ProfileTextarea
+          title="自己紹介"
+          value={editedProfile.bio}
+          placeholder="自己紹介を書いてください"
+          onChange={(value) => setEditedProfile({ ...editedProfile, bio: value })}
+        />
 
         {/* ポストの非公開設定（チェックボックス） */}
         <div className="mt-6 flex items-start space-x-3">
