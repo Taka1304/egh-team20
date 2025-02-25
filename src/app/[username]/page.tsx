@@ -2,7 +2,8 @@
 import type { User } from "@/app/[username]/types";
 import { Header } from "@/app/_features/Navigate/Header/Header";
 import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
-import { TimelineView } from "@/app/_features/Timeline/TimelineView";
+import { Timeline } from "@/app/_features/Timeline/Timeline";
+
 import { UserStats } from "@/app/_features/UserStats/UserStats";
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -157,7 +158,7 @@ export default function page() {
         {/* 中央のタイムライン（スクロール可 / スクロールバー非表示） */}
         <div className="w-full flex justify-center h-full overflow-y-auto hidden-scrollbar">
           <div className="w-full max-w-2xl">
-            <TimelineView reports={reports} />
+            <Timeline />
           </div>
         </div>
 

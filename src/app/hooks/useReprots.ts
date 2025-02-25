@@ -11,12 +11,13 @@ export function useReports() {
     const dummyReports: Report[] = [
       {
         id: 1,
+        title: "今日の日報",
         user: {
           name: "ヤマモト",
           handle: "@yamamotoVn",
           avatar: "/avatar.jpg",
         },
-        content: `## 今日の気分: 😃
+        text: `## 今日の気分: 😃
 
 ## 今日の出来事・作業内容
 - 朝会でチームの進捗共有
@@ -42,12 +43,13 @@ export function useReports() {
       },
       {
         id: 2,
+        title: "自由形",
         user: {
           name: "ヤマモト",
           handle: "@yamamotoVn",
           avatar: "/avatar.jpg",
         },
-        content: `## 今日の気分: 😃
+        text: `## 今日の気分: 😃
 
 ## 今日の出来事・作業内容
 - 朝会でチームの進捗共有
