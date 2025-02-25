@@ -117,22 +117,24 @@ export function ProfileDialogView({
           </div>
         </div>
 
-        {/* ✅ 新コンポーネントを使用（ロジックは上位で管理） */}
+        {/* スキル */}
         <ProfileTextarea
           title="スキルセット"
           value={skills}
           onChange={setSkills}
           placeholder="例: JavaScript, React, TypeScript"
         />
+        {/* 学びたいジャンル */}
         <ProfileTextarea
           title="学びたいジャンル・目指す分野"
           value={learningGoals}
           onChange={setLearningGoals}
           placeholder="例: Web開発, AI, UXデザイン"
         />
+        {/* 自己紹介 */}
         <ProfileTextarea title="自己紹介" value={bio} onChange={setBio} placeholder="自己紹介を書いてください" />
 
-        {/* ポストの非公開設定（チェックボックス） */}
+        {/* 公開設定 */}
         <div className="mt-6 flex items-start space-x-3">
           <input
             type="checkbox"
