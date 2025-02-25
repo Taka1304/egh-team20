@@ -1,7 +1,21 @@
 import { prisma } from "@/lib/prisma";
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
-const app = new Hono().get("/:id", async (c) => {
+const app = new Hono();
+
+const userScheme = z.object({
+  name: z.string().optional(),
+  email: z.string(),
+  emailVerified: z.date().optional(),
+  image: z.string().optional(),
+  displayName: z.string().optional(),
+  bio: z.string().optional(),
+  isPrivate: z.boolean().optional(),
+});
+
+app.get("/:id", async (c) => {
   const id = c.req.param("id");
   try {
     const data = await prisma.user.findUnique({
@@ -45,6 +59,24 @@ const app = new Hono().get("/:id", async (c) => {
   } catch (error) {
     console.error("Error fetching user:", error);
     return c.text(error as string);
+  }
+});
+
+app.patch("/:id", zValidator("json", userScheme), async (c) => {
+  const id = c.req.param("id");
+  const body = c.req.valid("json");
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: id },
+      data: body,
+    });
+    return c.json({ message: "User updated", user: user });
+  } catch (error) {
+    if (error instanceof Error) {
+      return c.json({ error: error.message }, 500);
+    }
+    return c.json({ error: "Unknown error" }, 500);
   }
 });
 export default app;
