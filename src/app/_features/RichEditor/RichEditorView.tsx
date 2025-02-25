@@ -1,6 +1,6 @@
 "use client";
 
-import TemplateDialog from "@/app/_features/RichEditor/TemplateDialog/TemplateDialogContainer";
+import TemplateDialog from "@/app/_features/RichEditor/TemplateDialog/TemplateDialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import type { Editor } from "@tiptap/react";

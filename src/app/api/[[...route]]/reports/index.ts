@@ -5,6 +5,7 @@ import { $Enums } from "@prisma/client";
 import { Hono } from "hono";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { recoverFromNotFound } from "../utils";
 
 const app = new Hono();
 
@@ -40,7 +41,8 @@ app.post(
       });
 
       return c.json({ report }, 201);
-    } catch (_error) {
+    } catch (error) {
+      console.error(error);
       return c.json({ error: "日報の作成に失敗しました" }, 500);
     }
   },
@@ -56,9 +58,7 @@ app.get(
   ),
   async (c) => {
     const reportId = c.req.param("id");
-
     const session = await getServerSession(authOptions);
-
     try {
       const report = await prisma.dailyReport.findUniqueOrThrow({
         where: {
@@ -152,8 +152,63 @@ app.get(
 
       return c.json({ report: sanitizedReport }, 200);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       return c.json({ error: "日報の取得に失敗しました" }, 500);
+    }
+  },
+);
+
+app.put(
+  "/:id",
+  zValidator(
+    "param",
+    z.object({
+      id: z.string().cuid(),
+    }),
+  ),
+  zValidator(
+    "json",
+    z.object({
+      text: z.string().min(1),
+      title: z.string().min(1),
+      formatId: z.string().optional(),
+      goalId: z.string().optional(),
+      visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
+      learningTime: z.number().min(0),
+      pomodoroCount: z.number().min(0),
+    }),
+  ),
+  async (c) => {
+    const reportId = c.req.param("id");
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+
+    const parsed = c.req.valid("json");
+
+    try {
+      const report = await recoverFromNotFound(
+        prisma.dailyReport.update({
+          where: {
+            id: reportId,
+            userId: session.user.id,
+          },
+          data: {
+            ...parsed,
+          },
+        }),
+      );
+
+      if (!report) {
+        return c.json({ error: "対象の日報が見つかりません" }, 404);
+      }
+
+      return c.json({ report }, 200);
+    } catch (error) {
+      console.error(error);
+      return c.json({ error: "日報の更新に失敗しました" }, 500);
     }
   },
 );

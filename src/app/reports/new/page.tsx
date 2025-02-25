@@ -1,7 +1,8 @@
 "use client";
 import { AIReviewDialog } from "@/app/_features/AIReviewDialog/AIReviewDialog";
 import type { AIReviewResult } from "@/app/_features/AIReviewDialog/AIReviewDialog";
-import RichEditorContainer from "@/app/_features/RichEditor/RichEditorContainer";
+import RichEditor from "@/app/_features/RichEditor/RichEditor";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bot } from "lucide-react";
@@ -80,7 +81,7 @@ export default function page() {
             />
           </div>
 
-          <RichEditorContainer onChange={setContent} />
+          <RichEditor onChange={setContent} />
         </div>
       </main>
       <AIReviewDialog open={isAIReviewDialogOpen} onOpenChange={setIsAIReviewDialogOpen} result={aiReviewResult} />

@@ -1,17 +1,5 @@
 import { ReportCard } from "@/app/_features/ReportCard/ReportCard";
-
-type Report = {
-  id: number;
-  user: {
-    name: string;
-    handle: string;
-    avatar: string;
-  };
-  content: string;
-  createdAt: string;
-  image?: string;
-  link?: string;
-};
+import type { Report } from "@/app/types/reports";
 
 type TimelineViewProps = {
   reports: Report[];
