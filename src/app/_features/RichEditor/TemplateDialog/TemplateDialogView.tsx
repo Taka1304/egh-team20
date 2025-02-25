@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-import type { TemplateType } from "@/app/_features/RichEditor/TemplateDialog/TemplateDialogContainer";
+import type { TemplateType } from "@/app/_features/RichEditor/TemplateDialog/TemplateDialog";
 import { TemplatePreview } from "@/app/_features/RichEditor/TemplateDialog/TemplatePreview/TemplatePreview";
 
 type TemplateDialogViewProps = {
