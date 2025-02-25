@@ -5,7 +5,8 @@ export type Report = {
     handle: string;
     avatar: string;
   };
-  content: string;
+  title: string;
+  text: string;
   createdAt: string;
   image?: string;
   link?: string;
