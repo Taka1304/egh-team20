@@ -253,7 +253,7 @@ model Reaction {
 
 // ユーザー間のフォロー関係を管理
 model Follow {
-  followerId  String // フォロワーのID (FK)
+  followerId  String // フォローを押したユーザーのID (FK)
   followingId String // フォロー対象のユーザーID (FK)
   follower    User   @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
   following   User   @relation("FollowedBy", fields: [followingId], references: [id], onDelete: Cascade)
