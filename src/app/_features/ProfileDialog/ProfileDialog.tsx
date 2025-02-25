@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { ProfileDialogView } from "./ProfileDialogView";
 
-type Profile = {
+export type Profile = {
   name: string;
   age: number;
   gender: string;
@@ -22,49 +22,58 @@ type ProfileDialogProps = {
 };
 
 export function ProfileDialog({ profile, onClose }: ProfileDialogProps) {
-  const [name, setName] = useState(profile.name);
-  const [age, setAge] = useState(profile.age);
-  const [gender, setGender] = useState(profile.gender);
-  const [skills, setSkills] = useState(profile.skills.join(", "));
-  const [learningGoals, setLearningGoals] = useState(profile.learningGoals.join(", "));
-  const [bio, setBio] = useState(profile.bio);
-  const [isPublic, setIsPublic] = useState(profile.isPublic);
+  const [editedProfile, setEditedProfile] = useState<Profile>(profile);
+
+  // フィールド1つを更新する共通関数
+  const setField = useCallback(<K extends keyof Profile>(key: K, value: Profile[K]) => {
+    setEditedProfile((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const skillsAsString = editedProfile.skills.join(", ");
+  const setSkillsFromString = (text: string) => {
+    // カンマ区切り文字列 → string[] へ
+    const array = text
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    setField("skills", array);
+  };
+
+  const goalsAsString = editedProfile.learningGoals.join(", ");
+  const setGoalsFromString = (text: string) => {
+    const array = text
+      .split(",")
+      .map((g) => g.trim())
+      .filter(Boolean);
+    setField("learningGoals", array);
+  };
 
   // 保存処理
   const handleSave = () => {
-    const updatedProfile: Profile = {
-      ...profile,
-      name,
-      age,
-      gender,
-      skills: skills.split(", ").map((s) => s.trim()),
-      learningGoals: learningGoals.split(", ").map((g) => g.trim()),
-      bio,
-      isPublic,
-    };
-    console.log("保存されたデータ:", updatedProfile);
+    // 保存処理
+    console.log(editedProfile);
     onClose();
   };
 
   return (
     <ProfileDialogView
-      avatar={profile.avatar}
-      following={profile.following}
-      followers={profile.followers}
-      name={name}
-      setName={setName}
-      age={age}
-      setAge={setAge}
-      gender={gender}
-      setGender={setGender}
-      skills={skills}
-      setSkills={setSkills}
-      learningGoals={learningGoals}
-      setLearningGoals={setLearningGoals}
-      bio={bio}
-      setBio={setBio}
-      isPublic={isPublic}
-      setIsPublic={setIsPublic}
+      avatar={editedProfile.avatar}
+      following={editedProfile.following}
+      followers={editedProfile.followers}
+      name={editedProfile.name}
+      setName={(val) => setField("name", val)}
+      age={editedProfile.age}
+      setAge={(val) => setField("age", val)}
+      gender={editedProfile.gender}
+      setGender={(val) => setField("gender", val)}
+      skills={skillsAsString}
+      setSkills={setSkillsFromString}
+      learningGoals={goalsAsString}
+      setLearningGoals={setGoalsFromString}
+      bio={editedProfile.bio}
+      setBio={(val) => setField("bio", val)}
+      isPublic={editedProfile.isPublic}
+      setIsPublic={(val) => setField("isPublic", val)}
       onClose={onClose}
       onSave={handleSave}
     />

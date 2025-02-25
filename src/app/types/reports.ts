@@ -10,4 +10,9 @@ export type Report = {
   createdAt: string;
   image?: string;
   link?: string;
+  tags?: string[];
+  likes?: number;
+  comments?: number;
+  flames?: number;
+  checks?: number;
 };

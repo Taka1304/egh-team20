@@ -9,6 +9,10 @@ const meta: Meta<typeof ReportCard> = {
 export default meta;
 type Story = StoryObj<typeof ReportCard>;
 
+const text = `
+# 今日の日報
+- マークダウンの制御難しく無いか？`;
+
 export const Default: Story = {
   args: {
     report: {
@@ -19,7 +23,7 @@ export const Default: Story = {
         avatar: "/avatar.jpg",
       },
       title: "今日の日報",
-      text: "## 今日の気分: 😃",
+      text: text,
       createdAt: "2024/02/23",
     },
   },
