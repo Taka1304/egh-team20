@@ -1,14 +1,14 @@
 "use client";
 import type { User } from "@/app/[username]/types";
-import { UserBages } from "@/app/_features/userBadges/page";
-import { TimelineView } from "@/app/_features/TimeLine/TimeLineView";
-import { UserStats } from "@/app/_features/userStats/page";
+import { Header } from "@/app/_features/Navigate/Header/Header";
+import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
+import { TimelineView } from "@/app/_features/Timeline/TimelineView";
+import { UserStats } from "@/app/_features/UserStats/UserStats";
+import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Header } from "@/app/_features/Navigate/Header/Header";
-import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
 
 // ダミーデータ（APIから取得する想定）
 const reports = [
@@ -126,7 +126,7 @@ export default function page() {
             </CardContent>
 
             <div className="border-t card-foreground mt-4 pt-4 mx-4" />
-            
+
             <CardHeader>
               <CardTitle>自己紹介</CardTitle>
             </CardHeader>
@@ -151,7 +151,7 @@ export default function page() {
           </Card>
 
           <UserStats user={user} />
-          <UserBages badges={user.badges} />
+          <UserBadges badges={user.badges} />
         </div>
 
         {/* 中央のタイムライン（スクロール可 / スクロールバー非表示） */}

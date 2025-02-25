@@ -7,11 +7,11 @@ type UserBadge = {
   description: string;
 };
 
-type UserBadgeProps = {
+type UserBadgesProps = {
   badges: UserBadge[];
 };
 
-export function UserBages({ badges }: UserBadgeProps) {
+export function UserBadges({ badges }: UserBadgesProps) {
   return (
     <Card>
       <CardHeader>
