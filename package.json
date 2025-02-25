@@ -7,7 +7,9 @@
 		"dev": "next dev",
 		"build": "next build",
 		"start": "next start",
-		"lint": "next lint"
+		"lint": "next lint",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build"
 	},
 	"dependencies": {
 		"@hono/zod-validator": "^0.4.3",
@@ -45,12 +47,21 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"@chromatic-com/storybook": "^3.2.4",
+		"@storybook/addon-essentials": "^8.5.8",
+		"@storybook/addon-interactions": "^8.5.8",
+		"@storybook/addon-onboarding": "^8.5.8",
+		"@storybook/blocks": "^8.5.8",
+		"@storybook/nextjs": "^8.5.8",
+		"@storybook/react": "^8.5.8",
+		"@storybook/test": "^8.5.8",
 		"@types/node": "^20",
 		"@types/react": "^19",
 		"@types/react-dom": "^19",
 		"lefthook": "^1.10.11",
 		"postcss": "^8",
 		"prisma": "^6.4.1",
+		"storybook": "^8.5.8",
 		"tailwindcss": "^3.4.1",
 		"typescript": "^5"
 	}

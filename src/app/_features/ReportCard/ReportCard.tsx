@@ -1,3 +1,4 @@
+import type { Report } from "@/app/types/reports";
 import { ReportDate } from "@/components/ui/ReportDate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -5,19 +6,6 @@ import { Card } from "@/components/ui/card";
 import { CheckCircle, Flame, Heart, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-
-type Report = {
-  id: number;
-  user: {
-    name: string;
-    handle: string;
-    avatar: string;
-  };
-  content: string;
-  createdAt: string;
-  image?: string;
-  link?: string;
-};
 
 type ReportCardProps = {
   report: Report;
@@ -27,8 +15,8 @@ export function ReportCard({ report }: ReportCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
 
   const maxLength = 200;
-  const isLongContent = report.content.length > maxLength;
-  const displayedContent = showFullContent ? report.content : `${report.content.slice(0, maxLength)}...`;
+  const isLongContent = report.text.length > maxLength;
+  const displayedContent = showFullContent ? report.text : `${report.text.slice(0, maxLength)}...`;
 
   return (
     <Card className="p-4 mb-4 border border-border w-full bg-card text-card-foreground rounded-[var(--radius)]">
@@ -64,7 +52,7 @@ export function ReportCard({ report }: ReportCardProps) {
         </button>
       )}
 
-      {report.image && <img src={report.image} alt={report.content} className="mt-2 rounded-lg border border-border" />}
+      {report.image && <img src={report.image} alt={report.text} className="mt-2 rounded-lg border border-border" />}
 
       {report.link && (
         <Link
