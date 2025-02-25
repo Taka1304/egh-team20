@@ -1,9 +1,9 @@
 "use client";
 
-import { TimelineView } from "@/app/_features/Timeline/TimelineView";
+import { TimeLineView } from "@/app/_features/Timeline/TimeLineView";
 import { useReports } from "@/app/hooks/useReprots";
 
-export function Timeline() {
+export function TimeLine() {
   const { reports, isLoading, error } = useReports();
 
   if (isLoading) {
@@ -14,5 +14,5 @@ export function Timeline() {
     return <div>Error: {error.message}</div>;
   }
 
-  return <TimelineView reports={reports} />;
+  return <TimeLineView reports={reports} />;
 }

@@ -1,13 +1,13 @@
-import { Timeline } from "@/app/_features/Timeline/Timeline";
+import { TimeLine } from "@/app/_features/Timeline/TimeLine";
 import type { Meta, StoryObj } from "@storybook/react";
 
-const meta: Meta<typeof Timeline> = {
+const meta: Meta<typeof TimeLine> = {
   title: "features/Timeline",
-  component: Timeline,
+  component: TimeLine,
 };
 
 export default meta;
-type Story = StoryObj<typeof Timeline>;
+type Story = StoryObj<typeof TimeLine>;
 
 export const Default: Story = {
   args: {

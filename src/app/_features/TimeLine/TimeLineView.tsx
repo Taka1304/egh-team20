@@ -1,11 +1,11 @@
 import { ReportCard } from "@/app/_features/ReportCard/ReportCard";
 import type { Report } from "@/app/types/reports";
 
-type TimelineViewProps = {
+type TimeLineViewProps = {
   reports: Report[];
 };
 
-export function TimelineView({ reports }: TimelineViewProps) {
+export function TimeLineView({ reports }: TimeLineViewProps) {
   return (
     <div>
       {reports.map((report) => (
