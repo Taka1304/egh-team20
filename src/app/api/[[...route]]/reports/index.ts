@@ -116,8 +116,43 @@ app.get(
           break;
       }
 
-      return c.json({ report }, 200);
-    } catch (_error) {
+      // Validation & followedByをレスポンスから削除
+      const reportSchema = z.object({
+        id: z.string(),
+        text: z.string(),
+        title: z.string(),
+        formatId: z.string().nullable().optional(),
+        goalId: z.string().nullable().optional(),
+        visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
+        learningTime: z.number(),
+        pomodoroCount: z.number(),
+        user: z.object({
+          id: z.string(),
+          displayName: z.string().optional().nullable(),
+          image: z.string().nullable(),
+          isPrivate: z.boolean(),
+        }),
+        reactions: z.array(
+          z.object({
+            id: z.string(),
+            type: z.object({
+              id: z.string(),
+              name: z.string(),
+            }),
+            user: z.object({
+              id: z.string(),
+              displayName: z.string().nullable().optional(),
+              image: z.string().nullable(),
+            }),
+          }),
+        ),
+      });
+
+      const sanitizedReport = reportSchema.parse(report);
+
+      return c.json({ report: sanitizedReport }, 200);
+    } catch (error) {
+      console.error(error)
       return c.json({ error: "日報の取得に失敗しました" }, 500);
     }
   },
