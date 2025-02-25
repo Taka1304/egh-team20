@@ -56,9 +56,7 @@ app.get(
   ),
   async (c) => {
     const reportId = c.req.param("id");
-
     const session = await getServerSession(authOptions);
-
     try {
       const report = await prisma.dailyReport.findUniqueOrThrow({
         where: {
@@ -157,5 +155,52 @@ app.get(
     }
   },
 );
+
+app.put(
+  "/:id",
+  zValidator(
+    "param",
+    z.object({
+      id: z.string().cuid(),
+    }),
+  ),
+  zValidator(
+    "json",
+    z.object({
+      text: z.string().min(1),
+      title: z.string().min(1),
+      formatId: z.string().optional(),
+      goalId: z.string().optional(),
+      visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
+      learningTime: z.number().min(0),
+      pomodoroCount: z.number().min(0),
+    }),
+  ),
+  async (c) => {
+    const reportId = c.req.param("id");
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+
+    const parsed = c.req.valid("json");
+
+    try {
+      const report = await prisma.dailyReport.update({
+        where: {
+          id: reportId,
+        },
+        data: {
+          ...parsed,
+        },
+      });
+
+      return c.json({ report }, 200);
+    } catch (_error) {
+      return c.json({ error: "日報の更新に失敗しました" }, 500);
+    }
+  },
+)
 
 export default app;
