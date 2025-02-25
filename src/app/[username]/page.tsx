@@ -1,10 +1,53 @@
+"use client";
 import type { User } from "@/app/[username]/types";
 import { UserBages } from "@/app/_features/userBadges/page";
+import { TimelineView } from "@/app/_features/TimeLine/TimeLineView";
 import { UserStats } from "@/app/_features/userStats/page";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Header } from "@/app/_features/Navigate/Header/Header";
+import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
+
+// ダミーデータ（APIから取得する想定）
+const reports = [
+  {
+    id: 1,
+    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
+    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
+    createdAt: "2024/02/23",
+    link: "https://note.com/yamamotokoki/n...",
+  },
+  {
+    id: 2,
+    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
+    content:
+      "今日は新しいプロジェクトの発表！楽しみ！🚀aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    createdAt: "2024/02/22",
+  },
+  {
+    id: 3,
+    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
+    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
+    createdAt: "2024/02/23",
+    link: "https://note.com/yamamotokoki/n...",
+  },
+  {
+    id: 4,
+    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
+    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
+    createdAt: "2024/02/23",
+    link: "https://note.com/yamamotokoki/n...",
+  },
+  {
+    id: 5,
+    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
+    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
+    createdAt: "2024/02/23",
+    link: "https://note.com/yamamotokoki/n...",
+  },
+];
 
 export default function page() {
   /*
@@ -44,68 +87,85 @@ export default function page() {
   };
 
   return (
-    <>
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1 space-y-6">
-            {/* プロフィールカード部分 */}
-            <Card>
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center">
-                  <Avatar className="w-24 h-24">
-                    <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
-                    <AvatarFallback>{user.displayName}</AvatarFallback>
-                  </Avatar>
-                  <h1 className="mt-4 text-2xl font-bold">{user.displayName}</h1>
-                  <p className="text-muted-foreground">@{user.username}</p>
-                  <div className="mt-4 flex space-x-4">
-                    <div className="text-center">
-                      <p className="font-semibold">{user.followersCount}</p>
-                      <p className="text-sm text-muted-foreground">フォロワー</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="font-semibold">{user.followingCount}</p>
-                      <p className="text-sm text-muted-foreground">フォロー中</p>
+    <div className="container mx-auto px-4 h-screen flex py-8 mt-10">
+      <Header />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full h-full">
+        {/* 左側のプロフィール情報（スクロール可 / スクロールバー非表示） */}
+        <div className="md:col-span-1 space-y-1 h-full overflow-y-auto hidden-scrollbar">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center">
+                <div className="flex gap-4">
+                  <div>
+                    <Avatar className="w-24 h-24">
+                      <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
+                      <AvatarFallback>{user.displayName}</AvatarFallback>
+                    </Avatar>
+                    <div className="mt-4 items-center space-x-2">
+                      <h1 className="mt-4 text-2xl font-bold">{user.displayName}</h1>
+                      <p className="text-muted-foreground">@{user.username}</p>
                     </div>
                   </div>
-                  <Button className="mt-4" variant="outline">
-                    プロフィールを編集
-                  </Button>
+                  <div className="flex flex-col justify-end gap-4">
+                    <div className="mt-4 flex space-x-4">
+                      <div className="text-center">
+                        <p className="font-semibold text-xl">{user.followersCount}</p>
+                        <p className="text-sm text-muted-foreground">フォロワー</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="font-semibold text-xl">{user.followingCount}</p>
+                        <p className="text-sm text-muted-foreground">フォロー中</p>
+                      </div>
+                    </div>
+                    <Button className="mt-4" variant="outline">
+                      プロフィールを編集
+                    </Button>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
 
-            {/* 自己紹介 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>自己紹介</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{user.bio}</p>
-              </CardContent>
-            </Card>
+            <div className="border-t card-foreground mt-4 pt-4 mx-4" />
+            
+            <CardHeader>
+              <CardTitle>自己紹介</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{user.bio}</p>
+            </CardContent>
 
-            {/* 興味分野 */}
-            <Card>
-              <CardHeader>
-                <CardTitle>興味分野</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {user.interests.map((interest) => (
-                    <Badge key={interest} variant="secondary">
-                      {interest}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div className="border-t card-foreground mt-4 pt-4 mx-4" />
 
-            <UserStats user={user} />
-            <UserBages badges={user.badges} />
+            <CardHeader>
+              <CardTitle>興味分野</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {user.interests.map((interest) => (
+                  <Badge key={interest} variant="secondary">
+                    {interest}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <UserStats user={user} />
+          <UserBages badges={user.badges} />
+        </div>
+
+        {/* 中央のタイムライン（スクロール可 / スクロールバー非表示） */}
+        <div className="w-full flex justify-center h-full overflow-y-auto hidden-scrollbar">
+          <div className="w-full max-w-2xl">
+            <TimelineView reports={reports} />
           </div>
         </div>
+
+        {/* 右側の「おすすめの人」リスト */}
+        <div className="md:col-span-1 h-full overflow-y-auto hidden-scrollbar">
+          <RecommendedUsers />
+        </div>
       </div>
-    </>
+    </div>
   );
 }
