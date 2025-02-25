@@ -6,26 +6,49 @@ import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
 import { ProfileTextarea } from "./ProfileTextarea";
 
-type Profile = {
-  name: string;
-  age: number;
-  gender: string;
-  avatar: string;
-  skills: string[];
-  learningGoals: string[];
-  bio: string;
-  isPublic: boolean;
-  followers: number;
-  following: number;
-};
-
 type ProfileDialogViewProps = {
-  profile: Profile;
-  onChange: (profile: Profile) => void;
+  avatar: string;
+  following: number;
+  followers: number;
+  name: string;
+  setName: (value: string) => void;
+  age: number;
+  setAge: (value: number) => void;
+  gender: string;
+  setGender: (value: string) => void;
+  skills: string;
+  setSkills: (value: string) => void;
+  learningGoals: string;
+  setLearningGoals: (value: string) => void;
+  bio: string;
+  setBio: (value: string) => void;
+  isPublic: boolean;
+  setIsPublic: (value: boolean) => void;
   onClose: () => void;
+  onSave: () => void;
 };
 
-export function ProfileDialogView({ profile, onChange, onClose }: ProfileDialogViewProps) {
+export function ProfileDialogView({
+  avatar,
+  following,
+  followers,
+  name,
+  setName,
+  age,
+  setAge,
+  gender,
+  setGender,
+  skills,
+  setSkills,
+  learningGoals,
+  setLearningGoals,
+  bio,
+  setBio,
+  isPublic,
+  setIsPublic,
+  onClose,
+  onSave,
+}: ProfileDialogViewProps) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-card p-6 rounded-lg shadow-lg w-[600px] max-w-full text-card-foreground relative">
@@ -44,14 +67,14 @@ export function ProfileDialogView({ profile, onChange, onClose }: ProfileDialogV
         {/* アイコンと名前 */}
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={profile.avatar} alt={`${profile.name}のアイコン`} />
-            <AvatarFallback>{profile.name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={avatar} alt={`${name}のアイコン`} />
+            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <Input
               className="border border-foreground"
-              value={profile.name}
-              onChange={(e) => onChange({ ...profile, name: e.target.value })}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               placeholder="名前"
             />
           </div>
@@ -60,8 +83,8 @@ export function ProfileDialogView({ profile, onChange, onClose }: ProfileDialogV
         {/* フォロー情報 */}
         <div className="mt-4 flex justify-between text-sm">
           <div className="flex space-x-4">
-            <span className="font-semibold">フォロー中: {profile.following}</span>
-            <span className="font-semibold">フォロワー: {profile.followers}</span>
+            <span className="font-semibold">フォロー中: {following}</span>
+            <span className="font-semibold">フォロワー: {followers}</span>
           </div>
         </div>
 
@@ -74,13 +97,8 @@ export function ProfileDialogView({ profile, onChange, onClose }: ProfileDialogV
               className="w-24 border border-foreground"
               type="number"
               min="0"
-              value={profile.age}
-              onChange={(e) =>
-                onChange({
-                  ...profile,
-                  age: Math.max(0, Number(e.target.value)),
-                })
-              }
+              value={age}
+              onChange={(e) => setAge(Math.max(0, Number(e.target.value)))}
             />
           </div>
 
@@ -89,8 +107,8 @@ export function ProfileDialogView({ profile, onChange, onClose }: ProfileDialogV
             <h3 className="text-lg font-semibold">性別</h3>
             <select
               className="border border-foreground bg-card text-card-foreground p-2 rounded-md w-40 text-sm"
-              value={profile.gender}
-              onChange={(e) => onChange({ ...profile, gender: e.target.value })}
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
             >
               <option value="男性">男性</option>
               <option value="女性">女性</option>
@@ -99,56 +117,40 @@ export function ProfileDialogView({ profile, onChange, onClose }: ProfileDialogV
           </div>
         </div>
 
-        {/* ✅ 新コンポーネントを使用 */}
+        {/* ✅ 新コンポーネントを使用（ロジックは上位で管理） */}
         <ProfileTextarea
           title="スキルセット"
-          value={profile.skills.join(", ")}
+          value={skills}
+          onChange={setSkills}
           placeholder="例: JavaScript, React, TypeScript"
-          onChange={(value) => onChange({ ...profile, skills: value.split(", ") })}
         />
-
         <ProfileTextarea
           title="学びたいジャンル・目指す分野"
-          value={profile.learningGoals.join(", ")}
+          value={learningGoals}
+          onChange={setLearningGoals}
           placeholder="例: Web開発, AI, UXデザイン"
-          onChange={(value) => onChange({ ...profile, learningGoals: value.split(", ") })}
         />
-
-        <ProfileTextarea
-          title="自己紹介"
-          value={profile.bio}
-          placeholder="自己紹介を書いてください"
-          onChange={(value) => onChange({ ...profile, bio: value })}
-        />
+        <ProfileTextarea title="自己紹介" value={bio} onChange={setBio} placeholder="自己紹介を書いてください" />
 
         {/* ポストの非公開設定（チェックボックス） */}
         <div className="mt-6 flex items-start space-x-3">
           <input
             type="checkbox"
             id="privatePost"
-            checked={!profile.isPublic}
-            onChange={(e) => onChange({ ...profile, isPublic: !e.target.checked })}
+            checked={!isPublic}
+            onChange={(e) => setIsPublic(!e.target.checked)}
             className="w-5 h-5 border border-foreground rounded-md cursor-pointer"
           />
           <label htmlFor="privatePost" className="cursor-pointer">
             <p className="font-semibold">ポストを非公開にする</p>
-            <p className="text-sm text-muted-foreground">
-              オンにすると、ポストと他のアカウント情報があなたをフォローしているアカウントにのみ表示されます。{" "}
-              <a
-                href="https://help.example.com/private-posts"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline"
-              >
-                詳細はこちら
-              </a>
-            </p>
           </label>
         </div>
 
         {/* 保存ボタン */}
         <div className="mt-6 text-right">
-          <Button variant="default">保存</Button>
+          <Button variant="default" onClick={onSave}>
+            保存
+          </Button>
         </div>
       </div>
     </div>
