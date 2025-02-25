@@ -5,6 +5,7 @@ import { $Enums } from "@prisma/client";
 import { Hono } from "hono";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { recoverFromNotFound } from "../utils";
 
 const app = new Hono();
 
@@ -40,7 +41,8 @@ app.post(
       });
 
       return c.json({ report }, 201);
-    } catch (_error) {
+    } catch (error) {
+      console.error(error);
       return c.json({ error: "日報の作成に失敗しました" }, 500);
     }
   },
@@ -150,7 +152,7 @@ app.get(
 
       return c.json({ report: sanitizedReport }, 200);
     } catch (error) {
-      console.error(error)
+      console.error(error);
       return c.json({ error: "日報の取得に失敗しました" }, 500);
     }
   },
@@ -187,20 +189,28 @@ app.put(
     const parsed = c.req.valid("json");
 
     try {
-      const report = await prisma.dailyReport.update({
-        where: {
-          id: reportId,
-        },
-        data: {
-          ...parsed,
-        },
-      });
+      const report = await recoverFromNotFound(
+        prisma.dailyReport.update({
+          where: {
+            id: reportId,
+            userId: session.user.id,
+          },
+          data: {
+            ...parsed,
+          },
+        }),
+      );
+
+      if (!report) {
+        return c.json({ error: "対象の日報が見つかりません" }, 404);
+      }
 
       return c.json({ report }, 200);
-    } catch (_error) {
+    } catch (error) {
+      console.error(error);
       return c.json({ error: "日報の更新に失敗しました" }, 500);
     }
   },
-)
+);
 
 export default app;
