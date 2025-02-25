@@ -1,5 +1,4 @@
 "use client";
-import { AIReviewSetting } from "@/app/_features/ReportPublishSetting/AIReviewSetting/AIReviewSetting";
 import { HashtagSection } from "@/app/_features/ReportPublishSetting/HasttagSection/HashtagSection";
 import { PublishHeader } from "@/app/_features/ReportPublishSetting/PublishHeader/PublishHeader";
 import { VisibilitySetting } from "@/app/_features/ReportPublishSetting/VisibilitySetting/VisibilitySetting";
@@ -26,7 +25,7 @@ export default function page() {
           <div className="max-w-3xl mx-auto space-y-8">
             <VisibilitySetting />
             <HashtagSection tags={tags} onAddTag={handleAddTag} onRemoveTag={handleRemoveTag} />
-            <AIReviewSetting />
+            {/* <AIReviewSetting /> */}
           </div>
         </main>
       </div>
