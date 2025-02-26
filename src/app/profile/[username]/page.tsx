@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AchievementsList } from "@/app/profile/[username]/AchievementsList";
 
 // ダミーデータ
 const reports = [
@@ -19,6 +20,44 @@ const reports = [
     content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
     createdAt: "2024/02/23",
     link: "https://note.com/yamamotokoki/n...",
+  },
+];
+
+const achievements = [
+  {
+    id: "1",
+    title: "just setting up my msky",
+    description: "初めてノートを投稿した\n良いMisskeyライフを！",
+    date: "2023/3/4",
+    icon: "/icons/post.png",
+  },
+  {
+    id: "2",
+    title: "一周年",
+    description: "アカウント作成から1年経過した",
+    date: "2025/2/26",
+    icon: "/icons/anniversary.png",
+  },
+  {
+    id: "3",
+    title: "準備万端",
+    description: "プロフィール設定を行った",
+    date: "2023/3/4",
+    icon: "/icons/profile.png",
+  },
+  {
+    id: "4",
+    title: "はじめてのフォロワー",
+    description: "初めてフォローされた",
+    date: "2025/2/26",
+    icon: "/icons/follower.png",
+  },
+  {
+    id: "5",
+    title: "Misskey初心者講座 修了証",
+    description: "チュートリアルを完了した",
+    date: "2025/2/26",
+    icon: "/icons/certificate.png",
   },
 ];
 
@@ -95,7 +134,7 @@ export default function ProfilePage() {
               投稿
             </TabsTrigger>
             <TabsTrigger value="about" onClick={() => setActiveTab("about")} className="p-4">
-              基本データ
+              実績
             </TabsTrigger>
             <TabsTrigger value="friends" onClick={() => setActiveTab("friends")} className="p-4">
               友達
@@ -178,7 +217,7 @@ export default function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="about">
-            <p className="p-4">基本データの内容</p>
+            <AchievementsList achievements={achievements} />
           </TabsContent>
 
           <TabsContent value="friends">
