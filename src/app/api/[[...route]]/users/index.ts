@@ -15,6 +15,7 @@ const userScheme = z.object({
   isPrivate: z.boolean().optional(),
 });
 
+// ユーザー情報を取得するエンドポイント
 app.get("/:id", async (c) => {
   const id = c.req.param("id");
   try {
@@ -62,6 +63,7 @@ app.get("/:id", async (c) => {
   }
 });
 
+// ユーザー情報を更新するエンドポイント
 app.patch("/:id", zValidator("json", userScheme), async (c) => {
   const id = c.req.param("id");
   const body = c.req.valid("json");
