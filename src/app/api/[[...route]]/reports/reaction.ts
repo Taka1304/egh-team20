@@ -4,6 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
+import { CheckReportAccessPermission } from "./utils";
 
 const app = new Hono();
 
@@ -22,9 +23,15 @@ app.post(
       return c.json({ error: "ログインしていないユーザーです" }, 401);
     }
 
-    const {id: reportId, typeId } = c.req.param();
+    const { id: reportId, typeId } = c.req.param();
 
     try {
+      const result = await CheckReportAccessPermission(reportId, session.user.id, c);
+
+      if (result._status !== 200) {
+        return result;
+      }
+
       const reaction = await prisma.reaction.create({
         data: {
           typeId: typeId,
@@ -56,7 +63,7 @@ app.delete(
       return c.json({ error: "ログインしていないユーザーです" }, 401);
     }
 
-    const {id: reportId, typeId } = c.req.param();
+    const { id: reportId, typeId } = c.req.param();
 
     try {
       const reaction = await prisma.reaction.deleteMany({

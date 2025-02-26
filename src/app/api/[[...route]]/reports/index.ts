@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { recoverFromNotFound } from "../utils";
 import reaction from "./reaction";
+import { CheckReportAccessPermission } from "./utils";
 
 const app = new Hono();
 app.route("/", reaction);
@@ -62,61 +63,10 @@ app.get(
     const reportId = c.req.param("id");
     const session = await getServerSession(authOptions);
     try {
-      const report = await prisma.dailyReport.findUniqueOrThrow({
-        where: {
-          id: reportId,
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              displayName: true,
-              image: true,
-              isPrivate: true,
-              followedBy: {
-                where: {
-                  followerId: session?.user.id,
-                },
-                take: 1,
-              },
-            },
-          },
-          reactions: {
-            select: {
-              type: true,
-              user: {
-                select: {
-                  id: true,
-                  displayName: true,
-                  image: true,
-                },
-              },
-            },
-          },
-        },
-      });
-
-      // アクセス権限のチェック
-      const isOwner = report.user.id === session?.user.id;
-      const isFollower = report.user.followedBy.length > 0;
-
-      if (report.user.isPrivate && !isOwner) {
-        return c.json({ error: "このユーザーの日報は非公開です" }, 403);
+      const result = await CheckReportAccessPermission(reportId, session?.user.id, c);
+      if (result._status !== 200) {
+        return result;
       }
-
-      switch (report.visibility) {
-        case $Enums.Visibility.PRIVATE:
-          if (!isOwner) {
-            return c.json({ error: "この日報は非公開です" }, 403);
-          }
-          break;
-        case $Enums.Visibility.FOLLOWERS:
-          if (!isOwner && !isFollower) {
-            return c.json({ error: "この日報はフォロワーのみ閲覧可能です" }, 403);
-          }
-          break;
-      }
-
       // Validation & followedByをレスポンスから削除
       const reportSchema = z.object({
         id: z.string(),
@@ -149,7 +99,7 @@ app.get(
         ),
       });
 
-      const sanitizedReport = reportSchema.parse(report);
+      const sanitizedReport = reportSchema.parse(result._data.report);
 
       return c.json({ report: sanitizedReport }, 200);
     } catch (error) {
