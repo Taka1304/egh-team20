@@ -1,4 +1,4 @@
-import ContinuityChart from "@/app/_features/UserCharts/ContinuityChart /ContinuityChart ";
+import ContinuityChart from "@/app/_features/UserCharts/ContinuityChart /ContinuityChart";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof ContinuityChart> = {
