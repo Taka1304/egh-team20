@@ -1,3 +1,4 @@
+import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher.tsx/ThemeSwitcher";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +36,7 @@ export function HeaderView({ onOpenPostModal }: HeaderViewProps) {
               className="pl-8 bg-muted text-primary-foreground border-muted-foreground focus:border-primary focus:ring-ring"
             />
           </div>
+          <ThemeSwitcher />
           <Avatar className="h-8 w-8">
             <AvatarImage src={session?.user.image ?? ""} />
             <AvatarFallback className="text-foreground">{session?.user.displayName}</AvatarFallback>

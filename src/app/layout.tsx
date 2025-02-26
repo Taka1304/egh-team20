@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { ThemeProvider } from "@/app/_features/ThemeSwitcher.tsx/ThemeProvider";
 import { Providers } from "@/app/providers";
 
 const notoSans = localFont({
@@ -21,8 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja">
-      <body className={`${notoSans.variable} antialiased`}>
-        <Providers>{children}</Providers>
+      <body className={`${notoSans.variable} ${notoSans.className} antialiased`}>
+        <ThemeProvider>
+          <Providers>{children}</Providers>
+        </ThemeProvider>
       </body>
     </html>
   );
