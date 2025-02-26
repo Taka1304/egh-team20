@@ -8,6 +8,7 @@ export const TemplatePreview: React.FC<{ content: string }> = ({ content }) => {
     extensions: [StarterKit, Markdown],
     content,
     editable: false,
+    immediatelyRender: false,
   });
 
   // content の変更に合わせてエディタ内容を更新

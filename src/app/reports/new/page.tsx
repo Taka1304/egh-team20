@@ -5,26 +5,59 @@ import RichEditor from "@/app/_features/RichEditor/RichEditor";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { client } from "@/lib/hono";
 import { Bot } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function page() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isAIReviewDialogOpen, setIsAIReviewDialogOpen] = useState(false);
+  // 下書き保存した場合IDを保存して次回以降更新する
+  const [draftId, setDraftId] = useState<string | null>(null);
   // AIの出力を保存するための変数
   const [aiReviewResult, setAIReviewResult] = useState<AIReviewResult | undefined>();
   const router = useRouter();
-  /**
-   * 下書き保存処理
-   */
-  const handleSaveDraft = () => {};
 
   /**
-   * 公開処理
+   * 保存処理
    */
-  const handlePublish = () => {};
+  const handleSave = async (isDraft: boolean) => {
+    const toastId = toast.loading("保存しています...");
+
+    const result = draftId
+      ? await client.api.reports[":id"].$put({
+          param: { id: draftId },
+          json: {
+            title,
+            text: content,
+            visibility: isDraft ? "PRIVATE" : "PUBLIC",
+            //TODO:
+            pomodoroCount: 0,
+            learningTime: 0,
+          },
+        })
+      : await client.api.reports.$post({
+          json: {
+            title,
+            text: content,
+            visibility: isDraft ? "PRIVATE" : "PUBLIC",
+            //TODO:
+            pomodoroCount: 0,
+            learningTime: 0,
+          },
+        });
+
+    if (result.ok) {
+      const { report } = await result.json();
+      isDraft && setDraftId(report.id);
+      toast.success("保存しました", { id: toastId });
+    } else {
+      toast.error("保存に失敗しました", { id: toastId });
+    }
+  };
 
   /**
    * AI添削処理
@@ -47,31 +80,29 @@ export default function page() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* 固定ヘッダー */}
-      <header className="fixed top-0 left-0 right-0 h-14 bg-white border-b border-gray-200 z-50">
+      <header className="fixed top-0 left-0 right-0 h-14 bg-card border-b border-border z-50">
         <div className="container mx-auto h-full flex items-center justify-between px-4">
-          <Button variant="ghost" onClick={() => router.back()}>
-            閉じる
-          </Button>
-          <div className="text-sm text-gray-500">{content.length} 文字</div>
+          <Button onClick={() => router.back()}>閉じる</Button>
+          <div className="text-sm text-muted-foreground">{content.length} 文字</div>
           <div className="flex items-center gap-2">
-            <Button className="bg-white text-black border" onClick={handleSaveDraft}>
+            <Button className="bg-card text-foreground border" onClick={() => handleSave(true)}>
               下書き保存
             </Button>
-            <Button className="bg-white text-black border" onClick={handleAIReview}>
+            <Button className="bg-card text-foreground border" onClick={handleAIReview}>
               <Bot size={20} />
               AI添削
             </Button>
-            <Button className=" font-bold hover:scale-95 duration-100" onClick={handlePublish}>
-              公開に進む
+            <Button className="font-bold hover:scale-95 duration-100" onClick={() => handleSave(false)}>
+              公開する
             </Button>
           </div>
         </div>
       </header>
       <main className="container mx-auto pt-20 px-4 max-w-3xl">
         <div className="space-y-6">
-          <div className="bg-white rounded-lg p-4 border">
+          <div className="bg-card rounded-lg p-4 border">
             <Input
               type="text"
               placeholder="記事タイトル"
