@@ -1,4 +1,5 @@
 "use client";
+import { useState } from "react";
 import { Header } from "@/app/_features/Navigate/Header/Header";
 import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import { UserStats } from "@/app/_features/UserStats/UserStats";
@@ -8,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // ダミーデータ
 const reports = [
@@ -21,6 +23,8 @@ const reports = [
 ];
 
 export default function ProfilePage() {
+  const [activeTab, setActiveTab] = useState("posts");
+
   const user: User = {
     username: "yamada-taro",
     displayName: "山田 太郎",
@@ -84,71 +88,111 @@ export default function ProfilePage() {
           <ProfileRecommendedUsers />
         </div>
 
-        <div className="flex flex-grow container mx-auto px-4 py-8">
-          {/* 左カラム（プロフィール詳細） */}
-          <div className="w-2/5 pr-4 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>自己紹介</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p>{user.bio}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>興味分野</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {user.interests.map((interest) => (
-                    <Badge key={interest} variant="secondary">
-                      {interest}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-            <UserStats user={user} />
-            <UserBadges badges={user.badges} />
-          </div>
+        {/* タブ切り替え */}
+        <Tabs defaultValue="posts" className="mt-6">
+          <TabsList className="flex border-b h-20">
+            <TabsTrigger value="posts" onClick={() => setActiveTab("posts")} className="p-4">
+              投稿
+            </TabsTrigger>
+            <TabsTrigger value="about" onClick={() => setActiveTab("about")} className="p-4">
+              基本データ
+            </TabsTrigger>
+            <TabsTrigger value="friends" onClick={() => setActiveTab("friends")} className="p-4">
+              友達
+            </TabsTrigger>
+            <TabsTrigger value="photos" onClick={() => setActiveTab("photos")} className="p-4">
+              写真
+            </TabsTrigger>
+            <TabsTrigger value="videos" onClick={() => setActiveTab("videos")} className="p-4">
+              動画
+            </TabsTrigger>
+          </TabsList>
 
-          {/* 中央カラム（投稿一覧） */}
-          <div className="w-3/5 space-y-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>投稿</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {reports.map((report) => (
-                  <div key={report.id} className="mb-4 p-4 border rounded-lg shadow-sm">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={report.user.avatar} alt={report.user.name} />
-                        <AvatarFallback>{report.user.name}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-semibold">{report.user.name}</p>
-                        <p className="text-sm text-muted-foreground">{report.createdAt}</p>
-                      </div>
+          {/* タブの内容 */}
+          <TabsContent value="posts">
+            <div className="flex flex-grow container mx-auto px-4 py-8">
+              {/* 左カラム（プロフィール詳細） */}
+              <div className="w-2/5 pr-4 space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>自己紹介</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p>{user.bio}</p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>興味分野</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {user.interests.map((interest) => (
+                        <Badge key={interest} variant="secondary">
+                          {interest}
+                        </Badge>
+                      ))}
                     </div>
-                    <p className="mt-2">{report.content}</p>
-                    {report.link && (
-                      <a
-                        href={report.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline text-sm mt-2 block"
-                      >
-                        記事を読む
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+                  </CardContent>
+                </Card>
+                <UserStats user={user} />
+                <UserBadges badges={user.badges} />
+              </div>
+
+              {/* 中央カラム（投稿一覧） */}
+              <div className="w-3/5 space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>投稿</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {reports.map((report) => (
+                      <div key={report.id} className="mb-4 p-4 border rounded-lg shadow-sm">
+                        <div className="flex items-center space-x-4">
+                          <Avatar className="w-10 h-10">
+                            <AvatarImage src={report.user.avatar} alt={report.user.name} />
+                            <AvatarFallback>{report.user.name}</AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-semibold">{report.user.name}</p>
+                            <p className="text-sm text-muted-foreground">{report.createdAt}</p>
+                          </div>
+                        </div>
+                        <p className="mt-2">{report.content}</p>
+                        {report.link && (
+                          <a
+                            href={report.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-500 underline text-sm mt-2 block"
+                          >
+                            記事を読む
+                          </a>
+                        )}
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="about">
+            <p className="p-4">基本データの内容</p>
+          </TabsContent>
+
+          <TabsContent value="friends">
+            <p className="p-4">友達の一覧</p>
+          </TabsContent>
+
+          <TabsContent value="photos">
+            <p className="p-4">写真一覧</p>
+          </TabsContent>
+
+          <TabsContent value="videos">
+            <p className="p-4">動画一覧</p>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
