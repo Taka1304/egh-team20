@@ -26,28 +26,28 @@ const reports = [
 const achievements = [
   {
     id: "1",
-    title: "just setting up my msky",
+    title: "200日連続",
     description: "初めてノートを投稿した\n良いMisskeyライフを！",
     date: "2023/3/4",
     icon: "/icons/post.png",
   },
   {
     id: "2",
-    title: "一周年",
+    title: "100日連続",
     description: "アカウント作成から1年経過した",
     date: "2025/2/26",
     icon: "/icons/anniversary.png",
   },
   {
     id: "3",
-    title: "準備万端",
+    title: "フォロワー1万人",
     description: "プロフィール設定を行った",
     date: "2023/3/4",
     icon: "/icons/profile.png",
   },
   {
     id: "4",
-    title: "はじめてのフォロワー",
+    title: "はじめての投稿",
     description: "初めてフォローされた",
     date: "2025/2/26",
     icon: "/icons/follower.png",

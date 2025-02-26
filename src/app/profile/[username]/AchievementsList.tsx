@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { HexBadge } from "@/components/badges/HexBadge";
 
 type Achievement = {
   id: string;
@@ -16,12 +16,10 @@ export function AchievementsList({ achievements }: AchievementsListProps) {
   return (
     <div className="p-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {achievements.map((ach) => (
+        {achievements.map((ach, index) => (
           <div key={ach.id} className="flex items-center bg-card text-foreground p-4 rounded-lg shadow-md">
-            {/* アイコン画像 */}
-            <div className="w-12 h-12 flex-shrink-0">
-              <Image src={ach.icon} alt={ach.title} width={48} height={48} className="rounded-full" />
-            </div>
+            {/* `shadcn` のデザインを適用したバッジ */}
+            <HexBadge number={index + 1} title={ach.title} />
 
             {/* タイトル & 説明 */}
             <div className="flex-1 ml-4">
@@ -37,3 +35,5 @@ export function AchievementsList({ achievements }: AchievementsListProps) {
     </div>
   );
 }
+
+
