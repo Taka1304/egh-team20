@@ -2,9 +2,13 @@
 
 import { TimelineView } from "@/app/_features/Timeline/TimelineView";
 import { useReports } from "@/app/hooks/useReprots";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+export type ViewMode = "category" | "following" | "mine";
 
 export function Timeline() {
+  // 表示モードの状態管理
+  const [viewMode, setViewMode] = useState<ViewMode>("category");
   const { reports, isLoading, hasMore, handleLoadMore } = useReports();
 
   // 監視対象の要素
@@ -29,5 +33,19 @@ export function Timeline() {
     };
   }, [handleLoadMore]);
 
-  return <TimelineView reports={reports} loaderRef={loaderRef} isLoading={isLoading} hasMore={hasMore} />;
+  // 表示モード切り替え
+  const handleChangeViewMode = (mode: ViewMode) => {
+    setViewMode(mode);
+  };
+
+  return (
+    <TimelineView
+      reports={reports}
+      loaderRef={loaderRef}
+      isLoading={isLoading}
+      hasMore={hasMore}
+      viewMode={viewMode}
+      onChangeViewMode={handleChangeViewMode}
+    />
+  );
 }

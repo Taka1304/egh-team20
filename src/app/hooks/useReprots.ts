@@ -23,10 +23,17 @@ export function useReports() {
           id: `report-${idNumber}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           title: `サンプルレポート #${idNumber}`,
           text: `## 今日の気分: 😃
+## 本日の格言
+ああ 良き天気 心安らかなり
+日本の夏 蝉の声 いま静かにして
+木の下に宿れるなり 我が心
+その宿れるなりと同じき 安き心にある
+行ってきます!!!
 
-- ダミーの内容です
-- 現在のページ: ${page}
-- レポート番号: ${idNumber}
+## もくじ
+- 1. はじめに
+- 2. 本文
+- 3. おわりに
 `,
           createdAt: new Date().toISOString(),
           user: {
