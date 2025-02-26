@@ -6,8 +6,10 @@ import { Hono } from "hono";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { recoverFromNotFound } from "../utils";
+import reaction from "./reaction";
 
 const app = new Hono();
+app.route("/", reaction);
 
 app.post(
   "/",
