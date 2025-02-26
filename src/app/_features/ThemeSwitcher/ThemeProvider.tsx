@@ -1,5 +1,5 @@
 "use client";
-import { selectedThemeAtom } from "@/app/_features/ThemeSwitcher.tsx/atom";
+import { selectedThemeAtom } from "@/app/_features/ThemeSwitcher/atom";
 import { useAtom } from "jotai";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { ThemeProviderProps } from "next-themes";

@@ -2,7 +2,8 @@
 
 import Header from "@/app/_features/Navigate/Header/Header";
 import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
-import { UserStats } from "@/app/_features/UserStats/UserStats";
+
+import UserStatsList from "@/app/_features/UserStatsList/UserStatsList";
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import type { User } from "@/app/profile/[username]/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -19,6 +20,13 @@ const reports = [
     createdAt: "2024/02/23",
     link: "https://note.com/yamamotokoki/n...",
   },
+];
+
+const stats = [
+  { value: "100", label: "累計継続日数" },
+  { value: "50", label: "投稿数" },
+  { value: "200", label: "リアクション数" },
+  { value: "10", label: "バッジ取得数" },
 ];
 
 export default function ProfilePage() {
@@ -110,7 +118,7 @@ export default function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
-            <UserStats user={user} />
+            <UserStatsList stats={stats} />
             <UserBadges badges={user.badges} />
           </div>
 
