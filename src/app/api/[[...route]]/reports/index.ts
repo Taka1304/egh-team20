@@ -81,7 +81,6 @@ app.get(
           },
           reactions: {
             select: {
-              id: true,
               type: true,
               user: {
                 select: {
