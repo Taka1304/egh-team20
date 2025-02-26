@@ -4,7 +4,7 @@ import { UserMenu } from "@/app/_features/Navigate/Header/UserMenu/UserMenu";
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher.tsx/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Home, Search } from "lucide-react";
+import { Bell, Home, Search, Timer } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 
@@ -21,8 +21,8 @@ export default function Header() {
           <Link href="/notifications" className="text-foreground hover:text-secondary">
             <Bell className="h-5 w-5" />
           </Link>
-          <Link href="/profile" className="text-foreground hover:text-secondary">
-            {/* プロフィールリンク */}
+          <Link href="/pomodoro" className="text-foreground hover:text-secondary">
+            <Timer className="h-5 w-5" />
           </Link>
         </nav>
 
