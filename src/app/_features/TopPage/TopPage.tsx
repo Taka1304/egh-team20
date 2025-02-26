@@ -10,7 +10,7 @@ export default function TopPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full h-full">
         {/* 中央のタイムライン（スクロール可 / スクロールバー非表示） */}
         <div className="w-full flex justify-center h-full overflow-y-auto hidden-scrollbar md:col-span-2">
-          <div className="w-full max-w-2xl">
+          <div className="w-full ">
             <Timeline />
           </div>
         </div>
