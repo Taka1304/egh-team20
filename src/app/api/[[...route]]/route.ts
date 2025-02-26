@@ -1,10 +1,9 @@
-
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
-import users from "./users";
-import sample from "./sample";
-import reports from "./reports";
 import assets from "./assets";
+import reports from "./reports";
+import sample from "./sample";
+import users from "./users";
 
 export const runtime = "nodejs";
 
@@ -15,7 +14,7 @@ const app = new Hono()
   .route("/reports", reports)
   .route("/users", users)
 
-export type AppType = typeof app;
+export type HonoAppType = typeof app;
 
 const handlers = handle(app);
 
