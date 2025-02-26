@@ -1,9 +1,11 @@
+"use client";
+
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher.tsx/ThemeSwitcher";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserMenu } from "@/app/_features/UserMenu/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Home, Search, User } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { Bell, Home, Search } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 
 type HeaderViewProps = {
@@ -24,7 +26,7 @@ export function HeaderView({ onOpenPostModal }: HeaderViewProps) {
             <Bell className="h-5 w-5" />
           </Link>
           <Link href="/profile" className="text-foreground hover:text-secondary">
-            <User className="h-5 w-5" />
+            {/* プロフィールリンク */}
           </Link>
         </nav>
 
@@ -37,10 +39,21 @@ export function HeaderView({ onOpenPostModal }: HeaderViewProps) {
             />
           </div>
           <ThemeSwitcher />
-          <Avatar className="h-8 w-8">
-            <AvatarImage src={session?.user.image ?? ""} />
-            <AvatarFallback className="text-foreground">{session?.user.displayName}</AvatarFallback>
-          </Avatar>
+          {session?.user ? (
+            // ユーザーがログインしている場合は UserMenu を表示
+            <UserMenu user={session.user} />
+          ) : (
+            // 未ログインの場合はログインボタンのみを表示
+            <Button variant="ghost" onClick={() => signIn()}>
+              ログイン
+            </Button>
+          )}
+          {/*
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={session?.user.image ?? ""} />
+              <AvatarFallback className="text-foreground">{session?.user.displayName}</AvatarFallback>
+            </Avatar>
+          */}
           <Button className="bg-primary hover:bg-foreground" onClick={onOpenPostModal}>
             投稿する
           </Button>
