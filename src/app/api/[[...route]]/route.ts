@@ -12,7 +12,7 @@ const app = new Hono()
   .route("/assets", assets)
   .route("/sample", sample)
   .route("/reports", reports)
-  .route("/users", users)
+  .route("/users", users);
 
 export type HonoAppType = typeof app;
 

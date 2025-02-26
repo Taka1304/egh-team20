@@ -1,13 +1,12 @@
+import { randomUUID } from "node:crypto";
 import { authOptions } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { getServerSession } from "next-auth";
-import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-const app = new Hono()
-.post(
+const app = new Hono().post(
   "/upload",
   zValidator(
     "form",
@@ -18,8 +17,8 @@ const app = new Hono()
   ),
   async (c) => {
     try {
-      const { file, type } = c.req.valid('form')
-      const session = await getServerSession(authOptions)
+      const { file, type } = c.req.valid("form");
+      const session = await getServerSession(authOptions);
 
       if (!session) {
         return c.json({ error: "ログインしていないユーザーです" }, 401);
@@ -45,7 +44,6 @@ const app = new Hono()
       const { data: publicUrlData } = supabase.storage.from(type).getPublicUrl(fileName);
 
       return c.json({ url: publicUrlData.publicUrl });
-
     } catch (error) {
       if (error instanceof Error) {
         return c.json({ error: error.message }, 500);
