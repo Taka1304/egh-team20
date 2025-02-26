@@ -1,7 +1,7 @@
 "use client";
 
+import { UserMenu } from "@/app/_features/Navigate/Header/UserMenu/UserMenu";
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher.tsx/ThemeSwitcher";
-import { UserMenu } from "@/app/_features/UserMenu/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Home, Search } from "lucide-react";
@@ -49,12 +49,6 @@ export default function Header() {
               ログイン
             </Button>
           )}
-          {/*
-            <Avatar className="h-8 w-8">
-              <AvatarImage src={session?.user.image ?? ""} />
-              <AvatarFallback className="text-foreground">{session?.user.displayName}</AvatarFallback>
-            </Avatar>
-          */}
           <Button className="bg-primary hover:bg-foreground">投稿する</Button>
         </div>
       </div>

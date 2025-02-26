@@ -1,6 +1,6 @@
 "use client";
 
-import { menuItems } from "@/app/_features/UserMenu/constants";
+import { menuItems } from "@/app/_features/Navigate/Header/UserMenu/constants";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -38,7 +38,7 @@ export function UserMenu({ user }: UserMenuProps) {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
+          <Avatar className="h-8 w-8">
             <AvatarImage src={user.image ?? ""} alt={user.name} />
             <AvatarFallback>{user.name[0]}</AvatarFallback>
           </Avatar>
