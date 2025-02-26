@@ -1,27 +1,33 @@
 "use client";
+
 import { TimelineView } from "@/app/_features/Timeline/TimelineView";
 import { useReports } from "@/app/hooks/useReprots";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { useEffect, useRef } from "react";
 
 export function Timeline() {
-  const { reports, isLoading, error } = useReports();
+  const { reports, isLoading, hasMore, handleLoadMore } = useReports();
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  // 監視対象の要素
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  if (error) {
-    return (
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>エラーが発生しました</AlertTitle>
-        <AlertDescription>
-          タイムラインの読み込み中にエラーが発生しました。時間をおいて再度お試しください。
-        </AlertDescription>
-      </Alert>
-    );
-  }
+  useEffect(() => {
+    // IntersectionObserverを設定
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      // ローダー要素が可視範囲に入ったら次のページを読み込む
+      if (entry.isIntersecting) {
+        handleLoadMore();
+      }
+    });
 
-  return <TimelineView reports={reports} />;
+    if (loaderRef.current) {
+      observer.observe(loaderRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [handleLoadMore]);
+
+  return <TimelineView reports={reports} loaderRef={loaderRef} isLoading={isLoading} hasMore={hasMore} />;
 }
