@@ -74,7 +74,7 @@ export default function ProfilePage() {
               <p className="text-sm text-muted-foreground">フォロー中</p>
             </div>
           </div>
-          <Button className="mt-4" variant="outline">
+          <Button className="mt-4 text-foreground" variant="outline">
             プロフィールを編集
           </Button>
         </div>
