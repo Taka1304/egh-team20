@@ -108,7 +108,7 @@ app.post("/:id/follow/:followerId", async (c) => {
       },
     });
 
-    return c.json({ message: "Followed", follow: follow });
+    return c.json({ message: "フォロー完了", follow: follow });
   } catch (error) {
     if (!error) {
       console.error("ユーザーのフォロー処理に失敗しました:", error);
