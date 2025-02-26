@@ -67,23 +67,29 @@ export function UserMenu({ user }: UserMenuProps) {
               <DropdownMenuSeparator />
 
               {/* メニュー項目 */}
-              {menuItems.map((group, index) => (
+              {menuItems.map((group) => (
                 <div key={group.label}>
                   <DropdownMenuLabel className="font-normal text-xs text-muted-foreground px-4 py-2">
                     {group.label}
                   </DropdownMenuLabel>
                   <DropdownMenuGroup>
-                    {group.items.map((item) => (
-                      <DropdownMenuItem key={item.label} className="flex items-center gap-3 px-4 py-3 cursor-pointer">
-                        <Link href={item.link}>
-                          <item.icon className="h-4 w-4" />
-                          <span className="flex-1">{item.label}</span>
-                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
+                    {group.items.map((item) => {
+                      const href = item.label === "プロフィール" ? `/profile/${user.name}` : item.link;
+                      return (
+                        <DropdownMenuItem key={item.label}>
+                          <Link
+                            href={href}
+                            className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:scale-95 duration-100"
+                          >
+                            <item.icon className="h-4 w-4" />
+                            <span className="flex-1">{item.label}</span>
+                            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                          </Link>
+                        </DropdownMenuItem>
+                      );
+                    })}
                   </DropdownMenuGroup>
-                  {index < menuItems.length - 1 && <DropdownMenuSeparator />}
+                  <DropdownMenuSeparator />
                 </div>
               ))}
 

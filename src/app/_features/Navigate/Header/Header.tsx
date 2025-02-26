@@ -37,7 +37,12 @@ export default function Header() {
           <ThemeSwitcher />
           {session?.user ? (
             // ユーザーがログインしている場合は UserMenu を表示
-            <UserMenu user={session.user} />
+            <UserMenu
+              user={{
+                ...session.user,
+                name: session.user.name ?? session.user.displayName ?? "ゲスト",
+              }}
+            />
           ) : (
             // 未ログインの場合はログインボタンのみを表示
             <Button variant="ghost" onClick={() => signIn()}>
@@ -50,9 +55,7 @@ export default function Header() {
               <AvatarFallback className="text-foreground">{session?.user.displayName}</AvatarFallback>
             </Avatar>
           */}
-          <Button className="bg-primary hover:bg-foreground" onClick={onOpenPostModal}>
-            投稿する
-          </Button>
+          <Button className="bg-primary hover:bg-foreground">投稿する</Button>
         </div>
       </div>
     </div>
