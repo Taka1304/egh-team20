@@ -118,4 +118,43 @@ app.post("/:id/follow/:followerId", async (c) => {
     return c.json({ error: "ユーザーフォロー処理に失敗しました" }, 500);
   }
 });
+
+// フォロー解除するエンドポイント
+app.delete("/:id/follow/:followerId", async (c) => {
+  const id = c.req.param("id");
+  const followerId = c.req.param("followerId");
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return c.json({ error: "ログインしていないユーザーです" }, 401);
+  }
+
+  try {
+    const follow = await prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followingId: id,
+          followerId: followerId,
+        },
+      },
+    });
+
+    return c.json({ message: "フォロー解除完了", follow: follow });
+  } catch (error) {
+    const isFollowing = await prisma.follow.findFirst({
+      where: {
+        followerId: followerId,
+        followingId: id,
+      },
+    });
+    if (!isFollowing) {
+      return c.json({ error: "既にフォローが解除されています" }, 500);
+    }
+    if (!error) {
+      console.error("ユーザーのフォロー解除処理に失敗しました:", error);
+    } else {
+      console.error("ユーザーのフォロー解除処理に失敗しました:");
+    }
+    return c.json({ error: "ユーザーフォロー解除処理に失敗しました" }, 500);
+  }
+});
 export default app;
