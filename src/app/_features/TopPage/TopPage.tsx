@@ -1,5 +1,6 @@
 "use client";
-import { Header } from "@/app/_features/Navigate/Header/Header";
+
+import Header from "@/app/_features/Navigate/Header/Header";
 import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
 import { Timeline } from "@/app/_features/Timeline/Timeline";
 
