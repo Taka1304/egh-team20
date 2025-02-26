@@ -9,159 +9,156 @@ import { recoverFromNotFound } from "../utils";
 import reaction from "./reaction";
 import { CheckReportAccessPermission } from "./utils";
 
-const app = new Hono();
-app.route("/", reaction);
-
-app.post(
-  "/",
-  zValidator(
-    "json",
-    z.object({
-      text: z.string().min(1),
-      title: z.string().min(1),
-      formatId: z.string().optional(),
-      goalId: z.string().optional(),
-      // もっと良い書き方ありそう
-      visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
-      learningTime: z.number().min(0),
-      pomodoroCount: z.number().min(0),
-    }),
-  ),
-  async (c) => {
-    const session = await getServerSession(authOptions);
-    if (!session) {
-      return c.json({ error: "ログインしていないユーザーです" }, 401);
-    }
-
-    const parsed = c.req.valid("json");
-
-    try {
-      const report = await prisma.dailyReport.create({
-        data: {
-          userId: session.user.id,
-          ...parsed,
-        },
-      });
-
-      return c.json({ report }, 201);
-    } catch (error) {
-      console.error(error);
-      return c.json({ error: "日報の作成に失敗しました" }, 500);
-    }
-  },
-);
-
-app.get(
-  "/:id",
-  zValidator(
-    "param",
-    z.object({
-      id: z.string().cuid(),
-    }),
-  ),
-  async (c) => {
-    const reportId = c.req.param("id");
-    const session = await getServerSession(authOptions);
-    try {
-      const result = await CheckReportAccessPermission(reportId, session?.user.id, c);
-      if (result._status !== 200) {
-        return result;
-      }
-      // Validation & followedByをレスポンスから削除
-      const reportSchema = z.object({
-        id: z.string(),
-        text: z.string(),
-        title: z.string(),
-        formatId: z.string().nullable().optional(),
-        goalId: z.string().nullable().optional(),
+const app = new Hono()
+  .route("/", reaction)
+  .post(
+    "/",
+    zValidator(
+      "json",
+      z.object({
+        text: z.string().min(1),
+        title: z.string().min(1),
+        formatId: z.string().optional(),
+        goalId: z.string().optional(),
+        // もっと良い書き方ありそう
         visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
-        learningTime: z.number(),
-        pomodoroCount: z.number(),
-        user: z.object({
-          id: z.string(),
-          displayName: z.string().optional().nullable(),
-          image: z.string().nullable(),
-          isPrivate: z.boolean(),
-        }),
-        reactions: z.array(
-          z.object({
-            id: z.string(),
-            type: z.object({
-              id: z.string(),
-              name: z.string(),
-            }),
-            user: z.object({
-              id: z.string(),
-              displayName: z.string().nullable().optional(),
-              image: z.string().nullable(),
-            }),
-          }),
-        ),
-      });
+        learningTime: z.number().min(0),
+        pomodoroCount: z.number().min(0),
+      }),
+    ),
+    async (c) => {
+      const session = await getServerSession(authOptions);
+      if (!session) {
+        return c.json({ error: "ログインしていないユーザーです" }, 401);
+      }
 
-      const sanitizedReport = reportSchema.parse(result._data.report);
+      const parsed = c.req.valid("json");
 
-      return c.json({ report: sanitizedReport }, 200);
-    } catch (error) {
-      console.error(error);
-      return c.json({ error: "日報の取得に失敗しました" }, 500);
-    }
-  },
-);
-
-app.put(
-  "/:id",
-  zValidator(
-    "param",
-    z.object({
-      id: z.string().cuid(),
-    }),
-  ),
-  zValidator(
-    "json",
-    z.object({
-      text: z.string().min(1),
-      title: z.string().min(1),
-      formatId: z.string().optional(),
-      goalId: z.string().optional(),
-      visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
-      learningTime: z.number().min(0),
-      pomodoroCount: z.number().min(0),
-    }),
-  ),
-  async (c) => {
-    const reportId = c.req.param("id");
-    const session = await getServerSession(authOptions);
-
-    if (!session) {
-      return c.json({ error: "ログインしていないユーザーです" }, 401);
-    }
-
-    const parsed = c.req.valid("json");
-
-    try {
-      const report = await recoverFromNotFound(
-        prisma.dailyReport.update({
-          where: {
-            id: reportId,
-            userId: session.user.id,
-          },
+      try {
+        const report = await prisma.dailyReport.create({
           data: {
+            userId: session.user.id,
             ...parsed,
           },
-        }),
-      );
+        });
 
-      if (!report) {
-        return c.json({ error: "対象の日報が見つかりません" }, 404);
+        return c.json({ report }, 201);
+      } catch (error) {
+        console.error(error);
+        return c.json({ error: "日報の作成に失敗しました" }, 500);
+      }
+    },
+  )
+  .get(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: z.string().cuid(),
+      }),
+    ),
+    async (c) => {
+      const reportId = c.req.param("id");
+      const session = await getServerSession(authOptions);
+      try {
+        const result = await CheckReportAccessPermission(reportId, session?.user.id, c);
+        if (result._status !== 200) {
+          return result;
+        }
+        // Validation & followedByをレスポンスから削除
+        const reportSchema = z.object({
+          id: z.string(),
+          text: z.string(),
+          title: z.string(),
+          formatId: z.string().nullable().optional(),
+          goalId: z.string().nullable().optional(),
+          visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
+          learningTime: z.number(),
+          pomodoroCount: z.number(),
+          user: z.object({
+            id: z.string(),
+            displayName: z.string().optional().nullable(),
+            image: z.string().nullable(),
+            isPrivate: z.boolean(),
+          }),
+          reactions: z.array(
+            z.object({
+              id: z.string(),
+              type: z.object({
+                id: z.string(),
+                name: z.string(),
+              }),
+              user: z.object({
+                id: z.string(),
+                displayName: z.string().nullable().optional(),
+                image: z.string().nullable(),
+              }),
+            }),
+          ),
+        });
+
+        const sanitizedReport = reportSchema.parse(result._data.report);
+
+        return c.json({ report: sanitizedReport }, 200);
+      } catch (error) {
+        console.error(error);
+        return c.json({ error: "日報の取得に失敗しました" }, 500);
+      }
+    },
+  )
+  .put(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: z.string().cuid(),
+      }),
+    ),
+    zValidator(
+      "json",
+      z.object({
+        text: z.string().min(1),
+        title: z.string().min(1),
+        formatId: z.string().optional(),
+        goalId: z.string().optional(),
+        visibility: z.enum(Object.values($Enums.Visibility) as [$Enums.Visibility, ...$Enums.Visibility[]]),
+        learningTime: z.number().min(0),
+        pomodoroCount: z.number().min(0),
+      }),
+    ),
+    async (c) => {
+      const reportId = c.req.param("id");
+      const session = await getServerSession(authOptions);
+
+      if (!session) {
+        return c.json({ error: "ログインしていないユーザーです" }, 401);
       }
 
-      return c.json({ report }, 200);
-    } catch (error) {
-      console.error(error);
-      return c.json({ error: "日報の更新に失敗しました" }, 500);
-    }
-  },
-);
+      const parsed = c.req.valid("json");
+
+      try {
+        const report = await recoverFromNotFound(
+          prisma.dailyReport.update({
+            where: {
+              id: reportId,
+              userId: session.user.id,
+            },
+            data: {
+              ...parsed,
+            },
+          }),
+        );
+
+        if (!report) {
+          return c.json({ error: "対象の日報が見つかりません" }, 404);
+        }
+
+        return c.json({ report }, 200);
+      } catch (error) {
+        console.error(error);
+        return c.json({ error: "日報の更新に失敗しました" }, 500);
+      }
+    },
+  );
 
 export default app;
