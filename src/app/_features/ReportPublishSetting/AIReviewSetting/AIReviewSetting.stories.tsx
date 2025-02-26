@@ -1,13 +1,13 @@
-import { AIReviewDialog } from "@/app/_features/AIReviewDialog/AIReviewDialog";
+import { AIReviewSetting } from "@/app/_features/ReportPublishSetting/AIReviewSetting/AIReviewSetting";
 import type { Meta, StoryObj } from "@storybook/react";
 
-const meta: Meta<typeof AIReviewDialog> = {
-  title: "features/ReportPublishSetting/AIReviewDialog",
-  component: AIReviewDialog,
+const meta: Meta<typeof AIReviewSetting> = {
+  title: "features/ReportPublishSetting/AIReviewSetting",
+  component: AIReviewSetting,
 };
 
 export default meta;
-type Story = StoryObj<typeof AIReviewDialog>;
+type Story = StoryObj<typeof AIReviewSetting>;
 
 export const Default: Story = {
   args: {},

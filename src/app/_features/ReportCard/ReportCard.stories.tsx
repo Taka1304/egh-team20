@@ -10,7 +10,7 @@ export default meta;
 type Story = StoryObj<typeof ReportCard>;
 
 const text = `
-# 今日の日報
+## aaaaa
 - マークダウンの制御難しく無いか？`;
 
 export const Default: Story = {

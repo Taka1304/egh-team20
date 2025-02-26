@@ -2,7 +2,7 @@
 
 import Header from "@/app/_features/Navigate/Header/Header";
 import { HourglassTimer } from "@/app/_features/Pomodoro/HourglassTimer/HourglassTimer";
-import TodoCard from "@/app/_features/Pomodoro/TodoCard";
+import TodoCard from "@/app/_features/Pomodoro/TodoCard/TodoCard";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
