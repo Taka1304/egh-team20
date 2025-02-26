@@ -2,7 +2,7 @@
 
 import Header from "@/app/_features/Navigate/Header/Header";
 import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
-import { UserStats } from "@/app/_features/UserStats/UserStats";
+import { UserStats } from "@/app/_features/UserStatsList/UserStats";
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import type { User } from "@/app/profile/[username]/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
