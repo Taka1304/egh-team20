@@ -9,7 +9,7 @@ type ReportCardProps = {
 
 export function ReportCard({ report }: ReportCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
-  const maxLength = 200;
+  const maxLength = 100;
   const isLongContent = report.text.length > maxLength;
   const displayedContent = showFullContent ? report.text : report.text;
   const handleShowMore = () => setShowFullContent(true);
