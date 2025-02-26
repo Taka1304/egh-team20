@@ -1,7 +1,7 @@
 "use client";
 
 import { PomodoroPageView } from "@/app/_features/Pomodoro/PomodoroPage/PomodoroPageView";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function PomodoroPageContainer() {
   const [isRunning, setIsRunning] = useState(false);
@@ -10,16 +10,6 @@ export default function PomodoroPageContainer() {
   const [breakDuration, setBreakDuration] = useState(5);
   const [isBreak, setIsBreak] = useState(false);
   const [sound, setSound] = useState(true);
-
-  useEffect(() => {
-    if (isRunning) return;
-
-    if (!isBreak) {
-      setTimeLeft(workDuration * 60);
-    } else {
-      setTimeLeft(breakDuration * 60);
-    }
-  }, [workDuration, breakDuration, isBreak, isRunning]);
 
   const handleStart = () => {
     if (sound) {
