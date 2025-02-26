@@ -22,6 +22,10 @@ export default function PomodoroPageContainer() {
   }, [workDuration, breakDuration, isBreak, isRunning]);
 
   const handleStart = () => {
+    if (sound) {
+      const audio = new Audio("/sound/pomodoro.mp3");
+      audio.play();
+    }
     setIsRunning(true);
   };
 
