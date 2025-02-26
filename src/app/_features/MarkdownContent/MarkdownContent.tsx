@@ -12,6 +12,7 @@ export default function MarkdownContent({ content }: MarkDownContentProps) {
     extensions: [StarterKit, Markdown],
     content: marked(content),
     editable: false,
+    immediatelyRender: false,
   });
 
   if (!editor) return null;

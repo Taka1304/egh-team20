@@ -15,6 +15,7 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
   const editor = useEditor({
     extensions: [StarterKit, Image],
     content: initialContent || "",
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: "prose prose-lg max-w-none focus:outline-none min-h-[500px]",
