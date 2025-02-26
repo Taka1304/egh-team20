@@ -14,7 +14,7 @@ type TimelineViewProps = {
 export function TimelineView({ reports, loaderRef, isLoading, hasMore }: TimelineViewProps) {
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4">
+      <div className="h-[90vh] overflow-y-auto border rounded-md p-2 space-y-4">
         {reports.map((report) => (
           <ReportCard key={report.id} report={report} />
         ))}
