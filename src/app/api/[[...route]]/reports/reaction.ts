@@ -1,3 +1,4 @@
+import { recoverFromNotFound } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
@@ -66,18 +67,21 @@ app.delete(
     const { id: reportId, typeId } = c.req.param();
 
     try {
-      const reaction = await prisma.reaction.deleteMany({
-        where: {
-          typeId: typeId,
-          userId: session.user.id,
-          reportId,
-        },
-      });
+      const reaction = await recoverFromNotFound(
+        prisma.reaction.delete({
+          where: {
+            typeId_userId_reportId: {
+              typeId,
+              reportId,
+              userId: session.user.id,
+            },
+          },
+        }),
+      );
 
-      if (reaction.count === 0) {
-        return c.json({ error: "リアクションが見つかりません" }, 404);
+      if (!reaction) {
+        return c.json({ error: "対象のリアクションが見つかりません" }, 404);
       }
-
       return c.json({ message: "リアクションを削除しました" }, 200);
     } catch (error) {
       console.error(error);
