@@ -1,8 +1,7 @@
 "use client";
 import type { User } from "@/app/[username]/types";
 import { Header } from "@/app/_features/Navigate/Header/Header";
-import { RecommendedUsers } from "@/app/_features/RecommendedUsers/RecommendedUsers";
-
+import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import { UserStats } from "@/app/_features/UserStats/UserStats";
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-// ダミーデータ（APIから取得する想定）
+// ダミーデータ
 const reports = [
   {
     id: 1,
@@ -19,41 +18,9 @@ const reports = [
     createdAt: "2024/02/23",
     link: "https://note.com/yamamotokoki/n...",
   },
-  {
-    id: 2,
-    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
-    content:
-      "今日は新しいプロジェクトの発表！楽しみ！🚀aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-    createdAt: "2024/02/22",
-  },
-  {
-    id: 3,
-    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
-    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
-    createdAt: "2024/02/23",
-    link: "https://note.com/yamamotokoki/n...",
-  },
-  {
-    id: 4,
-    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
-    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
-    createdAt: "2024/02/23",
-    link: "https://note.com/yamamotokoki/n...",
-  },
-  {
-    id: 5,
-    user: { name: "ヤマモト", handle: "@yamamotoVn", avatar: "/avatar.jpg" },
-    content: "JPHACKS2024 AWARD DAYの参加記事を書きました！ぜひご覧ください。",
-    createdAt: "2024/02/23",
-    link: "https://note.com/yamamotokoki/n...",
-  },
 ];
 
-export default function page() {
-  /*
-    モックデータ
-    後で、getUserProfileみたいな感じでユーザー情報を取得
-  */
+export default function ProfilePage() {
   const user: User = {
     username: "yamada-taro",
     displayName: "山田 太郎",
@@ -87,81 +54,100 @@ export default function page() {
   };
 
   return (
-    <div className="container mx-auto px-4 h-screen flex py-8 mt-10">
+    <div className="flex flex-col h-screen">
       <Header />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full h-full">
-        {/* 左側のプロフィール情報（スクロール可 / スクロールバー非表示） */}
-        <div className="md:col-span-1 space-y-1 h-full overflow-y-auto hidden-scrollbar">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col items-center">
-                <div className="flex gap-4">
-                  <div>
-                    <Avatar className="w-24 h-24">
-                      <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
-                      <AvatarFallback>{user.displayName}</AvatarFallback>
-                    </Avatar>
-                    <div className="mt-4 items-center space-x-2">
-                      <h1 className="mt-4 text-2xl font-bold">{user.displayName}</h1>
-                      <p className="text-muted-foreground">@{user.username}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-end gap-4">
-                    <div className="mt-4 flex space-x-4">
-                      <div className="text-center">
-                        <p className="font-semibold text-xl">{user.followersCount}</p>
-                        <p className="text-sm text-muted-foreground">フォロワー</p>
-                      </div>
-                      <div className="text-center">
-                        <p className="font-semibold text-xl">{user.followingCount}</p>
-                        <p className="text-sm text-muted-foreground">フォロー中</p>
-                      </div>
-                    </div>
-                    <Button className="mt-4" variant="outline">
-                      プロフィールを編集
-                    </Button>
-                  </div>
+      <div className="w-4/5 flex mx-auto flex-col">
+        <div className="flex flex-col items-center mt-20 bg-gray-100 py-6">
+          <Avatar className="w-32 h-32">
+            <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
+            <AvatarFallback>{user.displayName}</AvatarFallback>
+          </Avatar>
+          <h1 className="mt-4 text-3xl font-bold">{user.displayName}</h1>
+          <p className="text-muted-foreground">@{user.username}</p>
+          <div className="mt-2 flex space-x-4">
+            <div className="text-center">
+              <p className="font-semibold text-lg">{user.followersCount}</p>
+              <p className="text-sm text-muted-foreground">フォロワー</p>
+            </div>
+            <div className="text-center">
+              <p className="font-semibold text-lg">{user.followingCount}</p>
+              <p className="text-sm text-muted-foreground">フォロー中</p>
+            </div>
+          </div>
+          <Button className="mt-4" variant="outline">
+            プロフィールを編集
+          </Button>
+        </div>
+
+        {/* 右カラム（おすすめユーザー） */}
+        <div className="w-full pl-4">
+            <ProfileRecommendedUsers />
+        </div>
+
+        <div className="flex flex-grow container mx-auto px-4 py-8">
+          {/* 左カラム（プロフィール詳細） */}
+          <div className="w-1/4 pr-4 space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>自己紹介</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p>{user.bio}</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>興味分野</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-2">
+                  {user.interests.map((interest) => (
+                    <Badge key={interest} variant="secondary">
+                      {interest}
+                    </Badge>
+                  ))}
                 </div>
-              </div>
-            </CardContent>
+              </CardContent>
+            </Card>
+            <UserStats user={user} />
+            <UserBadges badges={user.badges} />
+          </div>
 
-            <div className="border-t card-foreground mt-4 pt-4 mx-4" />
-
-            <CardHeader>
-              <CardTitle>自己紹介</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>{user.bio}</p>
-            </CardContent>
-
-            <div className="border-t card-foreground mt-4 pt-4 mx-4" />
-
-            <CardHeader>
-              <CardTitle>興味分野</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {user.interests.map((interest) => (
-                  <Badge key={interest} variant="secondary">
-                    {interest}
-                  </Badge>
+          {/* 中央カラム（投稿一覧） */}
+          <div className="w-1/2 space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>投稿</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {reports.map((report) => (
+                  <div key={report.id} className="mb-4 p-4 border rounded-lg shadow-sm">
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="w-10 h-10">
+                        <AvatarImage src={report.user.avatar} alt={report.user.name} />
+                        <AvatarFallback>{report.user.name}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-semibold">{report.user.name}</p>
+                        <p className="text-sm text-muted-foreground">{report.createdAt}</p>
+                      </div>
+                    </div>
+                    <p className="mt-2">{report.content}</p>
+                    {report.link && (
+                      <a
+                        href={report.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-500 underline text-sm mt-2 block"
+                      >
+                        記事を読む
+                      </a>
+                    )}
+                  </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <UserStats user={user} />
-          <UserBadges badges={user.badges} />
-        </div>
-
-        {/* 中央のタイムライン（スクロール可 / スクロールバー非表示） */}
-        <div className="w-full flex justify-center h-full overflow-y-auto hidden-scrollbar">
-          <div className="w-full max-w-2xl">{/* <Timeline /> */}</div>
-        </div>
-
-        {/* 右側の「おすすめの人」リスト */}
-        <div className="md:col-span-1 h-full overflow-y-auto hidden-scrollbar">
-          <RecommendedUsers />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
