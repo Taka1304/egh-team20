@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 type User = {
+  id: string;
   image?: string | null;
   name: string;
   email?: string | null;
@@ -74,7 +75,7 @@ export function UserMenu({ user }: UserMenuProps) {
                   </DropdownMenuLabel>
                   <DropdownMenuGroup>
                     {group.items.map((item) => {
-                      const href = item.label === "プロフィール" ? `/profile/${user.name}` : item.link;
+                      const href = item.label === "プロフィール" ? `/profile/${user.id}` : item.link;
                       return (
                         <DropdownMenuItem key={item.label}>
                           <Link
