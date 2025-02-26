@@ -86,7 +86,7 @@ export default function ProfilePage() {
 
         <div className="flex flex-grow container mx-auto px-4 py-8">
           {/* 左カラム（プロフィール詳細） */}
-          <div className="w-1/4 pr-4 space-y-4">
+          <div className="w-2/5 pr-4 space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>自己紹介</CardTitle>
@@ -114,7 +114,7 @@ export default function ProfilePage() {
           </div>
 
           {/* 中央カラム（投稿一覧） */}
-          <div className="w-1/2 space-y-4">
+          <div className="w-3/5 space-y-4">
             <Card>
               <CardHeader>
                 <CardTitle>投稿</CardTitle>
