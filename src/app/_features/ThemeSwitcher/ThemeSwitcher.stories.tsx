@@ -1,4 +1,4 @@
-import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher.tsx/ThemeSwitcher";
+import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof ThemeSwitcher> = {

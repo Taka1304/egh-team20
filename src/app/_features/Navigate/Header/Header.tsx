@@ -1,7 +1,7 @@
 "use client";
 
 import { UserMenu } from "@/app/_features/Navigate/Header/UserMenu/UserMenu";
-import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher.tsx/ThemeSwitcher";
+import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Bell, Home, Search, Timer } from "lucide-react";

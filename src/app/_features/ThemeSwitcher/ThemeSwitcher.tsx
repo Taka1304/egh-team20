@@ -1,4 +1,4 @@
-import { isThemeModalOpenAtom, selectedThemeAtom, themes } from "@/app/_features/ThemeSwitcher.tsx/atom";
+import { isThemeModalOpenAtom, selectedThemeAtom, themes } from "@/app/_features/ThemeSwitcher/atom";
 import { Button } from "@/components/ui/button";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAtom } from "jotai";
