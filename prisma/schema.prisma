@@ -239,7 +239,6 @@ model ReactionType {
 
 // ユーザーが日報に対して行うリアクション
 model Reaction {
-  id       String       @id @default(cuid()) // リアクションID
   typeId   String // リアクションの種類ID (FK)
   userId   String // ユーザーID (FK)
   reportId String // 日報ID (FK)
@@ -249,6 +248,8 @@ model Reaction {
 
   createdAt DateTime @default(now()) // 作成日時
   updatedAt DateTime @updatedAt // 更新日時
+
+  @@id([typeId, userId, reportId])
 }
 
 // ユーザー間のフォロー関係を管理
