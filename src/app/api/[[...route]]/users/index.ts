@@ -1,6 +1,8 @@
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 const app = new Hono();
@@ -79,6 +81,41 @@ app.patch("/:id", zValidator("json", userScheme), async (c) => {
       return c.json({ error: error.message }, 500);
     }
     return c.json({ error: "Unknown error" }, 500);
+  }
+});
+
+// フォローするエンドポイント
+app.post("/:id/follow/:followerId", async (c) => {
+  const id = c.req.param("id");
+  const followerId = c.req.param("followerId");
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return c.json({ error: "ログインしていないユーザーです" }, 401);
+  }
+
+  try {
+    const follow = await prisma.follow.upsert({
+      where: {
+        followerId_followingId: {
+          followingId: id,
+          followerId: followerId,
+        },
+      },
+      update: {},
+      create: {
+        followerId: followerId,
+        followingId: id,
+      },
+    });
+
+    return c.json({ message: "Followed", follow: follow });
+  } catch (error) {
+    if (!error) {
+      console.error("ユーザーのフォロー処理に失敗しました:", error);
+    } else {
+      console.error("ユーザーのフォロー処理に失敗しました:");
+    }
+    return c.json({ error: "ユーザーフォロー処理に失敗しました" }, 500);
   }
 });
 export default app;
