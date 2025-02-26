@@ -1,5 +1,6 @@
 "use client";
-import { Header } from "@/app/_features/Navigate/Header/Header";
+
+import Header from "@/app/_features/Navigate/Header/Header";
 import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import { UserStats } from "@/app/_features/UserStats/UserStats";
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
