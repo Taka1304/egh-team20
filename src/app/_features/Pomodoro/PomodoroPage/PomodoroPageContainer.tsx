@@ -1,15 +1,25 @@
 "use client";
 
 import { PomodoroPageView } from "@/app/_features/Pomodoro/PomodoroPage/PomodoroPageView";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function PomodoroPageContainer() {
   const [isRunning, setIsRunning] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [workDuration, setWorkDuration] = useState(25);
+  const [timeLeft, setTimeLeft] = useState(workDuration * 60);
   const [breakDuration, setBreakDuration] = useState(5);
   const [isBreak, setIsBreak] = useState(false);
   const [sound, setSound] = useState(true);
+
+  useEffect(() => {
+    if (isRunning) return;
+
+    if (!isBreak) {
+      setTimeLeft(workDuration * 60);
+    } else {
+      setTimeLeft(breakDuration * 60);
+    }
+  }, [workDuration, breakDuration, isBreak, isRunning]);
 
   const handleStart = () => {
     setIsRunning(true);
@@ -21,8 +31,21 @@ export default function PomodoroPageContainer() {
 
   const handleReset = () => {
     setIsRunning(false);
-    setTimeLeft(workDuration * 60);
-    setIsBreak(false);
+    setTimeLeft(isBreak ? breakDuration * 60 : workDuration * 60);
+  };
+
+  const handleWorkDurationChange = (value: number) => {
+    setWorkDuration(value);
+    if (!isRunning && !isBreak) {
+      setTimeLeft(value * 60);
+    }
+  };
+
+  const handleBreakDurationChange = (value: number) => {
+    setBreakDuration(value);
+    if (!isRunning && isBreak) {
+      setTimeLeft(value * 60);
+    }
   };
 
   const handleComplete = () => {
@@ -42,9 +65,9 @@ export default function PomodoroPageContainer() {
       isBreak={isBreak}
       onComplete={handleComplete}
       workDuration={workDuration}
-      setWorkDuration={setWorkDuration}
+      setWorkDuration={handleWorkDurationChange}
       breakDuration={breakDuration}
-      setBreakDuration={setBreakDuration}
+      setBreakDuration={handleBreakDurationChange}
       sound={sound}
       setSound={setSound}
       onStart={handleStart}
