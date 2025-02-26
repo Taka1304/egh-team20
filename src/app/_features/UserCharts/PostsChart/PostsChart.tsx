@@ -1,3 +1,4 @@
+import { selectedThemeAtom, themes } from "@/app/_features/ThemeSwitcher/atom";
 import { Card } from "@/components/ui/card";
 import {
   Bar,
@@ -9,12 +10,16 @@ import {
   XAxis,
   YAxis,
 } from "@/components/ui/chart";
+import { useAtom } from "jotai";
 
 type PostsChartProps = {
   postsData: { month: string; count: number }[];
 };
 
 export default function PostsChart({ postsData }: PostsChartProps) {
+  const [selectedTheme] = useAtom(selectedThemeAtom);
+  const currentTheme = themes.find((theme) => theme.name === selectedTheme);
+  const COLORS = currentTheme?.reactionChartColors[0];
   return (
     <Card className="p-6">
       <h2 className="text-lg font-semibold mb-4">月別投稿数</h2>
@@ -26,7 +31,7 @@ export default function PostsChart({ postsData }: PostsChartProps) {
             <YAxis />
             <Tooltip />
             <Legend />
-            <Bar dataKey="count" fill="#6c5ce7" />
+            <Bar dataKey="count" fill={COLORS} />
           </BarChart>
         </ResponsiveContainer>
       </div>

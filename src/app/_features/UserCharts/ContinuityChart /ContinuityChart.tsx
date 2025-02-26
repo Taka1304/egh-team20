@@ -1,3 +1,4 @@
+import { selectedThemeAtom, themes } from "@/app/_features/ThemeSwitcher/atom";
 import { Card } from "@/components/ui/card";
 import {
   CartesianGrid,
@@ -9,12 +10,16 @@ import {
   XAxis,
   YAxis,
 } from "@/components/ui/chart";
+import { useAtom } from "jotai";
 
 type ContinuityChartProps = {
   continuityData: { date: string; days: number }[];
 };
 
 export default function ContinuityChart({ continuityData }: ContinuityChartProps) {
+  const [selectedTheme] = useAtom(selectedThemeAtom);
+  const currentTheme = themes.find((theme) => theme.name === selectedTheme);
+  const COLORS = currentTheme?.reactionChartColors[0];
   return (
     <Card className="p-6">
       <h2 className="text-lg font-semibold mb-4">継続日数の推移</h2>
@@ -26,7 +31,7 @@ export default function ContinuityChart({ continuityData }: ContinuityChartProps
             <YAxis />
             <Tooltip />
             <Legend />
-            <Line type="monotone" dataKey="days" stroke="#6c5ce7" strokeWidth={2} dot={{ fill: "#6c5ce7" }} />
+            <Line type="monotone" dataKey="days" stroke={COLORS} strokeWidth={2} dot={{ fill: COLORS }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

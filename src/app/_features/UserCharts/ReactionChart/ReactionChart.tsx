@@ -1,4 +1,4 @@
-import { selectedThemeAtom, themes } from "@/app/_features/ThemeSwitcher.tsx/atom";
+import { selectedThemeAtom, themes } from "@/app/_features/ThemeSwitcher/atom";
 import { Card } from "@/components/ui/card";
 import { Cell, Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "@/components/ui/chart";
 import { useAtom } from "jotai";
