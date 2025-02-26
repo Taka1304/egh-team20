@@ -11,6 +11,32 @@ import { CheckReportAccessPermission } from "./utils";
 
 const app = new Hono()
   .route("/", reaction)
+  .get("/drafts", async (c) => {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+
+    try {
+      const reports = await prisma.dailyReport.findMany({
+        where: {
+          userId: session.user.id,
+          visibility: $Enums.Visibility.PRIVATE,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (reports.length === 0) {
+        return c.json({ error: "下書きが見つかりません" }, 404);
+      }
+      return c.json({ reports }, 200);
+    } catch (error) {
+      console.error(error);
+      return c.json({ error: "下書きの取得に失敗しました" }, 500);
+    }
+  })
   .post(
     "/",
     zValidator(
