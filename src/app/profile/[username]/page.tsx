@@ -1,9 +1,9 @@
 "use client";
-import type { User } from "@/app/[username]/types";
 import { Header } from "@/app/_features/Navigate/Header/Header";
 import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import { UserStats } from "@/app/_features/UserStats/UserStats";
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
+import type { User } from "@/app/profile/[username]/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -81,7 +81,7 @@ export default function ProfilePage() {
 
         {/* 右カラム（おすすめユーザー） */}
         <div className="w-full pl-4">
-            <ProfileRecommendedUsers />
+          <ProfileRecommendedUsers />
         </div>
 
         <div className="flex flex-grow container mx-auto px-4 py-8">
