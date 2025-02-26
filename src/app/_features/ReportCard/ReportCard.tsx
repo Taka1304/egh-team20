@@ -1,3 +1,4 @@
+"use client";
 import { ReportCardView } from "@/app/_features/ReportCard/ReportCardView";
 import type { Report } from "@/app/types/reports";
 import { useState } from "react";

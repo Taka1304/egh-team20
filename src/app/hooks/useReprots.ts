@@ -1,3 +1,4 @@
+"use client";
 import type { Report } from "@/app/types/reports";
 import { useEffect, useState } from "react";
 

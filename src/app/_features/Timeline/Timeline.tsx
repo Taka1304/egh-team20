@@ -1,3 +1,4 @@
+"use client";
 import { TimelineView } from "@/app/_features/Timeline/TimelineView";
 import { useReports } from "@/app/hooks/useReprots";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
