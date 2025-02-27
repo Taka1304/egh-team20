@@ -13,6 +13,7 @@ import {
 import { DropdownMenu, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronRight, LogOut } from "lucide-react";
+import { signOut } from "next-auth/react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -30,9 +31,8 @@ type UserMenuProps = {
 export function UserMenu({ user }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // ログアウト処理(未実装)
   const handleLogout = () => {
-    console.log("Logout");
+    signOut();
   };
 
   return (
