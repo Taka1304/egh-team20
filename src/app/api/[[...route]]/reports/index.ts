@@ -36,6 +36,23 @@ const app = new Hono()
               image: true,
               isPrivate: true,
             },
+          },
+          reactions: {
+            select: {
+              type: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              user: {
+                select: {
+                  id: true,
+                  displayName: true,
+                  image: true,
+                },
+              },
+            },
           }
         },
         where: !session
@@ -250,6 +267,43 @@ const app = new Hono()
       } catch (error) {
         console.error(error);
         return c.json({ error: "日報の更新に失敗しました" }, 500);
+      }
+    },
+  )
+  .delete(
+    "/:id",
+    zValidator(
+      "param",
+      z.object({
+        id: z.string().cuid(),
+      }),
+    ),
+    async (c) => {
+      const reportId = c.req.param("id");
+      const session = await getServerSession(authOptions);
+
+      if (!session) {
+        return c.json({ error: "ログインしていないユーザーです" }, 401);
+      }
+
+      try {
+        const report = await recoverFromNotFound(
+          prisma.dailyReport.delete({
+            where: {
+              id: reportId,
+              userId: session.user.id,
+            },
+          }),
+        );
+
+        if (!report) {
+          return c.json({ error: "対象の日報が見つかりません" }, 404);
+        }
+
+        return c.json({ report }, 200);
+      } catch (error) {
+        console.error(error);
+        return c.json({ error: "日報の削除に失敗しました" }, 500);
       }
     },
   );
