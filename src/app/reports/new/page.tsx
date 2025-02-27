@@ -56,6 +56,9 @@ export default function page() {
       const { report } = await result.json();
       isDraft && setDraftId(report.id);
       toast.success("保存しました", { id: toastId });
+      if (!isDraft) {
+        router.push("/");
+      }
     } else {
       toast.error("保存に失敗しました", { id: toastId });
     }
