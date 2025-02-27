@@ -36,6 +36,23 @@ const app = new Hono()
               image: true,
               isPrivate: true,
             },
+          },
+          reactions: {
+            select: {
+              type: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+              user: {
+                select: {
+                  id: true,
+                  displayName: true,
+                  image: true,
+                },
+              },
+            },
           }
         },
         where: !session
