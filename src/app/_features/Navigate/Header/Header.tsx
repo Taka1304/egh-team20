@@ -1,12 +1,12 @@
 "use client";
 
 import { UserMenu } from "@/app/_features/Navigate/Header/UserMenu/UserMenu";
+import { NotificationModal } from "@/app/_features/NotificationModal/NotificationModal";
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Bell, Home, Search, Timer } from "lucide-react";
+import { Home, Search, Timer } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
@@ -17,19 +17,35 @@ export default function Header() {
     router.push("/reports/new");
   };
 
+  const handleHomeClick = () => {
+    router.push("/");
+  };
+
+  const handleTimerClick = () => {
+    router.push("/pomodoro");
+  };
+
   return (
     <div className="fixed top-0 left-0 right-0 h-14 bg-background border-b border-secondary z-50">
       <div className="container mx-auto h-full flex items-center justify-between px-4">
-        <nav className="flex items-center space-x-8">
-          <Link href="/" className="text-foreground hover:text-secondary">
+        <nav className="flex items-center space-x-3">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative w-10 h-10 rounded-full text-primary-foreground"
+            onClick={handleHomeClick}
+          >
             <Home className="h-5 w-5" />
-          </Link>
-          <Link href="/notifications" className="text-foreground hover:text-secondary">
-            <Bell className="h-5 w-5" />
-          </Link>
-          <Link href="/pomodoro" className="text-foreground hover:text-secondary">
+          </Button>
+          <NotificationModal />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative w-10 h-10 rounded-full text-primary-foreground"
+            onClick={handleTimerClick}
+          >
             <Timer className="h-5 w-5" />
-          </Link>
+          </Button>
         </nav>
 
         <div className="flex items-center space-x-4">
