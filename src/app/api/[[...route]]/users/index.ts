@@ -151,6 +151,8 @@ app
       return c.json({ error: "ユーザーフォロー解除処理に失敗しました" }, 500);
     }
   })
+
+  // おすすめのユーザーを取得するエンドポイント
   .get("/:id/recommended", async (c) => {
     const id = c.req.param("id");
     const getUserNum = 5;
