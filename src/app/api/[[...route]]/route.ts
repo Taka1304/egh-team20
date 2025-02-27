@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import assets from "./assets";
-import reports from "./reports";
-import reactions from "./reactions";
+import badges from "./badges";
 import interests from "./interests";
+import reactions from "./reactions";
+import reports from "./reports";
 import sample from "./sample";
 import users from "./users";
 
@@ -12,6 +13,7 @@ export const runtime = "nodejs";
 const app = new Hono()
   .basePath("/api")
   .route("/assets", assets)
+  .route("/badges", badges)
   .route("/sample", sample)
   .route("/interests", interests)
   .route("/reports", reports)
