@@ -11,6 +11,73 @@ import { CheckReportAccessPermission } from "./utils";
 
 const app = new Hono()
   .route("/", reaction)
+  .get("/", async (c) => {
+    const session = await getServerSession(authOptions);
+    try {
+      let followedUserIds: string[] = [];
+      if (session) {
+        followedUserIds = await prisma.follow
+          .findMany({
+            where: {
+              followerId: session.user.id,
+            },
+            select: {
+              followingId: true,
+            },
+          })
+          .then((follows) => follows.map((follow) => follow.followingId));
+      }
+      const reports = await prisma.dailyReport.findMany({
+        include: {
+          user: {
+            select:{
+              id: true,
+              displayName: true,
+              image: true,
+              isPrivate: true,
+            },
+          }
+        },
+        where: !session
+          ? {
+              visibility: $Enums.Visibility.PUBLIC,
+              user: {
+                isPrivate: false,
+              }
+            }
+          : {
+              OR: [
+                // 全ユーザーのパブリックな投稿
+                { visibility: $Enums.Visibility.PUBLIC, user: { isPrivate: false } },
+                // フォローしているユーザーの投稿
+                {
+                  visibility: $Enums.Visibility.FOLLOWERS,
+                  user: { isPrivate: false },
+                  userId: { in: followedUserIds },
+                },
+                // 自分の投稿
+                {
+                  userId: session.user.id,
+                  visibility: $Enums.Visibility.FOLLOWERS || $Enums.Visibility.PUBLIC,
+                }
+              ],
+            },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 30,
+      });
+
+      if (reports.length === 0) {
+        return c.json({ error: "日報が見つかりません" }, 404);
+      }
+
+      return c.json({ reports }, 200);
+    } catch (error) {
+      console.error(error);
+      return c.json({ error: "日報の取得に失敗しました" }, 500);
+    }
+  })
   .get("/drafts", async (c) => {
     const session = await getServerSession(authOptions);
     if (!session) {
