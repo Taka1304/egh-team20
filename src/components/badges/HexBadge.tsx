@@ -8,16 +8,16 @@ type HexBadgeProps = {
 export function HexBadge({
   number,
   title,
-  color = "rgba(108, 187, 156, 0.7)",
-  gradient = "rgba(108, 187, 156, 0.7)",
+  color = "#2C3E50", // 落ち着いた青系カラー
+  gradient = "#34495E", // 立体感のあるグラデーション
 }: HexBadgeProps) {
   return (
     <div className="relative w-20 h-20 flex items-center justify-center">
-      {/* 六角形のSVG（落ち着いた色合い + ゴールド縁を控えめに） */}
+      {/* 六角形のSVG（ゴールドの縁 + 立体感） */}
       <svg
         viewBox="0 0 100 100"
         xmlns="http://www.w3.org/2000/svg"
-        className="w-full h-full drop-shadow-md"
+        className="w-full h-full drop-shadow-sm"
         role="img"
         aria-label={`Badge: ${title}`}
       >
@@ -34,16 +34,15 @@ export function HexBadge({
         <polygon
           points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5"
           fill={`url(#badgeGradient-${number})`}
-          stroke="rgba(175, 136, 125, 1)"
-          strokeWidth="2.5"
+          stroke="rgba(255, 215, 0, 0.8)" /* ゴールドの枠 */
+          strokeWidth="3"
         />
       </svg>
 
-      {/* バッジのテキスト（六角形内に収める） */}
+      {/* バッジのテキスト（中央配置） */}
       <div className="absolute flex flex-col items-center text-white w-full h-full justify-center p-1 overflow-hidden">
-        <p className="text-xs font-semibold text-center leading-tight max-w-[90%] truncate">{title}</p>{" "}
-        {/* タイトルを小さくし、はみ出し防止 */}
-        <p className="text-sm font-semibold mt-1 text-yellow-600">{number}</p> {/* 数字をバランスよく調整 */}
+        <p className="text-[11px] font-semibold text-center leading-tight max-w-[85%] truncate">{title}</p>
+        <p className="text-base font-bold mt-1 text-yellow-500">{number}</p>
       </div>
     </div>
   );

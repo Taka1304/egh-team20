@@ -1,39 +1,17 @@
-import { HexBadge } from "@/components/badges/HexBadge";
+import { StyledBadge } from "@/app/profile/[username]/StyledBadge";
 
-type Achievement = {
-  id: string;
-  title: string;
-  description: string;
-  date: string;
-  icon: string; // アイコン画像のURL
-};
+const achievements = [
+  { id: "streak-100", title: "100日連続", subtitle: "継続は力", iconName: "bell", backgroundColor: "#3B82F6" },
+  { id: "first-report", title: "最初の日報", subtitle: "初めの一歩", iconName: "home", backgroundColor: "#EC4899" },
+  { id: "first-follower", title: "初めてのフォロワー", subtitle: "みんな仲良く", iconName: "user", backgroundColor: "#F59E0B" },
+] as const;
 
-type AchievementsListProps = {
-  achievements: Achievement[];
-};
-
-export function AchievementsList({ achievements }: AchievementsListProps) {
+export function AchievementsList() {
   return (
-    <div className="p-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {achievements.map((ach, index) => (
-          <div key={ach.id} className="flex items-center bg-card text-foreground p-4 rounded-lg shadow-md">
-            {/* `shadcn` のデザインを適用したバッジ */}
-            <HexBadge number={index + 1} title={ach.title} />
-
-            {/* タイトル & 説明 */}
-            <div className="flex-1 ml-4">
-              <p className="font-bold text-lg">{ach.title}</p>
-              <p className="text-sm text-gray-300">{ach.description}</p>
-            </div>
-
-            {/* 獲得日 */}
-            <div className="text-sm text-gray-400">{ach.date}</div>
-          </div>
-        ))}
-      </div>
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+      {achievements.map((ach) => (
+        <StyledBadge key={ach.id} {...ach} />
+      ))}
     </div>
   );
 }
-
-
