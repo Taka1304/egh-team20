@@ -1,7 +1,7 @@
 "use client";
 
+import { ProfileEditDialogView } from "@/app/_features/Profile/ProfileEditDialog/ProfileEditDialogView";
 import { useCallback, useState } from "react";
-import { ProfileDialogView } from "./ProfileDialogView";
 
 export type Profile = {
   name: string;
@@ -16,12 +16,12 @@ export type Profile = {
   following: number;
 };
 
-type ProfileDialogProps = {
+type ProfileEditDialogProps = {
   profile: Profile;
   onClose: () => void;
 };
 
-export function ProfileDialog({ profile, onClose }: ProfileDialogProps) {
+export function ProfileEditDialog({ profile, onClose }: ProfileEditDialogProps) {
   const [editedProfile, setEditedProfile] = useState<Profile>(profile);
 
   // フィールド1つを更新する共通関数
@@ -56,7 +56,7 @@ export function ProfileDialog({ profile, onClose }: ProfileDialogProps) {
   };
 
   return (
-    <ProfileDialogView
+    <ProfileEditDialogView
       avatar={editedProfile.avatar}
       following={editedProfile.following}
       followers={editedProfile.followers}
