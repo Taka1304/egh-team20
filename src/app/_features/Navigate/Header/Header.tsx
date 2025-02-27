@@ -7,9 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Bell, Home, Search, Timer } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { data: session } = useSession();
+  const router = useRouter();
+
+  const handlePostClick = () => {
+    router.push("/reports/new");
+  };
 
   return (
     <div className="fixed top-0 left-0 right-0 h-14 bg-background border-b border-secondary z-50">
@@ -49,7 +55,9 @@ export default function Header() {
               ログイン
             </Button>
           )}
-          <Button className="bg-primary hover:bg-foreground">投稿する</Button>
+          <Button className="bg-primary hover:bg-foreground" onClick={handlePostClick}>
+            投稿する
+          </Button>
         </div>
       </div>
     </div>
