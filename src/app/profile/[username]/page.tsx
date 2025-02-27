@@ -3,11 +3,12 @@
 import Header from "@/app/_features/Navigate/Header/Header";
 import ProfileCard from "@/app/_features/Profile/ProfileCard/ProfileCard";
 import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsers";
+
 import UserStatsList from "@/app/_features/Profile/UserStatsList/UserStatsList";
-import { UserBadges } from "@/app/_features/Profile/userBadges/UserBadges";
+import { Timeline } from "@/app/_features/Timeline/Timeline";
 
 import type { User } from "@/app/profile/[username]/types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {} from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -65,9 +66,13 @@ export default function ProfilePage() {
   return (
     <div className="bg-background">
       <Header />
-      <div className="w-4/5 flex mx-auto flex-col">
+      <div className="w-4/5 flex mx-auto flex-col gap-4">
         {/* プロフィールカード */}
-        <ProfileCard user={user} />
+        <div className="pl-4">
+          <ProfileCard user={user} />
+          {/* Todo ユーザーの累計投稿日数を受け取って、グラフとして表示 */}
+          {/* <PostsChart postsData={} /> */}
+        </div>
         {/* 右カラム（おすすめユーザー） */}
         <div className="w-full pl-4">
           <ProfileRecommendedUsers />
@@ -99,42 +104,12 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
             <UserStatsList stats={stats} />
-            <UserBadges badges={user.badges} />
           </div>
 
           {/* 中央カラム（投稿一覧） */}
-          <div className="w-3/5 space-y-4">
+          <div className="w-3/5">
             <Card>
-              <CardHeader>
-                <CardTitle>投稿</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {reports.map((report) => (
-                  <div key={report.id} className="mb-4 p-4 border rounded-lg shadow-sm">
-                    <div className="flex items-center space-x-4">
-                      <Avatar className="w-10 h-10">
-                        <AvatarImage src={report.user.avatar} alt={report.user.name} />
-                        <AvatarFallback>{report.user.name}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-semibold">{report.user.name}</p>
-                        <p className="text-sm text-muted-foreground">{report.createdAt}</p>
-                      </div>
-                    </div>
-                    <p className="mt-2">{report.content}</p>
-                    {report.link && (
-                      <a
-                        href={report.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline text-sm mt-2 block"
-                      >
-                        記事を読む
-                      </a>
-                    )}
-                  </div>
-                ))}
-              </CardContent>
+              <Timeline />
             </Card>
           </div>
         </div>
