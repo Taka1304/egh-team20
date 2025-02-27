@@ -1,4 +1,4 @@
-import ReactionChart from "@/app/_features/UserCharts/ReactionChart/ReactionChart";
+import ReactionChart from "@/app/_features/Profile/UserCharts/ReactionChart/ReactionChart";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof ReactionChart> = {

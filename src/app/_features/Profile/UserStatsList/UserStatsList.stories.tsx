@@ -1,4 +1,4 @@
-import UserStatsList from "@/app/_features/UserStatsList/UserStatsList";
+import UserStatsList from "@/app/_features/Profile/UserStatsList/UserStatsList";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof UserStatsList> = {

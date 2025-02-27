@@ -1,4 +1,4 @@
-import { UserBadges } from "@/app/_features/userBadges/UserBadges";
+import { UserBadges } from "@/app/_features/Profile/userBadges/UserBadges";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof UserBadges> = {
