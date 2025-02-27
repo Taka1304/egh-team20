@@ -180,38 +180,34 @@ app
         const followingUserIds = followingUsers.map((fu) => fu.followerId);
 
         // 同じカテゴリーをフォローしている他のユーザーを取得
-        const recommendedUserProfilesPromises = userInterests.map(async (userInterest) => {
-          return prisma.user.findMany({
-            where: {
-              UserInterest: {
-                some: {
-                  interestId: userInterest.interestId,
-                },
-              },
-              id: {
-                notIn: followingUserIds.concat(id),
+        const recommendedUserProfilesResult = await prisma.user.findMany({
+          where: {
+            UserInterest: {
+              some: {
+                interestId: { in: userInterests.map((interest) => interest.interestId) },
               },
             },
-            select: {
-              id: true,
-              displayName: true,
-              image: true,
-              UserInterest: {
-                select: {
-                  interest: {
-                    select: {
-                      name: true,
-                    },
+            id: {
+              notIn: followingUserIds.concat(id),
+            },
+          },
+          select: {
+            id: true,
+            displayName: true,
+            image: true,
+            UserInterest: {
+              select: {
+                interest: {
+                  select: {
+                    name: true,
                   },
                 },
               },
             },
-          });
+          },
         });
 
-        const recommendedUserProfilesResult = await Promise.all(recommendedUserProfilesPromises);
-        const recommendedUserProfilesFlat = recommendedUserProfilesResult.flat();
-        let recommendedUserProfiles = shuffleArray(recommendedUserProfilesFlat).slice(0, recommendedUserNum);
+        let recommendedUserProfiles = shuffleArray(recommendedUserProfilesResult).slice(0, recommendedUserNum);
 
         // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
         if (recommendedUserProfiles.length < recommendedUserNum) {
