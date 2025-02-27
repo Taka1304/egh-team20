@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@/app/_features/Navigate/Header/Header";
+import ProfileCard from "@/app/_features/Profile/ProfileCard/ProfileCard";
 import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import UserStatsList from "@/app/_features/Profile/UserStatsList/UserStatsList";
 import { UserBadges } from "@/app/_features/Profile/userBadges/UserBadges";
@@ -8,7 +9,6 @@ import { UserBadges } from "@/app/_features/Profile/userBadges/UserBadges";
 import type { User } from "@/app/profile/[username]/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // ダミーデータ
@@ -63,31 +63,11 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="bg-background">
       <Header />
       <div className="w-4/5 flex mx-auto flex-col">
-        <div className="flex flex-col items-center mt-20 bg-gray-100 py-6">
-          <Avatar className="w-32 h-32">
-            <AvatarImage src={user.profileImageUrl} alt={user.displayName} />
-            <AvatarFallback>{user.displayName}</AvatarFallback>
-          </Avatar>
-          <h1 className="mt-4 text-3xl font-bold">{user.displayName}</h1>
-          <p className="text-muted-foreground">@{user.username}</p>
-          <div className="mt-2 flex space-x-4">
-            <div className="text-center">
-              <p className="font-semibold text-lg">{user.followersCount}</p>
-              <p className="text-sm text-muted-foreground">フォロワー</p>
-            </div>
-            <div className="text-center">
-              <p className="font-semibold text-lg">{user.followingCount}</p>
-              <p className="text-sm text-muted-foreground">フォロー中</p>
-            </div>
-          </div>
-          <Button className="mt-4 text-foreground" variant="outline">
-            プロフィールを編集
-          </Button>
-        </div>
-
+        {/* プロフィールカード */}
+        <ProfileCard user={user} />
         {/* 右カラム（おすすめユーザー） */}
         <div className="w-full pl-4">
           <ProfileRecommendedUsers />
