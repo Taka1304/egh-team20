@@ -1,4 +1,4 @@
-import { recoverFromNotFound } from "@/app/api/[[...route]]/utils";
+import { recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
@@ -150,5 +150,109 @@ app
       }
       return c.json({ error: "ユーザーフォロー解除処理に失敗しました" }, 500);
     }
-  });
+  })
+
+  // おすすめのユーザーを取得するエンドポイント
+  .get(
+    "/:id/recommended",
+    zValidator(
+      "query",
+      z.object({
+        recommendedUserNum: z.number().optional(),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
+      const recommendedUserNum = c.req.valid("query").recommendedUserNum ?? 5;
+
+      try {
+        // 現在のユーザーがフォローしているカテゴリーを取得
+        const userInterests = await prisma.userInterest.findMany({
+          where: { userId: id },
+          select: { interestId: true },
+        });
+
+        // 既にフォローしているユーザーを省くため，現在のユーザーがフォローしているユーザーを取得
+        const followingUsers = await prisma.follow.findMany({
+          where: { followingId: id },
+          select: { followerId: true },
+        });
+        const followingUserIds = followingUsers.map((fu) => fu.followerId);
+
+        // 同じカテゴリーをフォローしている他のユーザーを取得
+        const recommendedUserProfilesResult = await prisma.user.findMany({
+          where: {
+            UserInterest: {
+              some: {
+                interestId: { in: userInterests.map((interest) => interest.interestId) },
+              },
+            },
+            id: {
+              notIn: followingUserIds.concat(id),
+            },
+          },
+          select: {
+            id: true,
+            displayName: true,
+            image: true,
+            UserInterest: {
+              select: {
+                interest: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        let recommendedUserProfiles = shuffleArray(recommendedUserProfilesResult).slice(0, recommendedUserNum);
+
+        // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
+        if (recommendedUserProfiles.length < recommendedUserNum) {
+          const additionalUsers = await prisma.user.findMany({
+            where: {
+              id: {
+                notIn: recommendedUserProfiles
+                  .map((user) => user.id)
+                  .concat(followingUserIds)
+                  .concat(id),
+              },
+            },
+            select: {
+              id: true,
+              displayName: true,
+              image: true,
+              UserInterest: {
+                select: {
+                  interest: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+            take: recommendedUserNum - recommendedUserProfiles.length,
+          });
+          recommendedUserProfiles = recommendedUserProfiles.concat(additionalUsers);
+        }
+
+        // 必要な情報を整形
+        const recommendedUsers = recommendedUserProfiles.map((user) => ({
+          id: user.id,
+          displayName: user.displayName,
+          image: user.image,
+          interests: user.UserInterest.map((ui) => ui.interest.name),
+        }));
+
+        return c.json({ recommendedUsers });
+      } catch (error) {
+        console.error("レコメンド情報の取得に失敗しました:", error);
+        return c.json({ error: "レコメンド情報の取得に失敗しました", details: error as string }, 500);
+      }
+    },
+  );
+
 export default app;
