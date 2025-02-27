@@ -177,7 +177,6 @@ app
           where: { followingId: id },
           select: { followerId: true },
         });
-
         const followingUserIds = followingUsers.map((fu) => fu.followerId);
 
         // 同じカテゴリーをフォローしている他のユーザーを取得
