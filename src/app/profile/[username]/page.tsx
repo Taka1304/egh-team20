@@ -1,10 +1,10 @@
 "use client";
 
 import Header from "@/app/_features/Navigate/Header/Header";
-import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
+import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsers";
+import UserStatsList from "@/app/_features/Profile/UserStatsList/UserStatsList";
+import { UserBadges } from "@/app/_features/Profile/userBadges/UserBadges";
 
-import UserStatsList from "@/app/_features/UserStatsList/UserStatsList";
-import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import type { User } from "@/app/profile/[username]/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

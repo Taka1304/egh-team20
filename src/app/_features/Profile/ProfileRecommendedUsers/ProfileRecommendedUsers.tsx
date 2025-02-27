@@ -1,6 +1,6 @@
 "use client";
 
-import { ProfileRecommendedUserCard } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUserCard";
+import { ProfileRecommendedUserCard } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUserCard";
 import { useGetRecommendedUsers } from "@/app/hooks/useGetRecommendedUsers";
 
 export function ProfileRecommendedUsers() {

@@ -1,4 +1,4 @@
-import UserStatsCard from "@/app/_features/UserStatsList/UserStatsCard/UserStatsCard";
+import UserStatsCard from "@/app/_features/Profile/UserStatsList/UserStatsCard/UserStatsCard";
 
 type UserStatsListProps = {
   stats: {
