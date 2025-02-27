@@ -11,7 +11,7 @@ type RecommendedArticleCardProps = {
 
 export function RecommendedArticlesCard({ article }: RecommendedArticleCardProps) {
   return (
-    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+    <motion.div whileHover={{ scale: 0.99 }} whileTap={{ scale: 0.98 }}>
       <Link href={article.url} passHref>
         <Card className="overflow-hidden cursor-pointer h-36 max-w-[600px] flex">
           <div className="relative w-full min-w-44 max-w-44">
