@@ -26,15 +26,19 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
       handleDrop: (_view, event, _slice, moved) => {
         // if dropping external files
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
-          // const file = event.dataTransfer.files[0];
-          // if (file.type === "image/jpeg" || file.type === "image/png") {
-          //   toast.error("このファイルの形式はサポートされていません");
-          //   return false;
-          // }
-          // if (file.size > 1024 * 1024 * 5) {
-          //   toast.error("ファイルサイズが大きすぎます");
-          //   return false;
-          // }
+          const file = event.dataTransfer.files[0];
+          // check file type
+          if (file.type !== "image/jpeg" && file.type !== "image/png") {
+            toast.error("このファイルの形式はサポートされていません");
+            event.preventDefault();
+            return false;
+          }
+          // 5MB
+          if (file.size > 1024 * 1024 * 5) {
+            toast.error("ファイルサイズが5MBを超えています");
+            event.preventDefault();
+            return false;
+          }
 
           const toastId = toast.loading("画像をアップロードしています...");
 
