@@ -1,6 +1,6 @@
 "use client";
 
-import { NotificationModalView } from "@/app/_features/Notification/NotificationView";
+import { NotificationModalView } from "@/app/_features/Notification/NotificationModalView";
 
 type Notification = {
   id: number;

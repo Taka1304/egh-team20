@@ -1,9 +1,9 @@
-import { NotificationModal } from "@/app/_features/Notification/Notification";
+import { NotificationModal } from "@/app/_features/Notification/NotificationModal";
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 
 const meta: Meta<typeof NotificationModal> = {
-  title: "features/Notification",
+  title: "features/NotificationModal",
   component: NotificationModal,
 };
 
