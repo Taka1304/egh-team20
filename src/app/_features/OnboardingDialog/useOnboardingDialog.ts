@@ -1,6 +1,6 @@
 "use client";
 
-import { useGetRecommendedUsers } from "@/app/hooks/useGetRecommendedUsers";
+import { useGetRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/useGetRecommendedUsers";
 import { useState } from "react";
 
 export function useOnboardingDialog(onClose: () => void) {

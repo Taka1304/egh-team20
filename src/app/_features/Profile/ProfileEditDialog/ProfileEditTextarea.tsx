@@ -2,14 +2,14 @@
 
 import { Textarea } from "@/components/ui/textarea";
 
-type ProfileTextareaProps = {
+type ProfileEditTextareaProps = {
   title: string;
   value: string;
   placeholder: string;
   onChange: (value: string) => void;
 };
 
-export function ProfileTextarea({ title, value, placeholder, onChange }: ProfileTextareaProps) {
+export function ProfileEditTextarea({ title, value, placeholder, onChange }: ProfileEditTextareaProps) {
   return (
     <div className="mt-4">
       <h3 className="text-lg font-semibold">{title}</h3>

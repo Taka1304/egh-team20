@@ -1,4 +1,4 @@
-import PostsChart from "@/app/_features/UserCharts/PostsChart/PostsChart";
+import PostsChart from "@/app/_features/Profile/UserCharts/PostsChart/PostsChart";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const meta: Meta<typeof PostsChart> = {

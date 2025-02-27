@@ -1,17 +1,17 @@
-import { ProfileDialog } from "@/app/_features/ProfileDialog/ProfileDialog";
+import { ProfileEditDialog } from "@/app/_features/Profile/ProfileEditDialog/ProfileEditDialog";
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 
-const meta: Meta<typeof ProfileDialog> = {
-  title: "features/ProfileDialog",
-  component: ProfileDialog,
+const meta: Meta<typeof ProfileEditDialog> = {
+  title: "features/Profile/ProfileEditDialog",
+  component: ProfileEditDialog,
   parameters: {
     layout: "fullscreen",
   },
 };
 
 export default meta;
-type Story = StoryObj<typeof ProfileDialog>;
+type Story = StoryObj<typeof ProfileEditDialog>;
 
 export const Default: Story = {
   args: {
@@ -30,6 +30,6 @@ export const Default: Story = {
     onClose: fn(),
   },
   render: (args) => {
-    return <ProfileDialog {...args} />;
+    return <ProfileEditDialog {...args} />;
   },
 };

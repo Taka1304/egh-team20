@@ -4,9 +4,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-import { ProfileTextarea } from "./ProfileTextarea";
+import { ProfileEditTextarea } from "./ProfileEditTextarea";
 
-type ProfileDialogViewProps = {
+type ProfileEditDialogViewProps = {
   avatar: string;
   following: number;
   followers: number;
@@ -28,7 +28,7 @@ type ProfileDialogViewProps = {
   onSave: () => void;
 };
 
-export function ProfileDialogView({
+export function ProfileEditDialogView({
   avatar,
   following,
   followers,
@@ -48,7 +48,7 @@ export function ProfileDialogView({
   setIsPublic,
   onClose,
   onSave,
-}: ProfileDialogViewProps) {
+}: ProfileEditDialogViewProps) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-card p-6 rounded-lg shadow-lg w-[600px] max-w-full text-card-foreground relative">
@@ -118,21 +118,21 @@ export function ProfileDialogView({
         </div>
 
         {/* スキル */}
-        <ProfileTextarea
+        <ProfileEditTextarea
           title="スキルセット"
           value={skills}
           onChange={setSkills}
           placeholder="例: JavaScript, React, TypeScript"
         />
         {/* 学びたいジャンル */}
-        <ProfileTextarea
+        <ProfileEditTextarea
           title="学びたいジャンル・目指す分野"
           value={learningGoals}
           onChange={setLearningGoals}
           placeholder="例: Web開発, AI, UXデザイン"
         />
         {/* 自己紹介 */}
-        <ProfileTextarea title="自己紹介" value={bio} onChange={setBio} placeholder="自己紹介を書いてください" />
+        <ProfileEditTextarea title="自己紹介" value={bio} onChange={setBio} placeholder="自己紹介を書いてください" />
 
         {/* 公開設定 */}
         <div className="mt-6 flex items-start space-x-3">

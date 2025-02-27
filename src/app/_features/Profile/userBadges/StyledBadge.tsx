@@ -1,18 +1,18 @@
 import { Bell, Home, Search, User } from "lucide-react";
 
-type StyledBadgeProps = {
+type UserBadgeProps = {
   title: string;
   subtitle: string;
   iconName: "bell" | "home" | "search" | "user"; // 指定可能なアイコン名
   backgroundColor?: string;
 };
 
-export function StyledBadge({
+export function UserBadge({
   title,
   subtitle,
   iconName,
   backgroundColor = "#3B82F6", // デフォルトの背景色
-}: StyledBadgeProps) {
+}: UserBadgeProps) {
   // `iconName` に応じて適切なアイコンを選択
   const IconComponent = {
     bell: Bell,
@@ -38,7 +38,7 @@ export function StyledBadge({
       </div>
 
       {/* 右側の装飾 */}
-      <div className="absolute -right-2 w-6 h-6 rounded-full border border-white opacity-50"/>
+      <div className="absolute -right-2 w-6 h-6 rounded-full border border-white opacity-50" />
     </div>
   );
 }

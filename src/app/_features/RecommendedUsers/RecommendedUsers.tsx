@@ -1,7 +1,7 @@
 "use client";
 
+import { useGetRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/useGetRecommendedUsers";
 import { RecommendedUserCard } from "@/app/_features/RecommendedUsers/RecommendedUserCard";
-import { useGetRecommendedUsers } from "@/app/hooks/useGetRecommendedUsers";
 
 export function RecommendedUsers() {
   const { recommendedUsers, isLoading } = useGetRecommendedUsers();

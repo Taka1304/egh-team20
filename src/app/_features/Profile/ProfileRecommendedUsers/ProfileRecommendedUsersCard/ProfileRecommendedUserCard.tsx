@@ -16,14 +16,14 @@ export function ProfileRecommendedUserCard({ user }: ProfileRecommendedUserCardP
   };
 
   return (
-    <div className="relative w-36 bg-white rounded-lg shadow-md border overflow-hidden flex-shrink-0">
+    <div className="relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex-shrink-0">
       {/* 閉じるボタン */}
-      <Button className="absolute top-2 right-2 p-1 bg-gray-200 rounded-full hover:bg-gray-300">
+      <Button className="absolute top-2 right-2 p-1 rounded-full bg-primary-foreground">
         <X size={16} className="text-gray-600" />
       </Button>
 
       {/* プロフィール画像 */}
-      <div className="w-full h-24 bg-gray-100 flex items-center justify-center">
+      <div className="w-full h-24 bg-primary-foreground flex items-center justify-center">
         <Avatar className="w-16 h-16 rounded-full border border-gray-300">
           <AvatarImage src={user.image ?? ""} alt={`${user.name}のアイコン`} />
           <AvatarFallback className="bg-muted text-muted-foreground">
@@ -35,7 +35,7 @@ export function ProfileRecommendedUserCard({ user }: ProfileRecommendedUserCardP
       {/* ユーザー情報 */}
       <div className="p-2 text-center">
         <p className="font-bold text-sm">{user.name}</p>
-        {user.bio && <p className="text-xs text-gray-500 truncate">{user.bio}</p>}
+        {user.bio && <p className="text-xs text-background truncate">@{user.id}</p>}
       </div>
 
       {/* フォローボタン */}
