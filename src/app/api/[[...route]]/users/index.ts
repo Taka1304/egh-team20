@@ -253,8 +253,8 @@ app
 
         return c.json({ recommendedUsers });
       } catch (error) {
-        console.error("Error fetching recommended users:", error);
-        return c.json({ error: "Error fetching recommended users", details: error as string }, 500);
+        console.error("レコメンド情報の取得に失敗しました:", error);
+        return c.json({ error: "レコメンド情報の取得に失敗しました", details: error as string }, 500);
       }
     },
   );
