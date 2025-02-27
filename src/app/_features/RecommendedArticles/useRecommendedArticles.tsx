@@ -32,6 +32,8 @@ export function useRecommendedArticles() {
       ];
 
       try {
+        // UI確認用に3秒遅延
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         const articlesWithOGP = await Promise.all(
           mockData.map(async (article) => {
             try {
