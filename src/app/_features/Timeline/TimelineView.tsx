@@ -52,7 +52,7 @@ export function TimelineView({
       </div>
 
       {/* タイムライン表示エリア */}
-      <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4">
+      <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar">
         {reports.length > 0 ? (
           reports.map((report) => <ReportCard key={report.id} report={report} />)
         ) : (
