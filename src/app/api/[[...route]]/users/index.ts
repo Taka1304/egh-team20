@@ -202,7 +202,7 @@ app
     zValidator(
       "query",
       z.object({
-        recommendedUserNum: z.number().optional(),
+        recommendedUserNum: z.coerce.number().optional(),
       }),
     ),
     async (c) => {
