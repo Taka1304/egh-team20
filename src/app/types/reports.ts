@@ -1,5 +1,5 @@
 export type Report = {
-  id: number;
+  id: string;
   user: {
     name: string;
     handle: string;

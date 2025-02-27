@@ -9,14 +9,24 @@ const meta: Meta<typeof ReportCard> = {
 export default meta;
 type Story = StoryObj<typeof ReportCard>;
 
-const text = `
-# 今日の日報
-- マークダウンの制御難しく無いか？`;
+const text = `## 今日の気分: 😃
+## 本日の格言
+ああ 良き天気 心安らかなり
+日本の夏 蝉の声 いま静かにして
+木の下に宿れるなり 我が心
+その宿れるなりと同じき 安き心にある
+行ってきます!!!
+
+## もくじ
+- 1. はじめに
+- 2. 本文
+- 3. おわりに
+`;
 
 export const Default: Story = {
   args: {
     report: {
-      id: 1,
+      id: "1",
       user: {
         name: "ヤマモト",
         handle: "@yamamotoVn",

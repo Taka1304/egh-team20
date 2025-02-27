@@ -1,8 +1,7 @@
 "use client";
 import { useState } from "react";
-import { Header } from "@/app/_features/Navigate/Header/Header";
 import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
-import { UserStats } from "@/app/_features/UserStats/UserStats";
+
 import { UserBadges } from "@/app/_features/userBadges/UserBadges";
 import type { User } from "@/app/profile/[username]/types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AchievementsList } from "@/app/profile/[username]/AchievementsList";
+import Header from "@/app/_features/Navigate/Header/Header";
 
 // ダミーデータ
 const reports = [
@@ -174,7 +174,6 @@ export default function ProfilePage() {
                     </div>
                   </CardContent>
                 </Card>
-                <UserStats user={user} />
                 <UserBadges badges={user.badges} />
               </div>
 
