@@ -202,35 +202,11 @@ app
             },
           },
           select: { id: true },
+          take: getUserNum - selectedUsers.length,
         });
-
-        const additionalSelectedUsers = shuffleArray(additionalUsers)
-          .slice(0, getUserNum - selectedUsers.length)
-          .map((user) => ({ userId: user.id }));
-        selectedUsers = selectedUsers.concat(additionalSelectedUsers);
+        const additionalUsersSelect = additionalUsers.map((user) => ({ userId: user.id }));
+        selectedUsers = selectedUsers.concat(additionalUsersSelect);
       }
-
-      // プロフィール情報と興味を取得
-      const recommendedUserProfiles = await prisma.user.findMany({
-        where: {
-          id: { in: selectedUsers.map((user) => user.userId) },
-        },
-        select: {
-          id: true,
-          displayName: true,
-          image: true,
-          bio: true,
-          UserInterest: {
-            select: {
-              interest: {
-                select: {
-                  name: true,
-                },
-              },
-            },
-          },
-        },
-      });
 
       // 必要な情報を整形
       const recommendedUsers = recommendedUserProfiles.map((user) => ({
