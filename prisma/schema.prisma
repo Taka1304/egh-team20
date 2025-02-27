@@ -131,8 +131,10 @@ model Authenticator {
 
 model Badge {
   id          String   @id @default(cuid())
-  name        String
-  description String
+  name        String // バッジ名
+  description String // 主に取得条件
+  tagline     String? // 補足説明みたいなやつ
+  grade       Int // 1~5, 99(secret)
   createdAt   DateTime @default(now()) // 作成日時
   updatedAt   DateTime @updatedAt // 更新日時
 
@@ -145,8 +147,7 @@ model UserBadge {
   user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   badge   Badge  @relation(fields: [badgeId], references: [id], onDelete: Cascade)
 
-  createdAt DateTime @default(now()) // 作成日時
-  updatedAt DateTime @updatedAt // 更新日時
+  createdAt DateTime @default(now()) // 取得日時
 
   @@id([userId, badgeId])
 }
