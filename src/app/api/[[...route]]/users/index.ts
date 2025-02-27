@@ -247,13 +247,4 @@ app
     }
   });
 
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffledArray = [...array]; // 元の配列を変更しないようコピー
-  for (let i = shuffledArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1)); // 0 〜 i のランダムなインデックス
-    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // 要素をスワップ
-  }
-  return shuffledArray;
-}
-
 export default app;
