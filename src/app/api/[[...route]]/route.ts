@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { handle } from "hono/vercel";
 import assets from "./assets";
 import reports from "./reports";
+import reactions from "./reactions";
 import sample from "./sample";
 import users from "./users";
 
@@ -12,6 +13,7 @@ const app = new Hono()
   .route("/assets", assets)
   .route("/sample", sample)
   .route("/reports", reports)
+  .route("/reactions", reactions)
   .route("/users", users);
 
 export type HonoAppType = typeof app;
