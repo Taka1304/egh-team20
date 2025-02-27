@@ -1,6 +1,8 @@
 "use client";
 
 import MarkdownContent from "@/app/_features/MarkdownContent/MarkdownContent";
+import ActionButton from "@/app/_features/ReportCard/ActionButton/ActionButton";
+
 import type { Report } from "@/app/types/reports";
 import { ReportDate } from "@/components/ui/ReportDate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -15,7 +17,15 @@ type ReportCardViewProps = {
   displayedContent: string;
   shouldShowMoreButton: boolean;
   onShowMore: () => void;
+  onLike: () => void;
+  onFlame: () => void;
+  onCheck: () => void;
+  onComment: () => void;
   isExpanded: boolean;
+
+  hasLiked: boolean;
+  hasFlamed: boolean;
+  hasChecked: boolean;
 };
 
 export function ReportCardView({
@@ -23,7 +33,14 @@ export function ReportCardView({
   displayedContent,
   shouldShowMoreButton,
   onShowMore,
+  onLike,
+  onFlame,
+  onCheck,
+  onComment,
   isExpanded,
+  hasLiked,
+  hasFlamed,
+  hasChecked,
 }: ReportCardViewProps) {
   return (
     <Card
@@ -48,9 +65,11 @@ export function ReportCardView({
       </div>
 
       {/* 投稿タイトル */}
-      <div className="pt-3">
-        <h2 className="text-lg font-bold">{report.title}</h2>
-      </div>
+      {report.title && (
+        <div className="pt-3">
+          <h2 className="text-lg font-bold">{report.title}</h2>
+        </div>
+      )}
 
       {/* 投稿内容 */}
       <div className="mt-2 relative">
@@ -89,23 +108,20 @@ export function ReportCardView({
 
       {/* アクションボタン */}
       <div className="mt-4 flex justify-between items-center border-t pt-3">
-        <Button variant="ghost" size="sm" className="space-x-2">
+        <Button variant="ghost" size="sm" className="space-x-2" onClick={onComment}>
           <MessageCircle className="h-4 w-4" />
           <span>{report.comments || 0}</span>
         </Button>
         <div className="flex space-x-2">
-          <Button variant="ghost" size="sm" className="space-x-2">
-            <Heart className="h-4 w-4" />
-            <span>{report.likes || 0}</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="space-x-2">
-            <Flame className="h-4 w-4" />
-            <span>{report.flames || 0}</span>
-          </Button>
-          <Button variant="ghost" size="sm" className="space-x-2">
-            <CheckCircle className="h-4 w-4" />
-            <span>{report.checks || 0}</span>
-          </Button>
+          <ActionButton icon={Heart} label="いいね" count={report.likes || 0} onClick={onLike} active={hasLiked} />
+          <ActionButton icon={Flame} label="ファイト" count={report.flames || 0} onClick={onFlame} active={hasFlamed} />
+          <ActionButton
+            icon={CheckCircle}
+            label="チェック"
+            count={report.checks || 0}
+            onClick={onCheck}
+            active={hasChecked}
+          />
         </div>
       </div>
     </Card>
