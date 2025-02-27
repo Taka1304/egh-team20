@@ -1,6 +1,7 @@
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { marked } from "marked";
+import ImageResize from "tiptap-extension-resize-image";
 import { Markdown } from "tiptap-markdown";
 
 type MarkDownContentProps = {
@@ -9,7 +10,7 @@ type MarkDownContentProps = {
 
 export default function MarkdownContent({ content }: MarkDownContentProps) {
   const editor = useEditor({
-    extensions: [StarterKit, Markdown],
+    extensions: [StarterKit, Markdown, ImageResize],
     content: marked(content),
     editable: false,
     immediatelyRender: false,

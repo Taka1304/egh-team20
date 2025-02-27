@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/Loading";
 import { ReportCard } from "@/app/_features/ReportCard/ReportCard";
 import type { ViewMode } from "@/app/_features/Timeline/Timeline";
 import type { Report } from "@/app/types/reports";
@@ -51,7 +52,7 @@ export function TimelineView({
       </div>
 
       {/* タイムライン表示エリア */}
-      <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4">
+      <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar">
         {reports.length > 0 ? (
           reports.map((report) => <ReportCard key={report.id} report={report} />)
         ) : (
@@ -62,7 +63,11 @@ export function TimelineView({
 
         {/* ローダー */}
         <div ref={loaderRef} className="py-4 text-center">
-          {isLoading && <p className="text-muted-foreground">読み込み中...</p>}
+          {isLoading && (
+            <div className=" flex items-center justify-center">
+              <Loading />
+            </div>
+          )}
           {!hasMore && reports.length > 0 && <p className="text-muted-foreground">これ以上のレポートはありません</p>}
         </div>
       </div>

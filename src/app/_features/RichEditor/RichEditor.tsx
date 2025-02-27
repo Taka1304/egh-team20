@@ -1,24 +1,47 @@
 "use client";
 
 import { MARKDOWN_TEMPLATES } from "@/app/_features/RichEditor/constants";
+import type { client } from "@/lib/hono";
 import Image from "@tiptap/extension-image";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import type { InferResponseType } from "hono/client";
+import { toast } from "sonner";
+import ImageResize from "tiptap-extension-resize-image";
 import { RichEditorView } from "./RichEditorView";
 
 export type RichEditorProps = {
   onChange: (content: string) => void;
+  onAssetsUpload: (
+    file: File,
+    toastId?: string | number,
+  ) => Promise<InferResponseType<typeof client.api.assets.upload.$post, 200> | undefined>;
   initialContent?: string;
 };
 
-export default function RichEditor({ onChange, initialContent }: RichEditorProps) {
+export default function RichEditor({ onChange, onAssetsUpload, initialContent }: RichEditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit, Image],
+    extensions: [StarterKit, Image, ImageResize],
     content: initialContent || "",
     immediatelyRender: false,
     editorProps: {
       attributes: {
         class: "prose prose-lg max-w-none focus:outline-none min-h-[500px]",
+      },
+      handleDrop: (_view, event, _slice, moved) => {
+        // if dropping external files
+        if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
+          const toastId = toast.loading("画像をアップロードしています...");
+
+          onAssetsUpload(event.dataTransfer.files[0], toastId).then((result) => {
+            if (result) {
+              editor?.chain().focus().setImage({ src: result.url }).run();
+              toast.success("画像をアップロードしました", { id: toastId });
+            }
+          });
+          return true;
+        }
+        return false;
       },
     },
     onUpdate: ({ editor }) => {
@@ -30,14 +53,6 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
     return null;
   }
 
-  // Container側のロジック
-  const addImage = () => {
-    const url = window.prompt("URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
-
   const insertTemplate = (template: string) => {
     // 初期状態として、エディタにテンプレートをセット
     editor.commands.setContent(template);
@@ -46,7 +61,7 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
   return (
     <RichEditorView
       editor={editor}
-      addImage={addImage}
+      onAssetsUpload={onAssetsUpload}
       insertTemplate={insertTemplate}
       markdownTemplates={MARKDOWN_TEMPLATES}
     />

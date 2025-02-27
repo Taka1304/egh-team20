@@ -3,10 +3,13 @@
 import TemplateDialog from "@/app/_features/RichEditor/TemplateDialog/TemplateDialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import type { client } from "@/lib/hono";
 import type { Editor } from "@tiptap/react";
 import { EditorContent } from "@tiptap/react";
+import type { InferResponseType } from "hono";
 import { Bold, FileText, Heading2, ImageIcon, Italic, List, ListOrdered, Minus, Quote, Redo, Undo } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 export type MarkdownTemplate = {
   label: string;
@@ -15,16 +18,36 @@ export type MarkdownTemplate = {
 
 export type RichEditorViewProps = {
   editor: Editor;
-  addImage: () => void;
+  onAssetsUpload: (
+    file: File,
+    toastId?: string | number,
+  ) => Promise<InferResponseType<typeof client.api.assets.upload.$post, 200> | undefined>;
   insertTemplate: (template: string) => void;
   markdownTemplates: MarkdownTemplate[];
 };
 
-export function RichEditorView({ editor, addImage }: RichEditorViewProps) {
+export function RichEditorView({ editor, onAssetsUpload }: RichEditorViewProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
   const handleSelectTemplate = (content: string) => {
     editor.commands.setContent(content);
   };
+  const handleImageButtonClick = () => {
+    fileInputRef.current?.click();
+  };
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const toastId = toast.loading("画像をアップロードしています...");
+      onAssetsUpload(file, toastId).then((result) => {
+        if (result) {
+          editor.chain().focus().setImage({ src: result.url }).run();
+          toast.success("画像をアップロードしました", { id: toastId });
+        }
+      });
+    }
+  };
+
   // editor未生成の場合は早期return
   if (!editor) {
     return null;
@@ -80,9 +103,16 @@ export function RichEditorView({ editor, addImage }: RichEditorViewProps) {
         >
           <Quote className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="sm" onClick={addImage}>
+        <Button variant="ghost" size="sm" onClick={handleImageButtonClick}>
           <ImageIcon className="h-4 w-4" />
         </Button>
+        <input
+          type="file"
+          accept="image/png, image/jpeg"
+          ref={fileInputRef}
+          className="hidden"
+          onChange={handleFileChange}
+        />
         <Button variant="ghost" size="sm" onClick={() => editor.chain().focus().setHorizontalRule().run()}>
           <Minus className="h-4 w-4" />
         </Button>
