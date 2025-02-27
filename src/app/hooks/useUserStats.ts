@@ -25,7 +25,8 @@ export function useUserStats(userId?: string) {
 
     try {
       setIsLoading(true);
-      const response = await fetch(`/api/users/${targetUserId}/stats`);
+      // Todo Honoを使う
+      const response = await fetch(`/api/users/${userId}/stats`);
 
       if (!response.ok) {
         throw new Error("統計情報の取得に失敗しました");

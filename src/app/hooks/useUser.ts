@@ -1,6 +1,6 @@
 "use client";
-
 import { useSession } from "next-auth/react";
+import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export type ProfileUser = {
@@ -30,25 +30,39 @@ type UseUserReturn = {
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
+  isOwnProfile: boolean;
 };
 
-export function useUser(): UseUserReturn {
+export function useUser(usernameParam?: string): UseUserReturn {
   const { data: session } = useSession();
+  const params = useParams<{ username: string }>();
+  const username = usernameParam || params?.username;
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [isOwnProfile, setIsOwnProfile] = useState(false);
 
   const fetchUser = async () => {
-    if (!session?.user?.id) {
-      setUser(null);
-      setIsLoading(false);
-      return;
-    }
-
     try {
       setIsLoading(true);
-      // Honoクライアントの代わりに標準のfetchを使用
-      const response = await fetch(`/api/users/${session.user.id}`);
+      let userId: string;
+
+      if (username) {
+        userId = username;
+      } else if (session?.user?.id) {
+        // ログインユーザーのIDを使用
+        userId = session.user.id;
+        setIsOwnProfile(true);
+      } else {
+        // ログインしていない、かつユーザー名の指定がない
+        setUser(null);
+        setIsLoading(false);
+        return;
+      }
+
+      // Honoクライアントを不使用(直接fetch)
+      /* Honoに置き換え？ */
+      const response = await fetch(`/api/users/${userId}`);
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -56,6 +70,12 @@ export function useUser(): UseUserReturn {
       }
 
       const data = await response.json();
+
+      // ログインユーザーと表示するユーザーが同じかチェック
+      if (session?.user?.id === data.id) {
+        setIsOwnProfile(true);
+      }
+
       setUser(data as ProfileUser);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -69,15 +89,16 @@ export function useUser(): UseUserReturn {
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: sessionが変わったときだけ再取得
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     fetchUser();
-  }, [session]);
+  }, [username, session]);
 
   return {
     user,
     isLoading,
     error,
     refetch: fetchUser,
+    isOwnProfile,
   };
 }

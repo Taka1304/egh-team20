@@ -1,10 +1,15 @@
 "use client";
+
 import ProfilePageView from "@/app/_features/Profile/ProfilePage/ProfilePageView";
 import { useUser } from "@/app/hooks/useUser";
 import { useUserStats } from "@/app/hooks/useUserStats";
+import { useParams } from "next/navigation";
 
 export default function ProfilePageContainer() {
-  const { user, isLoading, error } = useUser();
+  const params = useParams<{ username: string }>();
+  const username = params?.username;
+
+  const { user, isLoading, error } = useUser(username);
   const { stats } = useUserStats(user?.id);
 
   // UserInterestからinterests配列に変換
