@@ -1,22 +1,16 @@
+"use client";
+
+import type { Notification } from "@/app/_features/NotificationModal/NotificationModal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { X } from "lucide-react";
 
-type Notification = {
-  id: number;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  message: string;
-  timestamp: string;
-};
-
-type NotificationModalViewProps = {
+export function NotificationModalView({
+  notifications,
+  onClose,
+}: {
   notifications: Notification[];
   onClose: () => void;
-};
-
-export function NotificationModalView({ notifications, onClose }: NotificationModalViewProps) {
+}) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
       <div className="bg-card p-6 rounded-lg shadow-lg w-[500px] max-w-full text-card-foreground relative">
@@ -54,8 +48,8 @@ export function NotificationModalView({ notifications, onClose }: NotificationMo
                   </div>
                 </div>
 
-                {/* 📌 追加: 区切り線（最後の要素には追加しない） */}
-                <div className="border-t card-foreground mt-4 pt-4" />
+                {/* 区切り線: 最後の要素には表示しない */}
+                {index !== notifications.length - 1 && <div className="border-t border-border mt-4 pt-4" />}
               </div>
             ))}
           </div>
