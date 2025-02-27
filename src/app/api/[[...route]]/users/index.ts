@@ -1,3 +1,4 @@
+import { recoverFromNotFound } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
@@ -94,19 +95,6 @@ app.post("/:id/follow/:followerId", async (c) => {
   }
 
   try {
-    // const follow = await prisma.follow.upsert({
-    //   where: {
-    //     followerId_followingId: {
-    //       followingId: id,
-    //       followerId: followerId,
-    //     },
-    //   },
-    //   update: {},
-    //   create: {
-    //     followerId: followerId,
-    //     followingId: id,
-    //   },
-    // });
     const follow = await prisma.follow.create({
       data: {
         followerId: followerId,
@@ -144,26 +132,22 @@ app.delete("/:id/follow/:followerId", async (c) => {
   }
 
   try {
-    const follow = await prisma.follow.delete({
-      where: {
-        followerId_followingId: {
-          followingId: id,
-          followerId: followerId,
+    const follow = await recoverFromNotFound(
+      prisma.follow.delete({
+        where: {
+          followerId_followingId: {
+            followingId: id,
+            followerId: followerId,
+          },
         },
-      },
-    });
+      }),
+    );
+    if (!follow) {
+      return c.json({ error: "フォローしていません" }, 500);
+    }
 
     return c.json({ message: "フォロー解除完了", follow: follow });
   } catch (error) {
-    const isFollowing = await prisma.follow.findFirst({
-      where: {
-        followerId: followerId,
-        followingId: id,
-      },
-    });
-    if (!isFollowing) {
-      return c.json({ error: "既にフォローが解除されています" }, 500);
-    }
     if (!error) {
       console.error("ユーザーのフォロー解除処理に失敗しました:", error);
     } else {
