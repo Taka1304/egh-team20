@@ -1,5 +1,6 @@
 "use client";
 
+import Loading from "@/app/Loading";
 import { ReportCard } from "@/app/_features/ReportCard/ReportCard";
 import type { ViewMode } from "@/app/_features/Timeline/Timeline";
 import type { Report } from "@/app/types/reports";
@@ -62,7 +63,11 @@ export function TimelineView({
 
         {/* ローダー */}
         <div ref={loaderRef} className="py-4 text-center">
-          {isLoading && <p className="text-muted-foreground">読み込み中...</p>}
+          {isLoading && (
+            <div className=" flex items-center justify-center">
+              <Loading />
+            </div>
+          )}
           {!hasMore && reports.length > 0 && <p className="text-muted-foreground">これ以上のレポートはありません</p>}
         </div>
       </div>
