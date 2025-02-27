@@ -11,7 +11,7 @@ export function RecommendedArticles() {
   }
 
   return (
-    <section className="p-4 border border-primary-foreground rounded-lg">
+    <section className="px-8 py-4 border border-primary-foreground rounded-lg h-fit w-fit">
       <h2 className="text-2xl font-bold mb-4 text-primary-foreground">おすすめの記事</h2>
       <div className="flex flex-col gap-6">
         {isLoading
