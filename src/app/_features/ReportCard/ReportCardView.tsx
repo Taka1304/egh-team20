@@ -22,10 +22,12 @@ type ReportCardViewProps = {
   onCheck: () => void;
   onComment: () => void;
   isExpanded: boolean;
-
   hasLiked: boolean;
   hasFlamed: boolean;
   hasChecked: boolean;
+  likes: number; // ← 追加
+  flames: number; // ← 追加
+  checks: number; // ← 追加
 };
 
 export function ReportCardView({
@@ -41,6 +43,9 @@ export function ReportCardView({
   hasLiked,
   hasFlamed,
   hasChecked,
+  likes,
+  flames,
+  checks,
 }: ReportCardViewProps) {
   return (
     <Card
@@ -113,15 +118,9 @@ export function ReportCardView({
           <span>{report.comments || 0}</span>
         </Button>
         <div className="flex space-x-2">
-          <ActionButton icon={Heart} label="いいね" count={report.likes || 0} onClick={onLike} active={hasLiked} />
-          <ActionButton icon={Flame} label="ファイト" count={report.flames || 0} onClick={onFlame} active={hasFlamed} />
-          <ActionButton
-            icon={CheckCircle}
-            label="チェック"
-            count={report.checks || 0}
-            onClick={onCheck}
-            active={hasChecked}
-          />
+          <ActionButton icon={Heart} label="いいね" count={likes} onClick={onLike} active={hasLiked} />
+          <ActionButton icon={Flame} label="ファイト" count={flames} onClick={onFlame} active={hasFlamed} />
+          <ActionButton icon={CheckCircle} label="チェック" count={checks} onClick={onCheck} active={hasChecked} />
         </div>
       </div>
     </Card>

@@ -2,7 +2,7 @@
 import { ReportCardView } from "@/app/_features/ReportCard/ReportCardView";
 import { useReaction } from "@/app/hooks/useReaction";
 import type { Report } from "@/app/types/reports";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type ReportCardProps = {
@@ -12,23 +12,80 @@ type ReportCardProps = {
 export function ReportCard({ report }: ReportCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
 
-  // 初期のリアクション数
-  const { reactions, addReaction, removeReaction, isLoading } = useReaction(report.id, {
+  // useReaction フック
+  const { addReaction, removeReaction, isLoading } = useReaction(report.id, {
     LIKE: report.likes ?? 0,
     FLAME: report.flames ?? 0,
     CHECK: report.checks ?? 0,
   });
 
-  const handleAddReaction = async (type: "LIKE" | "FLAME" | "CHECK") => {
-    if (isLoading) return;
-    await addReaction(type);
-    toast(`投稿に「${type}」リアクションをつけました`);
-  };
+  // 初期のリアクション状態を管理
+  const [hasLiked, setHasLiked] = useState(report.hasLiked ?? false);
+  const [hasFlamed, setHasFlamed] = useState(report.hasFlamed ?? false);
+  const [hasChecked, setHasChecked] = useState(report.hasChecked ?? false);
+  const [likes, setLikes] = useState(report.likes ?? 0);
+  const [flames, setFlames] = useState(report.flames ?? 0);
+  const [checks, setChecks] = useState(report.checks ?? 0);
 
-  const handleRemoveReaction = async (type: "LIKE" | "FLAME" | "CHECK") => {
+  // 🔹 `report` の値が変わったときに `useState` を更新
+  useEffect(() => {
+    setHasLiked(report.hasLiked ?? false);
+    setHasFlamed(report.hasFlamed ?? false);
+    setHasChecked(report.hasChecked ?? false);
+    setLikes(report.likes ?? 0);
+    setFlames(report.flames ?? 0);
+    setChecks(report.checks ?? 0);
+  }, [report]);
+
+  const handleToggleReaction = async (type: "LIKE" | "FLAME" | "CHECK") => {
     if (isLoading) return;
-    await removeReaction(type);
-    toast(`「${type}」を取り消しました`);
+
+    let setHasReaction: (value: boolean) => void;
+    let setCount: (value: number) => void;
+    let currentHasReaction: boolean;
+    let count: number;
+
+    switch (type) {
+      case "LIKE":
+        setHasReaction = setHasLiked;
+        setCount = setLikes;
+        currentHasReaction = hasLiked;
+        count = likes;
+        break;
+      case "FLAME":
+        setHasReaction = setHasFlamed;
+        setCount = setFlames;
+        currentHasReaction = hasFlamed;
+        count = flames;
+        break;
+      case "CHECK":
+        setHasReaction = setHasChecked;
+        setCount = setChecks;
+        currentHasReaction = hasChecked;
+        count = checks;
+        break;
+      default:
+        return;
+    }
+
+    // フロント側ですぐに反映
+    setHasReaction(!currentHasReaction);
+    setCount(currentHasReaction ? count - 1 : count + 1);
+
+    try {
+      if (currentHasReaction) {
+        await removeReaction(type);
+        toast(`「${type}」を取り消しました`);
+      } else {
+        await addReaction(type);
+        toast(`投稿に「${type}」リアクションをつけました`);
+      }
+    } catch (error) {
+      // エラーが発生した場合は状態を元に戻す
+      setHasReaction(currentHasReaction);
+      setCount(count);
+      toast.error("リアクションの更新に失敗しました");
+    }
   };
 
   // 表示する本文の処理
@@ -46,13 +103,16 @@ export function ReportCard({ report }: ReportCardProps) {
       onShowMore={() => setShowFullContent(true)}
       isExpanded={showFullContent}
       // リアクションボタンの処理
-      onLike={() => (report.hasLiked ? handleRemoveReaction("LIKE") : handleAddReaction("LIKE"))}
-      onFlame={() => (report.hasFlamed ? handleRemoveReaction("FLAME") : handleAddReaction("FLAME"))}
-      onCheck={() => (report.hasChecked ? handleRemoveReaction("CHECK") : handleAddReaction("CHECK"))}
+      onLike={() => handleToggleReaction("LIKE")}
+      onFlame={() => handleToggleReaction("FLAME")}
+      onCheck={() => handleToggleReaction("CHECK")}
       onComment={() => toast("コメント機能は後日実装予定…")}
-      hasLiked={report.hasLiked ?? false}
-      hasFlamed={report.hasFlamed ?? false}
-      hasChecked={report.hasChecked ?? false}
+      hasLiked={hasLiked}
+      hasFlamed={hasFlamed}
+      hasChecked={hasChecked}
+      likes={likes}
+      flames={flames}
+      checks={checks}
     />
   );
 }
