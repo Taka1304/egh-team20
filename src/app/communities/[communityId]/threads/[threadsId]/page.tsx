@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import Header from "@/app/_features/Navigate/Header/Header";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Hash, ArrowLeft, Send, Users, Menu } from "lucide-react";
+import { ArrowLeft, Hash, Menu, Send, Users } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
 
 // モックデータ
 const thread = {
@@ -60,6 +61,7 @@ export default function ThreadPage() {
 
   return (
     <div className="flex h-screen bg-background text-foreground">
+      <Header />
       {/* モバイルメニューボタン */}
       <div className="md:hidden fixed top-0 left-0 z-50 p-4">
         <Button variant="ghost" size="icon" onClick={() => setShowMobileMenu(!showMobileMenu)}>
