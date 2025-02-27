@@ -1,4 +1,4 @@
-import { NotificationModal } from "@/app/_features/Notification/NotificationModal";
+import { NotificationModal } from "@/app/_features/NotificationModal/NotificationModal";
 import type { Meta, StoryObj } from "@storybook/react";
 import { fn } from "@storybook/test";
 
