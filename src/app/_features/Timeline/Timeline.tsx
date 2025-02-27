@@ -9,7 +9,7 @@ export type ViewMode = "category" | "following" | "mine";
 export function Timeline() {
   // 表示モードの状態管理
   const [viewMode, setViewMode] = useState<ViewMode>("category");
-  const { reports, isLoading, hasMore, handleLoadMore } = useReports();
+  const { reports, isLoading, hasMore } = useReports();
 
   // 監視対象の要素
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -20,7 +20,7 @@ export function Timeline() {
       const entry = entries[0];
       // ローダー要素が可視範囲に入ったら次のページを読み込む
       if (entry.isIntersecting) {
-        handleLoadMore();
+        // handleLoadMore();
       }
     });
 
@@ -31,7 +31,7 @@ export function Timeline() {
     return () => {
       observer.disconnect();
     };
-  }, [handleLoadMore]);
+  }, []);
 
   // 表示モード切り替え
   const handleChangeViewMode = (mode: ViewMode) => {
