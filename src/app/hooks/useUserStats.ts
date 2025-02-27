@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 type UserStats = {
@@ -11,14 +10,12 @@ type UserStats = {
 };
 
 export function useUserStats(userId?: string) {
-  const { data: session } = useSession();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchStats = async () => {
-    const targetUserId = userId || session?.user?.id;
-    if (!targetUserId) {
+    if (!userId) {
       setIsLoading(false);
       return;
     }
@@ -44,7 +41,7 @@ export function useUserStats(userId?: string) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     fetchStats();
-  }, [userId, session]);
+  }, [userId]);
 
   return { stats, isLoading, error };
 }
