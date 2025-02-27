@@ -1,5 +1,5 @@
 import Header from "@/app/_features/Navigate/Header/Header";
-import { ProfileRecommendedUsers } from "@/app/_features/ProfileRecommendedUsers/ProfileRecommendedUsers";
+import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import { RecommendedArticles } from "@/app/_features/RecommendedArticles/RecommendedArticles";
 import { Timeline } from "@/app/_features/Timeline/Timeline";
 
