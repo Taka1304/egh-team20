@@ -1,11 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Hash, ArrowLeft, Send, Users, Menu } from "lucide-react"
+import { useState } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { Hash, ArrowLeft, Send, Users, ChevronDown, Menu } from "lucide-react";
 
 // モックデータ
 const thread = {
@@ -19,7 +21,7 @@ const thread = {
   commentsCount: 5,
   communityId: "1",
   communityName: "プログラミング学習",
-}
+};
 
 const comments = [
   {
@@ -31,45 +33,44 @@ const comments = [
     authorImage: "/placeholder.svg?height=40&width=40",
     createdAt: "2024-02-25T11:15:00Z",
   },
-]
+];
 
 const members = [
   { id: "1", name: "山田太郎", image: "/placeholder.svg?height=40&width=40", role: "ADMIN" },
   { id: "2", name: "佐藤花子", image: "/placeholder.svg?height=40&width=40", role: "MEMBER" },
   { id: "3", name: "鈴木一郎", image: "/placeholder.svg?height=40&width=40", role: "MEMBER" },
-]
+];
 
-// 修正: 正しいパラメータの型定義
-type PageProps = {
+interface PageProps {
   params: {
-    communityId: string
-    threadId: string
-  }
+    communityId: string;
+    threadId: string;
+  };
 }
 
 export default function ThreadPage({ params }: PageProps) {
-  const [newComment, setNewComment] = useState("")
-  const [showMembers, setShowMembers] = useState(false)
-  const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const router = useRouter()
+  const [newComment, setNewComment] = useState("");
+  const [showMembers, setShowMembers] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const router = useRouter();
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString("ja-JP", {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
+  };
 
   const handleSubmitComment = () => {
     if (newComment.trim()) {
-      console.log("コメント送信:", newComment)
-      setNewComment("")
+      console.log("コメント送信:", newComment);
+      setNewComment("");
     }
-  }
+  };
 
   return (
     <div className="flex h-screen bg-background text-foreground">
@@ -169,6 +170,5 @@ export default function ThreadPage({ params }: PageProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
