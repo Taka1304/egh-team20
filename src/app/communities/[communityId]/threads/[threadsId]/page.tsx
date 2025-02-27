@@ -4,10 +4,8 @@ import { useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { Hash, ArrowLeft, Send, Users, ChevronDown, Menu } from "lucide-react";
+import { Hash, ArrowLeft, Send, Users, Menu } from "lucide-react";
 
 // モックデータ
 const thread = {
@@ -35,20 +33,8 @@ const comments = [
   },
 ];
 
-const members = [
-  { id: "1", name: "山田太郎", image: "/placeholder.svg?height=40&width=40", role: "ADMIN" },
-  { id: "2", name: "佐藤花子", image: "/placeholder.svg?height=40&width=40", role: "MEMBER" },
-  { id: "3", name: "鈴木一郎", image: "/placeholder.svg?height=40&width=40", role: "MEMBER" },
-];
-
-interface PageProps {
-  params: {
-    communityId: string;
-    threadId: string;
-  };
-}
-
-export default function ThreadPage({ params }: PageProps) {
+export default function ThreadPage() {
+  const { communityId, threadId } = useParams(); // ✅ useParams() でルートパラメータを取得
   const [newComment, setNewComment] = useState("");
   const [showMembers, setShowMembers] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
