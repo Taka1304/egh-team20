@@ -1,4 +1,4 @@
-import { recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
+import { recoverFromNotFound } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
@@ -175,24 +175,18 @@ app
       const followingUserIds = followingUsers.map((fu) => fu.followingId);
 
       // 同じカテゴリーをフォローしている他のユーザーを取得
-      const sameInterestsUserPromises = interests.map(async (interest) => {
-        return await prisma.userInterest.findMany({
+      const recommendedUserProfilesPromises = userInterests.map(async (userInterest) => {
+        return prisma.user.findMany({
           where: {
-            interestId: interest,
-            userId: { notIn: followingUserIds.concat(id) },
+            UserInterest: {
+              some: {
+                interestId: userInterest.interestId,
+              },
+            },
+            id: {
+              notIn: followingUserIds.concat(id),
+            },
           },
-          select: { userId: true },
-          distinct: ["userId"],
-        });
-      });
-
-      const sameInterestsUserResults = await Promise.all(sameInterestsUserPromises);
-      const sameInterestsUserResultsFlat = sameInterestsUserResults.flat();
-      const sameInterestUserSelect = shuffleArray(sameInterestsUserResultsFlat).slice(0, getUserNum);
-
-      const recommendedUserProfilesPromises = sameInterestUserSelect.map(async (user) => {
-        return await prisma.user.findUnique({
-          where: { id: user.userId },
           select: {
             id: true,
             displayName: true,
