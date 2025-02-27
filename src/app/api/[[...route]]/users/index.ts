@@ -1,4 +1,4 @@
-import { recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
+import { calculateStreakDays, recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
@@ -66,6 +66,50 @@ app
       return c.json({ error: "ユーザー情報の取得に失敗しました", details: error as string }, 500);
     }
   })
+  // ユーザーの実績を取得するエンドポイント
+  .get("/:id/stats", async (c) => {
+    const id = c.req.param("id");
+
+    try {
+      // 投稿数を取得
+      const postsCount = await prisma.dailyReport.count({
+        where: { userId: id },
+      });
+
+      // リアクション数を取得 (ユーザーの投稿に対するリアクション)
+      const reactionsCount = await prisma.reaction.count({
+        where: {
+          report: { userId: id },
+        },
+      });
+
+      // バッジ取得数
+      const badgesCount = await prisma.userBadge.count({
+        where: { userId: id },
+      });
+
+      // 継続学習日数の計算
+      const contributions = await prisma.learningContribution.findMany({
+        where: { userId: id },
+        orderBy: { activityDate: "asc" },
+      });
+
+      // 継続日数を計算するロジック
+      // biome-ignore lint/style/useConst: <explanation>
+      let streakDays = calculateStreakDays(contributions);
+
+      return c.json({
+        postsCount,
+        reactionsCount,
+        badgesCount,
+        streakDays,
+      });
+    } catch (error) {
+      console.error("ユーザー統計情報の取得に失敗しました:", error);
+      return c.json({ error: "ユーザー統計情報の取得に失敗しました" }, 500);
+    }
+  })
+
   // ユーザー情報を更新するエンドポイント
   .patch("/:id", zValidator("json", userScheme), async (c) => {
     const id = c.req.param("id");
@@ -158,7 +202,7 @@ app
     zValidator(
       "query",
       z.object({
-        recommendedUserNum: z.number().optional(),
+        recommendedUserNum: z.coerce.number().optional(),
       }),
     ),
     async (c) => {

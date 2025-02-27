@@ -1,9 +1,9 @@
 "use client";
 
-import { RecommendedUserCard } from "@/app/_features/RecommendedUsers/RecommendedUserCard";
+import { ProfileRecommendedUserCard } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsersCard/ProfileRecommendedUserCard";
+import { useRecommendUser } from "@/app/hooks/useRecommendUser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { User } from "@prisma/client";
 import { X } from "lucide-react";
 
 type OnboardingDialogViewProps = {
@@ -12,8 +12,6 @@ type OnboardingDialogViewProps = {
   setName: (value: string) => void;
   interests: string[];
   setInterests: (value: string[]) => void;
-  recommendedUsers: User[];
-  isLoading: boolean;
   onNext: () => void;
   onClose: () => void;
 };
@@ -24,13 +22,12 @@ export function OnboardingDialogView({
   setName,
   interests,
   setInterests,
-  recommendedUsers,
-  isLoading,
   onNext,
   onClose,
 }: OnboardingDialogViewProps) {
   // 興味のあるジャンル（ダミーデータ）
   const genreOptions = ["Web開発", "AI", "デザイン", "ゲーム開発", "ビジネス"];
+  const { recommendedUsers, isLoading, followUser, unfollowUser } = useRecommendUser();
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
@@ -89,7 +86,12 @@ export function OnboardingDialogView({
             ) : (
               <div className="grid grid-cols-1 gap-2">
                 {recommendedUsers.map((user) => (
-                  <RecommendedUserCard key={user.id} user={user} />
+                  <ProfileRecommendedUserCard
+                    user={user}
+                    key={user.id}
+                    onFollow={followUser}
+                    onUnfollow={unfollowUser}
+                  />
                 ))}
               </div>
             )}

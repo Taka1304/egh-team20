@@ -8,8 +8,7 @@ type OnboardingProps = {
 };
 
 export function OnboardingDialog({ onClose }: OnboardingProps) {
-  const { currentStep, name, setName, interests, setInterests, recommendedUsers, isLoading, handleNext } =
-    useOnboardingDialog(onClose);
+  const { currentStep, name, setName, interests, setInterests, handleNext } = useOnboardingDialog(onClose);
 
   return (
     <OnboardingDialogView
@@ -18,8 +17,6 @@ export function OnboardingDialog({ onClose }: OnboardingProps) {
       setName={setName}
       interests={interests}
       setInterests={setInterests}
-      recommendedUsers={recommendedUsers}
-      isLoading={isLoading}
       onNext={handleNext}
       onClose={onClose}
     />
