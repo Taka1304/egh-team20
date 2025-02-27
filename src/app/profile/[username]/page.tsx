@@ -6,18 +6,13 @@ import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommen
 import UserStatsList from "@/app/_features/Profile/UserStatsList/UserStatsList";
 import { Timeline } from "@/app/_features/Timeline/Timeline";
 import { useUser } from "@/app/hooks/useUser";
+import { useUserStats } from "@/app/hooks/useUserStats";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const stats = [
-  { value: "100", label: "累計継続日数" },
-  { value: "50", label: "投稿数" },
-  { value: "200", label: "リアクション数" },
-  { value: "10", label: "バッジ取得数" },
-];
-
 export default function ProfilePage() {
   const { user, isLoading, error } = useUser();
+  const { stats } = useUserStats(user?.id);
 
   // ローディング状態の表示
   if (isLoading) {
@@ -57,6 +52,16 @@ export default function ProfilePage() {
 
   // UserInterestからinterests配列に変換
   const interests = user.UserInterest?.map((ui) => ui.interest.name) || [];
+
+  // データが取得できた場合、統計情報を表示用に整形
+  const userStats = stats
+    ? [
+        { value: stats.streakDays.toString(), label: "累計継続日数" },
+        { value: stats.postsCount.toString(), label: "投稿数" },
+        { value: stats.reactionsCount.toString(), label: "リアクション数" },
+        { value: stats.badgesCount.toString(), label: "バッジ取得数" },
+      ]
+    : [];
 
   return (
     <div className="bg-background">
@@ -102,7 +107,7 @@ export default function ProfilePage() {
                 </div>
               </CardContent>
             </Card>
-            <UserStatsList stats={stats} />
+            <UserStatsList stats={userStats} />
           </div>
 
           {/* 中央カラム（投稿一覧） */}
