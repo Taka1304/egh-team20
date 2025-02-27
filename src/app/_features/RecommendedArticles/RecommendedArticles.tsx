@@ -11,13 +11,11 @@ export function RecommendedArticles() {
   }
 
   return (
-    <section className="my-8">
-      <h2 className="text-2xl font-bold mb-4">おすすめの記事</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <section className="p-4 border border-primary-foreground rounded-lg">
+      <h2 className="text-2xl font-bold mb-4 text-primary-foreground">おすすめの記事</h2>
+      <div className="flex flex-col gap-6">
         {isLoading
-          ? Array(3)
-              .fill(0)
-              .map((_, index) => <Skeleton key={_} className="h-[300px] w-full" />)
+          ? [1, 2, 3].map((id) => <Skeleton key={`skeleton-${id}`} className="h-[300px] w-full" />)
           : articles.slice(0, 3).map((article) => <RecommendedArticlesCard key={article.id} article={article} />)}
       </div>
     </section>
