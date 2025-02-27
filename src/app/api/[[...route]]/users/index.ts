@@ -153,102 +153,111 @@ app
   })
 
   // おすすめのユーザーを取得するエンドポイント
-  .get("/:id/recommended", async (c) => {
-    const id = c.req.param("id");
-    const getUserNum = 5;
+  .get(
+    "/:id/recommended",
+    zValidator(
+      "query",
+      z.object({
+        getUserNum: z.number().optional(),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
+      const getUserNum = c.req.valid("query").getUserNum ?? 5;
 
-    try {
-      // 現在のユーザーがフォローしているカテゴリーを取得
-      const userInterests = await prisma.userInterest.findMany({
-        where: { userId: id },
-        select: { interestId: true },
-      });
+      try {
+        // 現在のユーザーがフォローしているカテゴリーを取得
+        const userInterests = await prisma.userInterest.findMany({
+          where: { userId: id },
+          select: { interestId: true },
+        });
 
-      // 既にフォローしているユーザーを省くため，現在のユーザーがフォローしているユーザーを取得
-      const followingUsers = await prisma.follow.findMany({
-        where: { followingId: id },
-        select: { followerId: true },
-      });
+        // 既にフォローしているユーザーを省くため，現在のユーザーがフォローしているユーザーを取得
+        const followingUsers = await prisma.follow.findMany({
+          where: { followingId: id },
+          select: { followerId: true },
+        });
 
-      const followingUserIds = followingUsers.map((fu) => fu.followerId);
+        const followingUserIds = followingUsers.map((fu) => fu.followerId);
 
-      // 同じカテゴリーをフォローしている他のユーザーを取得
-      const recommendedUserProfilesPromises = userInterests.map(async (userInterest) => {
-        return prisma.user.findMany({
-          where: {
-            UserInterest: {
-              some: {
-                interestId: userInterest.interestId,
+        // 同じカテゴリーをフォローしている他のユーザーを取得
+        const recommendedUserProfilesPromises = userInterests.map(async (userInterest) => {
+          return prisma.user.findMany({
+            where: {
+              UserInterest: {
+                some: {
+                  interestId: userInterest.interestId,
+                },
+              },
+              id: {
+                notIn: followingUserIds.concat(id),
               },
             },
-            id: {
-              notIn: followingUserIds.concat(id),
-            },
-          },
-          select: {
-            id: true,
-            displayName: true,
-            image: true,
-            UserInterest: {
-              select: {
-                interest: {
-                  select: {
-                    name: true,
+            select: {
+              id: true,
+              displayName: true,
+              image: true,
+              UserInterest: {
+                select: {
+                  interest: {
+                    select: {
+                      name: true,
+                    },
                   },
                 },
               },
             },
-          },
+          });
         });
-      });
 
-      const recommendedUserProfilesResult = await Promise.all(recommendedUserProfilesPromises);
-      const recommendedUserProfilesFlat = recommendedUserProfilesResult.flat();
-      let recommendedUserProfiles = shuffleArray(recommendedUserProfilesFlat).slice(0, getUserNum);
+        const recommendedUserProfilesResult = await Promise.all(recommendedUserProfilesPromises);
+        const recommendedUserProfilesFlat = recommendedUserProfilesResult.flat();
+        let recommendedUserProfiles = shuffleArray(recommendedUserProfilesFlat).slice(0, getUserNum);
 
-      // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
-      if (recommendedUserProfiles.length < getUserNum) {
-        const additionalUsers = await prisma.user.findMany({
-          where: {
-            id: {
-              notIn: recommendedUserProfiles
-                .map((user) => user.id)
-                .concat(followingUserIds)
-                .concat(id),
+        // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
+        if (recommendedUserProfiles.length < getUserNum) {
+          const additionalUsers = await prisma.user.findMany({
+            where: {
+              id: {
+                notIn: recommendedUserProfiles
+                  .map((user) => user.id)
+                  .concat(followingUserIds)
+                  .concat(id),
+              },
             },
-          },
-          select: {
-            id: true,
-            displayName: true,
-            image: true,
-            UserInterest: {
-              select: {
-                interest: {
-                  select: {
-                    name: true,
+            select: {
+              id: true,
+              displayName: true,
+              image: true,
+              UserInterest: {
+                select: {
+                  interest: {
+                    select: {
+                      name: true,
+                    },
                   },
                 },
               },
             },
-          },
-          take: getUserNum - recommendedUserProfiles.length,
-        });
-        recommendedUserProfiles = recommendedUserProfiles.concat(additionalUsers);
+            take: getUserNum - recommendedUserProfiles.length,
+          });
+          recommendedUserProfiles = recommendedUserProfiles.concat(additionalUsers);
+        }
+
+        // 必要な情報を整形
+        const recommendedUsers = recommendedUserProfiles.map((user) => ({
+          id: user.id,
+          displayName: user.displayName,
+          image: user.image,
+          interests: user.UserInterest.map((ui) => ui.interest.name),
+        }));
+
+        return c.json({ recommendedUsers });
+      } catch (error) {
+        console.error("Error fetching recommended users:", error);
+        return c.json({ error: "Error fetching recommended users", details: error as string }, 500);
       }
-
-      // 必要な情報を整形
-      const recommendedUsers = recommendedUserProfiles.map((user) => ({
-        id: user.id,
-        displayName: user.displayName,
-        image: user.image,
-        interests: user.UserInterest.map((ui) => ui.interest.name),
-      }));
-
-      return c.json({ recommendedUsers });
-    } catch (error) {
-      console.error("Error fetching recommended users:", error);
-      return c.json({ error: "Error fetching recommended users", details: error as string }, 500);
-    }
-  });
+    },
+  );
 
 export default app;
