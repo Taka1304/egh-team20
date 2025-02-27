@@ -1,27 +1,14 @@
-import { UserBadges } from "@/app/_features/Profile/userBadges/UserBadges";
+import UserBadeges from "@/app/_features/Profile/UserBadges/UserBadges";
 import type { Meta, StoryObj } from "@storybook/react";
 
-const meta: Meta<typeof UserBadges> = {
+const meta: Meta<typeof UserBadeges> = {
   title: "features/UserBadges",
-  component: UserBadges,
+  component: UserBadeges,
 };
 
 export default meta;
-type Story = StoryObj<typeof UserBadges>;
+type Story = StoryObj<typeof UserBadeges>;
 
 export const Default: Story = {
-  args: {
-    badges: [
-      {
-        id: "1",
-        name: "お前たちのやってる事は全部お見通しだ！",
-        description: "山田奈緒子",
-      },
-      {
-        id: "2",
-        name: "なぜベストを尽くさないのか？",
-        description: "上田次郎",
-      },
-    ],
-  },
+  args: {},
 };

@@ -1,31 +1,21 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+const achievements = [
+  { id: "streak-100", title: "100日連続", subtitle: "継続は力", iconName: "bell", backgroundColor: "#3B82F6" },
+  { id: "first-report", title: "最初の日報", subtitle: "初めの一歩", iconName: "home", backgroundColor: "#EC4899" },
+  {
+    id: "first-follower",
+    title: "初めてのフォロワー",
+    subtitle: "みんな仲良く",
+    iconName: "user",
+    backgroundColor: "#F59E0B",
+  },
+] as const;
 
-type UserBadge = {
-  id: string;
-  name: string;
-  description: string;
-};
-
-type UserBadgesProps = {
-  badges: UserBadge[];
-};
-
-export function UserBadges({ badges }: UserBadgesProps) {
+export default function UserBadeges() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>獲得バッチ</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="flex flex-wrap gap-2">
-          {badges.map((badge) => (
-            <Badge key={badge.id} className="cursor-help" title={badge.description}>
-              {badge.name}
-            </Badge>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+      {achievements.map((ach) => (
+        <UserBadeges key={ach.id} {...ach} />
+      ))}
+    </div>
   );
 }
