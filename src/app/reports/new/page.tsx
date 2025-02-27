@@ -35,6 +35,8 @@ export default function page() {
             text: content,
             visibility: isDraft ? "PRIVATE" : "PUBLIC",
             //TODO:
+            goalId: "1",
+            formatId: "1",
             pomodoroCount: 0,
             learningTime: 0,
           },
