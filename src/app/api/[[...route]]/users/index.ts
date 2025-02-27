@@ -187,25 +187,60 @@ app
       });
 
       const sameInterestsUserResults = await Promise.all(sameInterestsUserPromises);
-      const sameInterestsUser = sameInterestsUserResults.flat();
-      let selectedUsers = shuffleArray(sameInterestsUser).slice(0, getUserNum);
+      const sameInterestsUserResultsFlat = sameInterestsUserResults.flat();
+      const sameInterestUserSelect = shuffleArray(sameInterestsUserResultsFlat).slice(0, getUserNum);
+
+      const recommendedUserProfilesPromises = sameInterestUserSelect.map(async (user) => {
+        return await prisma.user.findUnique({
+          where: { id: user.userId },
+          select: {
+            id: true,
+            displayName: true,
+            image: true,
+            UserInterest: {
+              select: {
+                interest: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+      });
+
+      const recommendedUserProfilesResult = await Promise.all(recommendedUserProfilesPromises);
+      let recommendedUserProfiles = recommendedUserProfilesResult.flat();
 
       // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
-      if (selectedUsers.length < getUserNum) {
+      if (recommendedUserProfiles.length < getUserNum) {
         const additionalUsers = await prisma.user.findMany({
           where: {
             id: {
-              notIn: sameInterestsUser
+              notIn: sameInterestUserSelect
                 .map((user) => user.userId)
                 .concat(followingUserIds)
                 .concat(id),
             },
           },
-          select: { id: true },
-          take: getUserNum - selectedUsers.length,
+          select: {
+            id: true,
+            displayName: true,
+            image: true,
+            UserInterest: {
+              select: {
+                interest: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+          take: getUserNum - recommendedUserProfiles.length,
         });
-        const additionalUsersSelect = additionalUsers.map((user) => ({ userId: user.id }));
-        selectedUsers = selectedUsers.concat(additionalUsersSelect);
+        recommendedUserProfiles = recommendedUserProfiles.concat(additionalUsers);
       }
 
       // 必要な情報を整形
