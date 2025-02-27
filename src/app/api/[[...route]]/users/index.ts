@@ -95,24 +95,21 @@ app.post("/:id/follow/:followerId", async (c) => {
   }
 
   try {
-    const follow = await prisma.follow.create({
-      data: {
-        followerId: followerId,
-        followingId: id,
-      },
-    });
+    const follow = await recoverFromNotFound(
+      prisma.follow.create({
+        data: {
+          followerId: followerId,
+          followingId: id,
+        },
+      }),
+    );
+
+    if (!follow) {
+      return c.json({ error: "既にフォローしています" }, 500);
+    }
 
     return c.json({ message: "フォロー完了", follow: follow });
   } catch (error) {
-    const isFollowing = await prisma.follow.findFirst({
-      where: {
-        followerId: followerId,
-        followingId: id,
-      },
-    });
-    if (isFollowing) {
-      return c.json({ error: "既にフォローされています" }, 500);
-    }
     if (!error) {
       console.error("ユーザーのフォロー処理に失敗しました:", error);
     } else {
