@@ -5,7 +5,7 @@ import { NotificationModal } from "@/app/_features/NotificationModal/Notificatio
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Home, Search, Timer } from "lucide-react";
+import { Home, LandPlot, Search, Timer } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -23,6 +23,10 @@ export default function Header() {
 
   const handleTimerClick = () => {
     router.push("/pomodoro");
+  };
+
+  const handleCommunityClick = () => {
+    router.push("/communities");
   };
 
   return (
@@ -45,6 +49,14 @@ export default function Header() {
             onClick={handleTimerClick}
           >
             <Timer className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative w-10 h-10 rounded-full text-primary-foreground"
+            onClick={handleCommunityClick}
+          >
+            <LandPlot className="h-5 w-5" />
           </Button>
         </nav>
 
