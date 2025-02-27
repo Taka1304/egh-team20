@@ -3,6 +3,24 @@
 import type { Report } from "@/app/types/reports";
 import { useEffect, useState } from "react";
 
+// API のレスポンス型を定義
+type APIResponse = {
+  reports: {
+    id: string;
+    title: string;
+    text: string;
+    createdAt: string;
+    user: {
+      id: string;
+      displayName?: string | null;
+      image?: string | null;
+    };
+    reactions?: {
+      type: { name: "LIKE" | "FLAME" | "CHECK" };
+    }[];
+  }[];
+};
+
 export function useReports() {
   const [reports, setReports] = useState<Report[]>([]);
   const [page, setPage] = useState(1);
@@ -13,54 +31,47 @@ export function useReports() {
     const fetchReports = async () => {
       setIsLoading(true);
 
-      // ダミーAPIを模擬: 700ms 遅延
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      try {
+        const response = await fetch("/api/reports"); // Hono API にリクエスト送信
 
-      // 1ページあたり5件追加
-      const newReports: Report[] = Array.from({ length: 5 }).map((_, i) => {
-        const idNumber = (page - 1) * 5 + i + 1;
-        return {
-          id: `report-${idNumber}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          title: `サンプルレポート #${idNumber}`,
-          text: `## 今日の気分: 😃
-## 本日の格言
-ああ 良き天気 心安らかなり
-日本の夏 蝉の声 いま静かにして
-木の下に宿れるなり 我が心
-その宿れるなりと同じき 安き心にある
-行ってきます!!!
+        if (!response.ok) {
+          console.error("Failed to fetch reports:", await response.text());
+          setHasMore(false);
+          return;
+        }
 
-## もくじ
-- 1. はじめに
-- 2. 本文
-- 3. おわりに
-`,
-          createdAt: new Date().toISOString(),
-          user: {
-            name: `User${idNumber}`,
-            handle: `@user${idNumber}`,
-            avatar: "/avatar.jpg",
-          },
-          tags: ["Next.js", "React", "TailwindCSS"],
-          likes: 0,
-          flames: 0,
-          checks: 0,
-          comments: 0,
-        };
-      });
+        const data: APIResponse = await response.json(); // 型を指定
 
-      setReports((prev) => [...prev, ...newReports]);
+        setReports(
+          data.reports.map((r: APIResponse["reports"][number]) => ({
+            id: r.id,
+            title: r.title,
+            text: r.text,
+            createdAt: r.createdAt,
+            user: {
+              name: r.user.displayName || "Anonymous",
+              handle: `@user${r.user.id.substring(0, 5)}`,
+              avatar: r.user.image || "/avatar.jpg",
+            },
+            tags: [],
+            likes: r.reactions?.filter((reaction) => reaction.type.name === "LIKE")?.length || 0,
+            flames: r.reactions?.filter((reaction) => reaction.type.name === "FLAME")?.length || 0,
+            checks: r.reactions?.filter((reaction) => reaction.type.name === "CHECK")?.length || 0,
+            comments: 0,
+          })),
+        );
 
-      // 10ページ(=50件)超えたら終了
-      if (page >= 10) {
+        setHasMore(data.reports.length === 30);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
         setHasMore(false);
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     };
 
     fetchReports();
-  }, [page]);
+  }, []);
 
   const handleLoadMore = () => {
     if (!isLoading && hasMore) {
