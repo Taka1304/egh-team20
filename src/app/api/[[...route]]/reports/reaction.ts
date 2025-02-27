@@ -28,7 +28,7 @@ const app = new Hono()
       try {
         const result = await CheckReportAccessPermission(reportId, session.user.id, c);
 
-        if (result._status !== 200) {
+        if (!result.ok) {
           return result;
         }
 

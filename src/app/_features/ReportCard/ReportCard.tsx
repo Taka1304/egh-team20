@@ -1,54 +1,99 @@
 "use client";
 import { ReportCardView } from "@/app/_features/ReportCard/ReportCardView";
+import { useReaction } from "@/app/hooks/useReaction";
 import type { Report } from "@/app/types/reports";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 type ReportCardProps = {
   report: Report;
 };
 
-export function ReportCard({ report: initialReport }: ReportCardProps) {
+export function ReportCard({ report }: ReportCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
-  const [report, setReport] = useState(initialReport);
-  const [hasLiked, setHasLiked] = useState(false);
-  const [hasFlamed, setHasFlamed] = useState(false);
-  const [hasChecked, setHasChecked] = useState(false);
-  const toggleReaction = (reaction: "like" | "flame" | "check") => {
-    const newReport = { ...report };
 
-    if (reaction === "like") {
-      // 押されていなければ +1, 押されていれば -1
-      newReport.likes = hasLiked ? Math.max(0, (newReport.likes || 0) - 1) : (newReport.likes || 0) + 1;
-      setHasLiked(!hasLiked);
-      toast(hasLiked ? "いいねを取り消しました" : "投稿にいいねリアクションをつけました");
+  // useReaction フック
+  const { addReaction, removeReaction, isLoading } = useReaction(report.id, {
+    LIKE: report.likes ?? 0,
+    FLAME: report.flames ?? 0,
+    CHECK: report.checks ?? 0,
+  });
+
+  // 初期のリアクション状態を管理
+  const [hasLiked, setHasLiked] = useState(report.hasLiked ?? false);
+  const [hasFlamed, setHasFlamed] = useState(report.hasFlamed ?? false);
+  const [hasChecked, setHasChecked] = useState(report.hasChecked ?? false);
+  const [likes, setLikes] = useState(report.likes ?? 0);
+  const [flames, setFlames] = useState(report.flames ?? 0);
+  const [checks, setChecks] = useState(report.checks ?? 0);
+
+  // 🔹 `report` の値が変わったときに `useState` を更新
+  useEffect(() => {
+    setHasLiked(report.hasLiked ?? false);
+    setHasFlamed(report.hasFlamed ?? false);
+    setHasChecked(report.hasChecked ?? false);
+    setLikes(report.likes ?? 0);
+    setFlames(report.flames ?? 0);
+    setChecks(report.checks ?? 0);
+  }, [report]);
+
+  const handleToggleReaction = async (type: "LIKE" | "FLAME" | "CHECK") => {
+    if (isLoading) return;
+
+    let setHasReaction: (value: boolean) => void;
+    let setCount: (value: number) => void;
+    let currentHasReaction: boolean;
+    let count: number;
+
+    switch (type) {
+      case "LIKE":
+        setHasReaction = setHasLiked;
+        setCount = setLikes;
+        currentHasReaction = hasLiked;
+        count = likes;
+        break;
+      case "FLAME":
+        setHasReaction = setHasFlamed;
+        setCount = setFlames;
+        currentHasReaction = hasFlamed;
+        count = flames;
+        break;
+      case "CHECK":
+        setHasReaction = setHasChecked;
+        setCount = setChecks;
+        currentHasReaction = hasChecked;
+        count = checks;
+        break;
+      default:
+        return;
     }
 
-    if (reaction === "flame") {
-      // 押されていなければ +1, 押されていれば -1
-      newReport.flames = hasFlamed ? Math.max(0, (newReport.flames || 0) - 1) : (newReport.flames || 0) + 1;
-      setHasFlamed(!hasFlamed);
-      toast(hasFlamed ? "ファイト!を取り消しました" : "投稿にファイト!リアクションをつけました");
-    }
+    // フロント側ですぐに反映
+    setHasReaction(!currentHasReaction);
+    setCount(currentHasReaction ? count - 1 : count + 1);
 
-    if (reaction === "check") {
-      // 押されていなければ +1, 押されていれば -1
-      newReport.checks = hasChecked ? Math.max(0, (newReport.checks || 0) - 1) : (newReport.checks || 0) + 1;
-      setHasChecked(!hasChecked);
-      toast(hasChecked ? "チェックを取り消しました" : "投稿をチェックリアクションをつけました");
+    try {
+      if (currentHasReaction) {
+        await removeReaction(type);
+        toast(`「${type}」を取り消しました`);
+      } else {
+        await addReaction(type);
+        toast(`投稿に「${type}」リアクションをつけました`);
+      }
+    } catch (error) {
+      // エラーが発生した場合は状態を元に戻す
+      setHasReaction(currentHasReaction);
+      setCount(count);
+      toast.error("リアクションの更新に失敗しました");
     }
-
-    setReport(newReport);
   };
 
-  // コメントボタンを押したときの処理
-  const handleComment = () => {
-    toast("コメント機能は後日実装予定…");
-  };
-
+  // 表示する本文の処理
   const maxLength = 100;
   const isLongContent = report.text.length > maxLength;
-  const displayedContent = showFullContent ? report.text : report.text;
+  const displayedContent = showFullContent
+    ? report.text
+    : report.text.slice(0, maxLength) + (isLongContent ? "..." : "");
 
   return (
     <ReportCardView
@@ -57,13 +102,17 @@ export function ReportCard({ report: initialReport }: ReportCardProps) {
       shouldShowMoreButton={isLongContent && !showFullContent}
       onShowMore={() => setShowFullContent(true)}
       isExpanded={showFullContent}
-      onLike={() => toggleReaction("like")}
-      onFlame={() => toggleReaction("flame")}
-      onCheck={() => toggleReaction("check")}
-      onComment={handleComment}
+      // リアクションボタンの処理
+      onLike={() => handleToggleReaction("LIKE")}
+      onFlame={() => handleToggleReaction("FLAME")}
+      onCheck={() => handleToggleReaction("CHECK")}
+      onComment={() => toast("コメント機能は後日実装予定…")}
       hasLiked={hasLiked}
       hasFlamed={hasFlamed}
       hasChecked={hasChecked}
+      likes={likes}
+      flames={flames}
+      checks={checks}
     />
   );
 }
