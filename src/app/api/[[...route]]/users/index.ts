@@ -1,4 +1,4 @@
-import { recoverFromNotFound } from "@/app/api/[[...route]]/utils";
+import { recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
@@ -164,9 +164,7 @@ app
         select: { interestId: true },
       });
 
-      const interests = userInterests.map((ui) => ui.interestId);
-
-      // 現在のユーザーがフォローしているユーザーを取得
+      // 既にフォローしているユーザーを省くため，現在のユーザーがフォローしているユーザーを取得
       const followingUsers = await prisma.follow.findMany({
         where: { followerId: id },
         select: { followingId: true },
@@ -205,15 +203,16 @@ app
       });
 
       const recommendedUserProfilesResult = await Promise.all(recommendedUserProfilesPromises);
-      let recommendedUserProfiles = recommendedUserProfilesResult.flat();
+      const recommendedUserProfilesFlat = recommendedUserProfilesResult.flat();
+      let recommendedUserProfiles = shuffleArray(recommendedUserProfilesFlat).slice(0, getUserNum);
 
       // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
       if (recommendedUserProfiles.length < getUserNum) {
         const additionalUsers = await prisma.user.findMany({
           where: {
             id: {
-              notIn: sameInterestUserSelect
-                .map((user) => user.userId)
+              notIn: recommendedUserProfiles
+                .map((user) => user.id)
                 .concat(followingUserIds)
                 .concat(id),
             },
