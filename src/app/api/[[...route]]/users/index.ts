@@ -1,4 +1,4 @@
-import { recoverFromNotFound } from "@/app/api/[[...route]]/utils";
+import { recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { zValidator } from "@hono/zod-validator";
