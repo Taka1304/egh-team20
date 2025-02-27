@@ -62,8 +62,8 @@ app
 
       return c.json(formattedData);
     } catch (error) {
-      console.error("Error fetching user:", error);
-      return c.text(error as string);
+      console.error("ユーザー情報の取得に失敗しました:", error);
+      return c.json({ error: "ユーザー情報の取得に失敗しました", details: error as string }, 500);
     }
   })
   // ユーザー情報を更新するエンドポイント
