@@ -22,6 +22,31 @@ export default function page() {
   const [aiReviewResult, setAIReviewResult] = useState<AIReviewResult | undefined>();
   const router = useRouter();
 
+  const handleAssetsUpload = async (file: File, toastId?: string | number) => {
+    if (!file) return;
+    if (file.size > 1024 * 1024 * 5) {
+      toast.error("ファイルサイズが5MBを超えています", { id: toastId });
+      return;
+    }
+    if (file.type !== "image/jpeg" && file.type !== "image/png") {
+      toast.error("このファイルの形式はサポートされていません", { id: toastId });
+      return;
+    }
+
+    const res = await client.api.assets.upload.$post({
+      form: {
+        type: "report",
+        file,
+      },
+    });
+
+    if (res.status === 200) {
+      return res.json();
+    }
+    toast.error("アップロードに失敗しました", { id: toastId });
+    return;
+  };
+
   /**
    * 保存処理
    */
@@ -114,7 +139,7 @@ export default function page() {
             />
           </div>
 
-          <RichEditor onChange={setContent} />
+          <RichEditor onChange={setContent} onAssetsUpload={handleAssetsUpload} />
         </div>
       </main>
       <AIReviewDialog open={isAIReviewDialogOpen} onOpenChange={setIsAIReviewDialogOpen} result={aiReviewResult} />

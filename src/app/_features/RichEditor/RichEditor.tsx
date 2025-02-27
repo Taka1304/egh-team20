@@ -1,20 +1,25 @@
 "use client";
 
 import { MARKDOWN_TEMPLATES } from "@/app/_features/RichEditor/constants";
-import { client } from "@/lib/hono";
+import type { client } from "@/lib/hono";
 import Image from "@tiptap/extension-image";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import type { InferResponseType } from "hono/client";
 import { toast } from "sonner";
 import ImageResize from "tiptap-extension-resize-image";
 import { RichEditorView } from "./RichEditorView";
 
 export type RichEditorProps = {
   onChange: (content: string) => void;
+  onAssetsUpload: (
+    file: File,
+    toastId?: string | number,
+  ) => Promise<InferResponseType<typeof client.api.assets.upload.$post, 200> | undefined>;
   initialContent?: string;
 };
 
-export default function RichEditor({ onChange, initialContent }: RichEditorProps) {
+export default function RichEditor({ onChange, onAssetsUpload, initialContent }: RichEditorProps) {
   const editor = useEditor({
     extensions: [StarterKit, Image, ImageResize],
     content: initialContent || "",
@@ -26,41 +31,14 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
       handleDrop: (_view, event, _slice, moved) => {
         // if dropping external files
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0]) {
-          const file = event.dataTransfer.files[0];
-          // check file type
-          if (file.type !== "image/jpeg" && file.type !== "image/png") {
-            toast.error("このファイルの形式はサポートされていません");
-            event.preventDefault();
-            return false;
-          }
-          // 5MB
-          if (file.size > 1024 * 1024 * 5) {
-            toast.error("ファイルサイズが5MBを超えています");
-            event.preventDefault();
-            return false;
-          }
-
           const toastId = toast.loading("画像をアップロードしています...");
 
-          client.api.assets.upload
-            .$post({
-              form: {
-                type: "report",
-                file: event.dataTransfer.files[0],
-              },
-            })
-            .then((result) => {
-              if (result.ok) {
-                result.json().then((data) => {
-                  editor?.chain().focus().setImage({ src: data.url }).run();
-                  toast.success("画像をアップロードしました", { id: toastId });
-                });
-              }
-            })
-            .catch((error) => {
-              console.error(error);
-              toast.error("画像のアップロードに失敗しました", { id: toastId });
-            });
+          onAssetsUpload(event.dataTransfer.files[0], toastId).then((result) => {
+            if (result) {
+              editor?.chain().focus().setImage({ src: result.url }).run();
+              toast.success("画像をアップロードしました", { id: toastId });
+            }
+          });
           return true;
         }
         return false;
@@ -75,14 +53,6 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
     return null;
   }
 
-  // Container側のロジック
-  const addImage = () => {
-    const url = window.prompt("URL");
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run();
-    }
-  };
-
   const insertTemplate = (template: string) => {
     // 初期状態として、エディタにテンプレートをセット
     editor.commands.setContent(template);
@@ -91,7 +61,7 @@ export default function RichEditor({ onChange, initialContent }: RichEditorProps
   return (
     <RichEditorView
       editor={editor}
-      addImage={addImage}
+      onAssetsUpload={onAssetsUpload}
       insertTemplate={insertTemplate}
       markdownTemplates={MARKDOWN_TEMPLATES}
     />
