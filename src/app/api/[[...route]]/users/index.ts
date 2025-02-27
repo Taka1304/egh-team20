@@ -40,6 +40,11 @@ app
               interest: true,
             },
           },
+          UserBadge: {
+            select: {
+              badge: true,
+            },
+          },
         },
       });
 
