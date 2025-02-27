@@ -2,6 +2,7 @@
 
 import type { Report } from "@/app/types/reports";
 import { client } from "@/lib/hono";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
 type ReactionType = "LIKE" | "FLAME" | "CHECK";
@@ -14,6 +15,9 @@ const REACTION_TYPE_MAP: Record<string, string> = {
 };
 
 export function useReports() {
+  const { data: session } = useSession(); // ログインユーザー情報
+  const currentUserId = session?.user?.id; // ログインユーザーのID
+
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -46,10 +50,24 @@ export function useReports() {
               avatar: r.user.image || "/avatar.jpg",
             },
             tags: [],
-            // 取得したリアクション `name` を `typeId` に変換する
             likes: r.reactions?.filter((reaction) => reaction.type.id === REACTION_TYPE_MAP.LIKE)?.length || 0,
             flames: r.reactions?.filter((reaction) => reaction.type.id === REACTION_TYPE_MAP.FLAME)?.length || 0,
             checks: r.reactions?.filter((reaction) => reaction.type.id === REACTION_TYPE_MAP.CHECK)?.length || 0,
+
+            // ✅ 修正: `currentUserId` と比較する
+            hasLiked:
+              r.reactions?.some(
+                (reaction) => reaction.type.id === REACTION_TYPE_MAP.LIKE && reaction.user.id === currentUserId,
+              ) || false,
+            hasFlamed:
+              r.reactions?.some(
+                (reaction) => reaction.type.id === REACTION_TYPE_MAP.FLAME && reaction.user.id === currentUserId,
+              ) || false,
+            hasChecked:
+              r.reactions?.some(
+                (reaction) => reaction.type.id === REACTION_TYPE_MAP.CHECK && reaction.user.id === currentUserId,
+              ) || false,
+
             comments: 0,
           })),
         );
@@ -64,7 +82,7 @@ export function useReports() {
     };
 
     fetchReports();
-  }, []);
+  }, [currentUserId]);
 
   return {
     reports,
