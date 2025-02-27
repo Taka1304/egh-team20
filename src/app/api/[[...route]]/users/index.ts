@@ -173,10 +173,10 @@ app
       const followingUserIds = followingUsers.map((fu) => fu.followingId);
 
       // 同じカテゴリーをフォローしている他のユーザーを取得
-      const sameInterestsUserPromises = userInterests.map(async (interest) => {
+      const sameInterestsUserPromises = interests.map(async (interest) => {
         return await prisma.userInterest.findMany({
           where: {
-            interestId: interest.interestId,
+            interestId: interest,
             userId: { notIn: followingUserIds.concat(id) },
           },
           select: { userId: true },
