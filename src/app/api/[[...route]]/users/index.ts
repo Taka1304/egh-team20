@@ -188,9 +188,7 @@ app
 
       const sameInterestsUserResults = await Promise.all(sameInterestsUserPromises);
       const sameInterestsUser = sameInterestsUserResults.flat();
-
-      // ランダムに5人選出
-      let selectedUsers = sameInterestsUser.sort(() => 0.5 - Math.random()).slice(0, getUserNum);
+      let selectedUsers = shuffleArray(sameInterestsUser).slice(0, getUserNum);
 
       // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
       if (selectedUsers.length < getUserNum) {
