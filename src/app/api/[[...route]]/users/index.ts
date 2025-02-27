@@ -150,5 +150,110 @@ app
       }
       return c.json({ error: "ユーザーフォロー解除処理に失敗しました" }, 500);
     }
+  })
+  .get("/:id/recommended", async (c) => {
+    const id = c.req.param("id");
+    const getUserNum = 5;
+
+    try {
+      // 現在のユーザーがフォローしているカテゴリーを取得
+      const userInterests = await prisma.userInterest.findMany({
+        where: { userId: id },
+        select: { interestId: true },
+      });
+
+      const interests = userInterests.map((ui) => ui.interestId);
+
+      // 現在のユーザーがフォローしているユーザーを取得
+      const followingUsers = await prisma.follow.findMany({
+        where: { followerId: id },
+        select: { followingId: true },
+      });
+
+      const followingUserIds = followingUsers.map((fu) => fu.followingId);
+
+      // 同じカテゴリーをフォローしている他のユーザーを取得
+      const sameInterestsUserPromises = userInterests.map(async (interest) => {
+        return await prisma.userInterest.findMany({
+          where: {
+            interestId: interest.interestId,
+            userId: { notIn: followingUserIds.concat(id) },
+          },
+          select: { userId: true },
+          distinct: ["userId"],
+        });
+      });
+
+      const sameInterestsUserResults = await Promise.all(sameInterestsUserPromises);
+      const sameInterestsUser = sameInterestsUserResults.flat();
+
+      // ランダムに5人選出
+      let selectedUsers = sameInterestsUser.sort(() => 0.5 - Math.random()).slice(0, getUserNum);
+
+      // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
+      if (selectedUsers.length < getUserNum) {
+        const additionalUsers = await prisma.user.findMany({
+          where: {
+            id: {
+              notIn: sameInterestsUser
+                .map((user) => user.userId)
+                .concat(followingUserIds)
+                .concat(id),
+            },
+          },
+          select: { id: true },
+        });
+
+        const additionalSelectedUsers = shuffleArray(additionalUsers)
+          .slice(0, getUserNum - selectedUsers.length)
+          .map((user) => ({ userId: user.id }));
+        selectedUsers = selectedUsers.concat(additionalSelectedUsers);
+      }
+
+      // プロフィール情報と興味を取得
+      const recommendedUserProfiles = await prisma.user.findMany({
+        where: {
+          id: { in: selectedUsers.map((user) => user.userId) },
+        },
+        select: {
+          id: true,
+          displayName: true,
+          image: true,
+          bio: true,
+          UserInterest: {
+            select: {
+              interest: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // 必要な情報を整形
+      const recommendedUsers = recommendedUserProfiles.map((user) => ({
+        id: user.id,
+        displayName: user.displayName,
+        image: user.image,
+        interests: user.UserInterest.map((ui) => ui.interest.name),
+      }));
+
+      return c.json({ recommendedUsers });
+    } catch (error) {
+      console.error("Error fetching recommended users:", error);
+      return c.json({ error: "Error fetching recommended users", details: error as string }, 500);
+    }
   });
+
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffledArray = [...array]; // 元の配列を変更しないようコピー
+  for (let i = shuffledArray.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1)); // 0 〜 i のランダムなインデックス
+    [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]; // 要素をスワップ
+  }
+  return shuffledArray;
+}
+
 export default app;
