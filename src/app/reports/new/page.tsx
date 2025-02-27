@@ -1,6 +1,7 @@
 "use client";
 import { AIReviewDialog } from "@/app/_features/AIReviewDialog/AIReviewDialog";
 import type { AIReviewResult } from "@/app/_features/AIReviewDialog/AIReviewDialog";
+import { ReportPublishConfirmDialog } from "@/app/_features/ReportPublishConfirmDialog/ReportPublishConfirmDialog";
 import RichEditor from "@/app/_features/RichEditor/RichEditor";
 
 import { Button } from "@/components/ui/button";
@@ -97,9 +98,7 @@ export default function page() {
               <Bot size={20} />
               AI添削
             </Button>
-            <Button className="font-bold hover:scale-95 duration-100" onClick={() => handleSave(false)}>
-              公開する
-            </Button>
+            <ReportPublishConfirmDialog onConfirm={() => handleSave(false)} />
           </div>
         </div>
       </header>
