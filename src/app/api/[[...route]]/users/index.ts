@@ -158,12 +158,12 @@ app
     zValidator(
       "query",
       z.object({
-        getUserNum: z.number().optional(),
+        recommendedUserNum: z.number().optional(),
       }),
     ),
     async (c) => {
       const id = c.req.param("id");
-      const getUserNum = c.req.valid("query").getUserNum ?? 5;
+      const recommendedUserNum = c.req.valid("query").recommendedUserNum ?? 5;
 
       try {
         // 現在のユーザーがフォローしているカテゴリーを取得
@@ -211,10 +211,10 @@ app
 
         const recommendedUserProfilesResult = await Promise.all(recommendedUserProfilesPromises);
         const recommendedUserProfilesFlat = recommendedUserProfilesResult.flat();
-        let recommendedUserProfiles = shuffleArray(recommendedUserProfilesFlat).slice(0, getUserNum);
+        let recommendedUserProfiles = shuffleArray(recommendedUserProfilesFlat).slice(0, recommendedUserNum);
 
         // 同じカテゴリーをフォローしているユーザーが5人未満の場合、その他のユーザーから補充
-        if (recommendedUserProfiles.length < getUserNum) {
+        if (recommendedUserProfiles.length < recommendedUserNum) {
           const additionalUsers = await prisma.user.findMany({
             where: {
               id: {
@@ -238,7 +238,7 @@ app
                 },
               },
             },
-            take: getUserNum - recommendedUserProfiles.length,
+            take: recommendedUserNum - recommendedUserProfiles.length,
           });
           recommendedUserProfiles = recommendedUserProfiles.concat(additionalUsers);
         }
