@@ -4,7 +4,6 @@ import { ProfileRecommendedUserCard } from "@/app/_features/Profile/ProfileRecom
 import { useRecommendUser } from "@/app/hooks/useRecommendUser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { User } from "@prisma/client";
 import { X } from "lucide-react";
 
 type OnboardingDialogViewProps = {
@@ -13,8 +12,6 @@ type OnboardingDialogViewProps = {
   setName: (value: string) => void;
   interests: string[];
   setInterests: (value: string[]) => void;
-  recommendedUsers: User[];
-  isLoading: boolean;
   onNext: () => void;
   onClose: () => void;
 };
