@@ -15,13 +15,15 @@ const app = new Hono()
     "/",
     zValidator(
       "query",
-      z.object({
-        type: z.enum(["sameCategory", "following", "own"]).default("sameCategory"),
-      }),
+      z
+        .object({
+          type: z.enum(["sameCategory", "following", "own"]),
+        })
+        .optional(),
     ),
     async (c) => {
       const session = await getServerSession(authOptions);
-      const getType = c.req.valid("query").type;
+      const getType = c.req.valid("query")?.type ?? "sameCategory";
 
       try {
         let followedUserIds: string[] = [];
@@ -56,7 +58,6 @@ const app = new Hono()
               ],
             };
           } else if (getType === "following") {
-            console.info("followedUserIds", followedUserIds);
             whereGetTypeCondition = {
               OR: [
                 // フォローしているユーザーのPUBLIC投稿
