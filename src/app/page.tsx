@@ -24,7 +24,7 @@ export default function Home() {
           <div className="h-full overflow-hidden">
             <Timeline />
           </div>
-          <div className="flex flex-col gap-4 overflow-visible">
+          <div className="flex flex-col gap-4 overflow-visible p-2">
             <ProfileRecommendedUsers />
             <RecommendedArticles />
             <Onboarding />
