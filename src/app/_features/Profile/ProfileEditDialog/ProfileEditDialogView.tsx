@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, X } from "lucide-react";
 import { InterestsCategoryDropdown } from "./InterestsCategoryDropdown";
-import { ProfileEditTextarea } from "./ProfileEditTextarea";
+import { ProfileEditTextarea } from "./ProfileEditTextarea/ProfileEditTextarea";
 
 type ProfileEditDialogViewProps = {
   avatar: string;
