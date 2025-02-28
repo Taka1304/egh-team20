@@ -613,10 +613,6 @@ const app = new Hono()
         RECOMMENDED_ARTICLE_COUNT,
       );
 
-      if (recommendedUrlsResult.length === 0) {
-        return c.json({ message: "おすすめ記事が見つかりませんでした" }, 200);
-      }
-
       const checkedRecommendedUrlsPromise = recommendedUrlsResult.map(async (url) => {
         const isUrlAlivePromise = await isUrlAlive(url);
         return { url: url, isAlive: isUrlAlivePromise };
@@ -624,7 +620,7 @@ const app = new Hono()
       const recommendedUrlsJudge = await Promise.all(checkedRecommendedUrlsPromise);
       const recommendedArticlesFilter = recommendedUrlsJudge.filter((url) => url.isAlive).map((url) => url.url);
 
-      if (recommendedArticlesFilter.length < RECOMMENDED_ARTICLE_COUNT) {
+      if (recommendedUrlsResult.length < RECOMMENDED_ARTICLE_COUNT) {
         return c.json(
           { message: "おすすめ記事の取得に失敗しました．デフォルトの記事を2つ返します．", recommendedArticles },
           200,
