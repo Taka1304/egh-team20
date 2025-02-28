@@ -6,6 +6,7 @@ import type { ViewMode } from "@/app/_features/Timeline/Timeline";
 import type { Report } from "@/app/types/reports";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 import type { ForwardedRef } from "react";
 
 type TimelineViewProps = {
@@ -15,6 +16,7 @@ type TimelineViewProps = {
   hasMore: boolean;
   viewMode: ViewMode;
   onChangeViewMode: (mode: ViewMode) => void;
+  onReportDeleted?: () => Promise<void>;
 };
 
 export function TimelineView({
@@ -24,7 +26,11 @@ export function TimelineView({
   hasMore,
   viewMode,
   onChangeViewMode,
+  onReportDeleted,
 }: TimelineViewProps) {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
+
   // シンプルな個別アニメーション設定
   const fadeIn = {
     initial: { opacity: 0 },
@@ -83,7 +89,7 @@ export function TimelineView({
                   delay: Math.min(index * 0.05, 0.5),
                 }}
               >
-                <ReportCard report={report} />
+                <ReportCard report={report} isOwner={currentUserId === report.user.id} onDeleted={onReportDeleted} />
               </motion.div>
             ))}
           </div>
