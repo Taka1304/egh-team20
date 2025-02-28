@@ -1,7 +1,8 @@
 "use client";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 
 export type ProfileUser = {
   id: string;
@@ -34,6 +35,7 @@ type UpdateProfileData = {
   interests?: string[];
   goals?: string[];
 };
+
 type UseUserReturn = {
   user: ProfileUser | null;
   isLoading: boolean;
@@ -43,69 +45,52 @@ type UseUserReturn = {
   updateProfile: (data: UpdateProfileData) => Promise<boolean>;
 };
 
+const fetcher = async (url: string) => {
+  // ユーザー名かIDのいずれかでAPIを呼び出す
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to fetch user");
+  }
+
+  return response.json();
+};
+
 export function useUser(usernameParam?: string): UseUserReturn {
   const { data: session } = useSession();
   const params = useParams<{ username: string }>();
   const username = usernameParam || params?.username;
-  const [user, setUser] = useState<ProfileUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
   const [isOwnProfile, setIsOwnProfile] = useState(false);
 
-  const fetchUser = async () => {
-    try {
-      setIsLoading(true);
-      let userId: string;
+  const cacheKey = username ? `/api/users/${username}` : session?.user?.id ? `/api/users/${session.user.id}` : null;
 
-      if (username) {
-        userId = username;
-      } else if (session?.user?.id) {
-        // ログインユーザーのIDを使用
-        userId = session.user.id;
-        setIsOwnProfile(true);
-      } else {
-        // ログインしていない、かつユーザー名の指定がない
-        setUser(null);
-        setIsLoading(false);
-        return;
-      }
-
-      // API呼び出し
-      const response = await fetch(`/api/users/${userId}`);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to fetch user");
-      }
-
-      const data = await response.json();
-
+  // SWRでデータ取得
+  const { data, error, mutate } = useSWR(cacheKey, fetcher, {
+    revalidateOnFocus: false,
+    dedupingInterval: 60000,
+    revalidateOnReconnect: false,
+    onSuccess: (data) => {
       // ログインユーザーと表示するユーザーが同じかチェック
       if (session?.user?.id === data.id) {
         setIsOwnProfile(true);
       }
-
-      setUser(data as ProfileUser);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error("Unknown error occurred"));
-      }
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+  });
 
   // プロフィール更新機能
   const updateProfile = async (data: UpdateProfileData): Promise<boolean> => {
     try {
-      if (!user) {
+      if (!cacheKey) {
         throw new Error("ユーザー情報が読み込まれていません");
       }
 
-      const response = await fetch(`/api/users/${user.id}`, {
+      const userId = username || session?.user?.id;
+      if (!userId) {
+        throw new Error("ユーザーIDが不明です");
+      }
+
+      const response = await fetch(`/api/users/${userId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -119,27 +104,24 @@ export function useUser(usernameParam?: string): UseUserReturn {
       }
 
       // 更新成功後にデータを再取得
-      await fetchUser();
+      await mutate();
       return true;
     } catch (err) {
       console.error("プロフィール更新エラー:", err);
-      if (err instanceof Error) {
-        setError(err);
-      }
       return false;
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    fetchUser();
-  }, [username, session]);
+  // データ再取得関数
+  const refetch = async () => {
+    await mutate();
+  };
 
   return {
-    user,
-    isLoading,
-    error,
-    refetch: fetchUser,
+    user: (data as ProfileUser) || null,
+    isLoading: !data && !error,
+    error: error instanceof Error ? error : null,
+    refetch,
     isOwnProfile,
     updateProfile,
   };
