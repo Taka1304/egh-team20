@@ -51,26 +51,27 @@ model User {
   bio           String? // 自己紹介文
   isPrivate     Boolean   @default(false) // 公開/非公開フラグ
 
-  accounts         Account[]
-  sessions         Session[]
-  Authenticator    Authenticator[]
-  goals            Goal[]
-  reports          DailyReport[]
-  reactions        Reaction[]
-  followedBy       Follow[]               @relation("FollowedBy")
-  following        Follow[]               @relation("Following")
-  communities      CommunityMember[]
-  threads          Thread[]
-  comments         Comment[]
-  matchesSent      Match[]                @relation("MatchesSent")
-  matchesReceived  Match[]                @relation("MatchesReceived")
-  pomodoroSessions PomodoroSession[]
-  futureMessages   FutureMessage[]
-  notifications    Notification[]
-  contributions    LearningContribution[]
-  UserInterest     UserInterest[]
-  UserBadge        UserBadge[]
-  Notification     Notification[]         @relation("SourceUser")
+  accounts           Account[]
+  sessions           Session[]
+  Authenticator      Authenticator[]
+  goals              Goal[]
+  reports            DailyReport[]
+  reactions          Reaction[]
+  followedBy         Follow[]               @relation("FollowedBy")
+  following          Follow[]               @relation("Following")
+  communities        CommunityMember[]
+  threads            Thread[]
+  comments           Comment[]
+  matchesSent        Match[]                @relation("MatchesSent")
+  matchesReceived    Match[]                @relation("MatchesReceived")
+  pomodoroSessions   PomodoroSession[]
+  futureMessages     FutureMessage[]
+  notifications      Notification[]
+  contributions      LearningContribution[]
+  UserInterest       UserInterest[]
+  UserBadge          UserBadge[]
+  Notification       Notification[]         @relation("SourceUser")
+  RecommendedArticle RecommendedArticle[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -435,5 +436,14 @@ model Notification {
   report     DailyReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
+}
+
+model RecommendedArticle {
+  id        String   @id @default(cuid()) // 一意のID
+  userId    String // User モデルの ID
+  url       String // 記事のURL
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // ユーザーとのリレーション
+  createdAt DateTime @default(now()) // 登録日時
   updatedAt DateTime @updatedAt // 更新日時
 }
