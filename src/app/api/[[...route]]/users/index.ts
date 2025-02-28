@@ -132,40 +132,38 @@ const app = new Hono()
       const { interests, goals, ...userData } = body;
 
       // 基本的なユーザー情報を更新
-      const user = await prisma.user.update({
+      const _user = await prisma.user.update({
         where: { id },
-        data: userData,
+        include: {
+          goals: {
+            select: {
+              id: true,
+              isPublic: true,
+              text: true,
+            },
+          },
+          UserInterest: {
+            select: {
+              interest: true,
+            },
+          },
+        },
+        data: {
+          ...userData,
+          UserInterest: {
+            deleteMany: {
+              userId: id,
+            },
+            createMany: {
+              data: interests?.map((interestId) => ({
+                interestId,
+              })) ?? [],
+            }
+          }
+        },
       });
 
-      // 興味カテゴリの処理
-      if (interests && Array.isArray(interests)) {
-        // 既存の興味カテゴリをすべて削除
-        await prisma.userInterest.deleteMany({
-          where: { userId: id },
-        });
 
-        // 新しい興味カテゴリを追加
-        for (const interestName of interests) {
-          // 既存のカテゴリを検索、なければ作成
-          let interest = await prisma.interest.findUnique({
-            where: { name: interestName },
-          });
-
-          if (!interest) {
-            interest = await prisma.interest.create({
-              data: { name: interestName },
-            });
-          }
-
-          // ユーザーとカテゴリを関連付け
-          await prisma.userInterest.create({
-            data: {
-              userId: id,
-              interestId: interest.id,
-            },
-          });
-        }
-      }
 
       // 学習目標の処理
       if (goals && Array.isArray(goals)) {
@@ -262,7 +260,7 @@ const app = new Hono()
         data: {
           userId: id,
           sourceUserId: session.user.id,
-          message: `${session.user.displayName}さんがあなたをフォローしました。`,
+          message: `${session.user.displayName ?? session.user.id}さんがあなたをフォローしました。`,
           type: "FOLLOW",
         },
       });
