@@ -1,6 +1,6 @@
 "use client";
 
-import { GoalInputFiled } from "@/app/_features/Profile/ProfileEditDialog/GoalInputFiled";
+import { GoalInputFiled } from "@/app/_features/Profile/ProfileEditDialog/GoalInputFiled/GoalInputFiled";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

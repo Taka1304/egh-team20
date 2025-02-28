@@ -4,39 +4,31 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X } from "lucide-react";
-import { useState } from "react";
 import type { KeyboardEvent } from "react";
 
-type GoalInputFiledProps = {
+type GoalInputViewProps = {
   goals: string[];
-  onChange: (goals: string[]) => void;
+  inputValue: string;
+  onInputChange: (value: string) => void;
+  onAddGoal: () => void;
+  onRemoveGoal: (goal: string) => void;
+  onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  onCompositionStart: () => void;
+  onCompositionEnd: () => void;
   disabled?: boolean;
 };
 
-export function GoalInputFiled({ goals, onChange, disabled = false }: GoalInputFiledProps) {
-  const [inputValue, setInputValue] = useState("");
-
-  const addGoal = () => {
-    if (inputValue.trim()) {
-      const newGoal = inputValue.trim();
-      if (!goals.includes(newGoal)) {
-        onChange([...goals, newGoal]);
-      }
-      setInputValue("");
-    }
-  };
-
-  const removeGoal = (goalToRemove: string) => {
-    onChange(goals.filter((goal) => goal !== goalToRemove));
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addGoal();
-    }
-  };
-
+export function GoalInputView({
+  goals,
+  inputValue,
+  onInputChange,
+  onAddGoal,
+  onRemoveGoal,
+  onKeyDown,
+  onCompositionStart,
+  onCompositionEnd,
+  disabled = false,
+}: GoalInputViewProps) {
   return (
     <div className="space-y-2">
       <div className="mt-4">
@@ -51,7 +43,7 @@ export function GoalInputFiled({ goals, onChange, disabled = false }: GoalInputF
                     variant="ghost"
                     size="sm"
                     className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
-                    onClick={() => removeGoal(goal)}
+                    onClick={() => onRemoveGoal(goal)}
                     disabled={disabled}
                   >
                     <X className="h-3 w-3" />
@@ -65,13 +57,15 @@ export function GoalInputFiled({ goals, onChange, disabled = false }: GoalInputF
           <div className="flex gap-2 mt-3">
             <Input
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
+              onChange={(e) => onInputChange(e.target.value)}
               placeholder="新しい目標を入力（Enterで追加）"
-              onKeyDown={handleKeyDown}
+              onKeyDown={onKeyDown}
+              onCompositionEnd={onCompositionEnd}
+              onCompositionStart={onCompositionStart}
               disabled={disabled}
               className="flex-1 bg-chart-5"
             />
-            <Button type="button" onClick={addGoal} disabled={!inputValue.trim() || disabled} variant="outline">
+            <Button type="button" onClick={onAddGoal} disabled={!inputValue.trim() || disabled} variant="outline">
               追加
             </Button>
           </div>
