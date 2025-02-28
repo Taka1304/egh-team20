@@ -32,7 +32,7 @@ export function InterestsCategoryDropdown({
             {selectedInterests.length > 0 ? (
               selectedInterests.map((interest) => (
                 <Badge key={interest} className="flex items-center gap-1">
-                  {interest}
+                  {availableInterests.find((i) => i.id === interest)?.name}
                   <Button className="l-1 w-4 h-4" variant={"ghost"} onClick={() => onInterestToggle(interest)}>
                     ×
                   </Button>
