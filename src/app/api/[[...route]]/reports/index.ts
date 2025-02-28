@@ -17,13 +17,13 @@ const app = new Hono()
       "query",
       z
         .object({
-          type: z.enum(["sameCategory", "following", "own"]),
+          type: z.enum(["sameCategory", "following", "own"]).optional(),
         })
-        .optional(),
+        .default({}),
     ),
     async (c) => {
       const session = await getServerSession(authOptions);
-      const getType = c.req.valid("query")?.type ?? "sameCategory";
+      const getType = c.req.valid("query").type ?? "sameCategory";
 
       try {
         let followedUserIds: string[] = [];
