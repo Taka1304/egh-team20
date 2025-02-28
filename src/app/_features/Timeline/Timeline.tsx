@@ -6,11 +6,12 @@ import { useEffect, useRef, useState } from "react";
 
 export type ViewMode = "category" | "following" | "mine";
 
-export function Timeline({ isNested = false }) {
+export function Timeline({ isNested = false, userId }: { isNested?: boolean; userId?: string }) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   // ローディング状態を個別に管理
   const [isChangingMode, setIsChangingMode] = useState(false);
-  const { reports, isLoading, hasMore, refetchReports } = useReports(viewMode);
+  // userId がある場合はそのユーザーの投稿を取得
+  const { reports, isLoading, hasMore, refetchReports } = useReports(viewMode, userId);
 
   // 監視対象の要素
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -61,6 +62,7 @@ export function Timeline({ isNested = false }) {
       onChangeViewMode={handleChangeViewMode}
       onReportDeleted={refetchReports}
       isNested={isNested}
+      userId={userId}
     />
   );
 }
