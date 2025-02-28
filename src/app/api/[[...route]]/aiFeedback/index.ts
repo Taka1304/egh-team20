@@ -25,7 +25,7 @@ const app = new Hono().get("/:reportId", async (c) => {
     }
 
     const { responseJson, responseText } = await geminiRun(report.title, report.text);
-    prisma.aIFeedback.create({
+    await prisma.aIFeedback.create({
       data: {
         reportId: report.id,
         sentiment: "まだ実装されていません",
