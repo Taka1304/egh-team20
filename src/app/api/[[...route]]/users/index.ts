@@ -40,24 +40,30 @@ app
               interest: true,
             },
           },
+          UserBadge: {
+            select: {
+              badge: true,
+            },
+          },
+          _count: {
+            select: {
+              followedBy: true, // フォロワー数
+              following: true, // フォロー数
+            },
+          },
         },
-      });
-
-      const followerCount = await prisma.follow.count({
-        where: { followerId: id },
-      });
-      const followingCount = await prisma.follow.count({
-        where: { followingId: id },
       });
 
       if (!data) {
         return c.json({ message: "user not found" }, 404);
       }
 
+      const { _count, ...userData } = data;
+
       const formattedData = {
-        ...data,
-        followerCount: followerCount,
-        followingCount: followingCount,
+        ...userData,
+        followerCount: _count.followedBy,
+        followingCount: _count.following,
       };
 
       return c.json(formattedData);
