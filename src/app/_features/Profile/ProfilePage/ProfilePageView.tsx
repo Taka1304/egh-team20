@@ -1,3 +1,4 @@
+import Loading from "@/app/Loading";
 import Header from "@/app/_features/Navigate/Header/Header";
 import ProfileCard from "@/app/_features/Profile/ProfileCard/ProfileCard";
 import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsers";
@@ -29,10 +30,10 @@ export default function ProfilePageView({
   // ローディング状態の表示
   if (isLoading) {
     return (
-      <div className="bg-background">
+      <div className="bg-background h-screen w-screen">
         <Header />
-        <div className="w-4/5 flex mx-auto flex-col items-center justify-center h-64">
-          <p>ユーザー情報を読み込み中...</p>
+        <div className=" h-screen w-screen flex items-center justify-center">
+          <Loading />
         </div>
       </div>
     );
