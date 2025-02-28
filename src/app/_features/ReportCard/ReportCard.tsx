@@ -2,7 +2,7 @@
 import { ReportCardView } from "@/app/_features/ReportCard/ReportCardView";
 import { useReaction } from "@/app/hooks/useReaction";
 import type { Report } from "@/app/types/reports";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type ReportCardProps = {
@@ -11,6 +11,27 @@ type ReportCardProps = {
 
 export function ReportCard({ report }: ReportCardProps) {
   const [showFullContent, setShowFullContent] = useState(false);
+
+  // 「続きを読む」ボタン表示のためのロジック
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [shouldShowMoreButton, setShouldShowMoreButton] = useState(false);
+  const contentHeightThreshold = 160; // px 単位の閾値
+
+  // コンテンツの高さを測定し、閾値を超えるかを判断する
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    if (contentRef.current) {
+      const height = contentRef.current.scrollHeight;
+      setShouldShowMoreButton(height > contentHeightThreshold);
+    }
+  }, [contentRef.current, report.text]);
+
+  // 文字数が多い場合も「続きを読む」ボタンを表示
+  useEffect(() => {
+    // 文字数が多い場合は「続きを読む」ボタンを表示
+    const shouldShowMoreByLength = report.text.length > 300;
+    setShouldShowMoreButton(shouldShowMoreByLength);
+  }, [report.text]);
 
   // useReaction フック
   const { addReaction, removeReaction, isLoading } = useReaction(report.id, {
@@ -88,15 +109,13 @@ export function ReportCard({ report }: ReportCardProps) {
     }
   };
 
-  // 表示する本文の処理
-
   return (
     <ReportCardView
       report={report}
       onShowMore={() => setShowFullContent(true)}
       isExpanded={showFullContent}
-      displayedContent={showFullContent ? report.text : report.text.slice(0, 200)}
-      shouldShowMoreButton={report.text.length > 200}
+      shouldShowMoreButton={shouldShowMoreButton}
+      contentRef={contentRef}
       onLike={() => handleToggleReaction("LIKE")}
       onFlame={() => handleToggleReaction("FLAME")}
       onCheck={() => handleToggleReaction("CHECK")}

@@ -9,12 +9,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { CheckCircle, ChevronDown, Flame, Heart, MessageCircle } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 type ReportCardViewProps = {
   report: Report;
-  displayedContent: string;
-  shouldShowMoreButton: boolean;
   onShowMore: () => void;
   onLike: () => void;
   onFlame: () => void;
@@ -27,6 +24,8 @@ type ReportCardViewProps = {
   likes: number;
   flames: number;
   checks: number;
+  shouldShowMoreButton: boolean;
+  contentRef: React.RefObject<HTMLDivElement>;
 };
 
 export function ReportCardView({
@@ -43,28 +42,9 @@ export function ReportCardView({
   likes,
   flames,
   checks,
+  shouldShowMoreButton,
+  contentRef,
 }: ReportCardViewProps) {
-  // コンテンツの高さを計測するための ref
-  const contentRef = useRef<HTMLDivElement>(null);
-  const [shouldShowMoreButton, setShouldShowMoreButton] = useState(false);
-  const contentHeightThreshold = 160; // px 単位の閾値
-
-  // コンテンツの高さを測定し、閾値を超えるかを判断する
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-  useEffect(() => {
-    if (contentRef.current) {
-      const height = contentRef.current.scrollHeight;
-      setShouldShowMoreButton(height > contentHeightThreshold);
-    }
-  }, [contentRef.current, report.text]);
-
-  // 文字数が多い場合も「続きを読む」ボタンを表示
-  useEffect(() => {
-    // 文字数が多い場合は「続きを読む」ボタンを表示
-    const shouldShowMoreByLength = report.text.length > 300;
-    setShouldShowMoreButton(shouldShowMoreByLength);
-  }, [report.text]);
-
   return (
     <Card
       className={cn(
@@ -122,7 +102,7 @@ export function ReportCardView({
       </div>
 
       {/* タグ */}
-      {report.tags && (
+      {report.tags && report.tags.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {report.tags.map((tag) => (
             <Badge key={tag} variant="secondary" className="text-xs">
