@@ -8,7 +8,7 @@ import { z } from "zod";
 
 const userScheme = z.object({
   name: z.string().optional(),
-  email: z.string(),
+  email: z.string().email().optional(),
   emailVerified: z.date().optional(),
   image: z.string().optional(),
   displayName: z.string().optional(),
@@ -132,62 +132,8 @@ const app = new Hono()
       const { interests, goals, ...userData } = body;
 
       // 基本的なユーザー情報を更新
-      const user = await prisma.user.update({
-        where: { id },
-        data: userData,
-      });
-
-      // 興味カテゴリの処理
-      if (interests && Array.isArray(interests)) {
-        // 既存の興味カテゴリをすべて削除
-        await prisma.userInterest.deleteMany({
-          where: { userId: id },
-        });
-
-        // 新しい興味カテゴリを追加
-        for (const interestName of interests) {
-          // 既存のカテゴリを検索、なければ作成
-          let interest = await prisma.interest.findUnique({
-            where: { name: interestName },
-          });
-
-          if (!interest) {
-            interest = await prisma.interest.create({
-              data: { name: interestName },
-            });
-          }
-
-          // ユーザーとカテゴリを関連付け
-          await prisma.userInterest.create({
-            data: {
-              userId: id,
-              interestId: interest.id,
-            },
-          });
-        }
-      }
-
-      // 学習目標の処理
-      if (goals && Array.isArray(goals)) {
-        // 既存の目標をすべて削除
-        await prisma.goal.deleteMany({
-          where: { userId: id },
-        });
-
-        // 新しい目標を追加
-        if (goals.length > 0) {
-          await prisma.goal.createMany({
-            data: goals.map((text) => ({
-              userId: id,
-              text,
-              isPublic: true, // デフォルトで公開に設定
-            })),
-          });
-        }
-      }
-
-      // 更新後のユーザー情報を取得
-      const updatedUser = await prisma.user.findUnique({
+      const user = await recoverFromNotFound(
+        prisma.user.update({
         where: { id },
         include: {
           goals: {
@@ -209,15 +155,39 @@ const app = new Hono()
             },
           },
         },
-      });
+        data: {
+          ...userData,
+          UserInterest: {
+            deleteMany: {
+              userId: id,
+            },
+            createMany: {
+              data: interests?.map((interestId) => ({
+                interestId,
+              })) ?? [],
+            }
+          },
+          goals: {
+            deleteMany: {
+              userId: id,
+            },
+            createMany: {
+              data: goals?.map((text) => ({
+                text,
+                isPublic: true,
+              })) ?? [],
+            }
+          }
+        },
+      }));
 
-      if (!updatedUser) {
+      if (!user) {
         return c.json({ error: "ユーザー情報の取得に失敗しました" }, 500);
       }
 
-      const { _count, ...userData2 } = updatedUser;
+      const { _count, ...updatedUserData } = user;
       const formattedData = {
-        ...userData2,
+        ...updatedUserData,
         followerCount: _count.followedBy,
         followingCount: _count.following,
       };
@@ -262,7 +232,7 @@ const app = new Hono()
         data: {
           userId: id,
           sourceUserId: session.user.id,
-          message: `${session.user.displayName}さんがあなたをフォローしました。`,
+          message: `${session.user.displayName ?? session.user.id}さんがあなたをフォローしました。`,
           type: "FOLLOW",
         },
       });

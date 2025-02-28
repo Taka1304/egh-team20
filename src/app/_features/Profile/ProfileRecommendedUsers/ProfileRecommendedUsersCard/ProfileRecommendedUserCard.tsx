@@ -9,9 +9,15 @@ type ProfileRecommendedUserCardProps = {
   user: RecommendedUser;
   onFollow: (userId: string) => Promise<boolean>;
   onUnfollow: (userId: string) => Promise<boolean>;
+  clickable?: boolean;
 };
 
-export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: ProfileRecommendedUserCardProps) {
+export function ProfileRecommendedUserCard({
+  user,
+  onFollow,
+  onUnfollow,
+  clickable = true,
+}: ProfileRecommendedUserCardProps) {
   const router = useRouter();
   const [isFollowing, setIsFollowing] = useState(user.isFollowing);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,32 +45,34 @@ export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: Profi
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
     <div
-      className="relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex-shrink-0 hover:shadow-lg transition-shadow cursor-pointer"
-      onClick={navigateToProfile}
+      className={`relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex flex-col justify-between flex-shrink-0 hover:shadow-lg transition-shadow ${clickable && "cursor-pointer"}`}
+      onClick={() => clickable && navigateToProfile}
     >
-      {/* プロフィール画像 */}
-      <div className="w-full h-24 bg-primary-foreground flex items-center justify-center">
-        <Avatar className="w-16 h-16 rounded-full border border-gray-300">
-          <AvatarImage src={user.image ?? ""} alt={`${user.displayName || ""}のアイコン`} />
-          <AvatarFallback className="bg-muted text-muted-foreground">
-            {(user.displayName || "U").charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
-      </div>
+      <div className="w-full">
+        {/* プロフィール画像 */}
+        <div className="w-full h-24 bg-primary-foreground flex items-center justify-center">
+          <Avatar className="w-16 h-16 rounded-full border border-gray-300">
+            <AvatarImage src={user.image ?? ""} alt={`${user.displayName || ""}のアイコン`} />
+            <AvatarFallback className="bg-muted text-muted-foreground">
+              {(user.displayName || "U").charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        </div>
 
-      {/* ユーザー情報 */}
-      <div className="p-2 text-center">
-        <p className="font-bold text-sm hover:underline">{user.displayName || "ユーザー"}</p>
-        {/* 興味・関心エリア */}
-        <div className="flex flex-wrap justify-center gap-1 mt-1">
-          {user.interests.slice(0, 2).map((interest) => (
-            <Badge key={interest} variant="outline" className="text-xs text-primary">
-              {interest}
-            </Badge>
-          ))}
-          {user.interests.length > 2 && (
-            <span className="text-xs text-muted-foreground">+{user.interests.length - 2}</span>
-          )}
+        {/* ユーザー情報 */}
+        <div className="p-2 text-center">
+          <p className="font-bold text-sm hover:underline">{user.displayName || "ユーザー"}</p>
+          {/* 興味・関心エリア */}
+          <div className="flex flex-wrap justify-center gap-1 mt-1">
+            {user.interests.slice(0, 2).map((interest) => (
+              <Badge key={interest} variant="outline" className="text-xs text-primary">
+                {interest}
+              </Badge>
+            ))}
+            {user.interests.length > 2 && (
+              <span className="text-xs text-muted-foreground">+{user.interests.length - 2}</span>
+            )}
+          </div>
         </div>
       </div>
 

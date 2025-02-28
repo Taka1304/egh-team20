@@ -27,6 +27,8 @@ export const authOptions: NextAuthOptions = {
         token.email = user.email;
         token.displayName = user.displayName || "";
         token.isPrivate = user.isPrivate || false;
+        token.picture = user.image;
+        // token.image = user.image;
       }
       return token;
     },
@@ -36,14 +38,15 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.displayName = token.displayName;
         session.user.isPrivate = token.isPrivate;
+        session.user.image = token.picture;
       }
       return session;
     },
   },
   pages: {
     signIn: "/auth/signin",
+    newUser: "/?onboarding=true",
     // signOut: "/auth/signout",
     // error: "/auth/error",
-    // newUser: '/auth/welcome',
   },
 };

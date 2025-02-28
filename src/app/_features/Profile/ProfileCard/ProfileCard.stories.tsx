@@ -35,9 +35,9 @@ const mockUser = {
     },
   ],
   UserInterest: [
-    { interest: { name: "プログラミング" } },
-    { interest: { name: "UI/UXデザイン" } },
-    { interest: { name: "AI" } },
+    { interest: { id: "cm7p0duh300002wux3dbx9h1q", name: "プログラミング" } },
+    { interest: { id: "cm7p0duh500022wuxbfa61eor", name: "UI/UXデザイン" } },
+    { interest: { id: "cm7p0duh500022wuxbfa61eor", name: "AI" } },
   ],
 };
 
