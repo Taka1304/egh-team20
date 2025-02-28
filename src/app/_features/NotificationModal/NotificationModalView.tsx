@@ -125,7 +125,10 @@ export function NotificationModalView({
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
                       {getNotificationIcon(notification.type)}
-                      <p className="text-sm font-medium">{notification.message}</p>
+                      <p className="text-sm font-medium">
+                        <span className="font-semibold">{notification.sourceUser?.displayName}</span>{" "}
+                        {notification.message}
+                      </p>
                     </div>
                     <p className="text-xs text-muted-foreground">{formatDate(notification.createdAt)}</p>
                   </div>
