@@ -40,7 +40,11 @@ export function useReports(viewMode: ViewMode = "category") {
       });
 
       if (!response.ok) {
-        console.error("Failed to fetch reports:", await response.text());
+        const errorText = await response.text();
+        console.error("Failed to fetch reports:", errorText);
+
+        // 404エラーの場合は明示的に空配列を設定
+        setReports([]);
         setHasMore(false);
         return;
       }
@@ -87,6 +91,8 @@ export function useReports(viewMode: ViewMode = "category") {
     } catch (error) {
       console.error("Error fetching reports:", error);
       setHasMore(false);
+      // エラー時は空の配列をセット
+      setReports([]);
     } finally {
       setIsLoading(false);
     }
