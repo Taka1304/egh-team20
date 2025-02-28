@@ -2,6 +2,7 @@ import type { RecommendedUser } from "@/app/hooks/useRecommendUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type ProfileRecommendedUserCardProps = {
@@ -11,10 +12,12 @@ type ProfileRecommendedUserCardProps = {
 };
 
 export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: ProfileRecommendedUserCardProps) {
+  const router = useRouter();
   const [isFollowing, setIsFollowing] = useState(user.isFollowing);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleFollowClick = async () => {
+  const handleFollowClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     setIsLoading(true);
     try {
       if (isFollowing) {
@@ -29,8 +32,16 @@ export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: Profi
     }
   };
 
+  const navigateToProfile = () => {
+    router.push(`/profile/${user.id}`);
+  };
+
   return (
-    <div className="relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex-shrink-0">
+    // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+    <div
+      className="relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex-shrink-0 hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={navigateToProfile}
+    >
       {/* プロフィール画像 */}
       <div className="w-full h-24 bg-primary-foreground flex items-center justify-center">
         <Avatar className="w-16 h-16 rounded-full border border-gray-300">
@@ -43,11 +54,11 @@ export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: Profi
 
       {/* ユーザー情報 */}
       <div className="p-2 text-center">
-        <p className="font-bold text-sm">{user.displayName || "ユーザー"}</p>
+        <p className="font-bold text-sm hover:underline">{user.displayName || "ユーザー"}</p>
         {/* 興味・関心エリア */}
         <div className="flex flex-wrap justify-center gap-1 mt-1">
           {user.interests.slice(0, 2).map((interest) => (
-            <Badge key={interest} variant="outline" className="text-xs">
+            <Badge key={interest} variant="outline" className="text-xs text-primary">
               {interest}
             </Badge>
           ))}
