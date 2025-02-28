@@ -61,7 +61,6 @@ const app = new Hono().get("/:reportId", async (c) => {
 export default app;
 
 async function geminiRun(reportTitle: string, reportText: string) {
-  // The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-2.0-flash",
