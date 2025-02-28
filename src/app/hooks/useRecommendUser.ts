@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { mutate } from "swr";
 
 export type RecommendedUser = {
   id: string;
@@ -11,10 +12,9 @@ export type RecommendedUser = {
   isFollowing: boolean;
 };
 
-// キャッシュ
 let cachedRecommendedUsers: RecommendedUser[] = [];
 let lastFetchTime = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5分間キャッシュ
+const CACHE_DURATION = 5 * 60 * 1000;
 
 export function useRecommendUser() {
   const { data: session } = useSession();
@@ -53,57 +53,76 @@ export function useRecommendUser() {
     }
   };
 
-  const followUser = async (userId: string) => {
-    if (!session?.user?.id) return false;
+  const followUser = async (userId: string): Promise<boolean> => {
+    // セッション・ユーザーIDチェック
+    if (!session?.user?.id) {
+      console.error("フォロー操作を実行できません: ユーザーがログインしていません");
+      return false;
+    }
 
     try {
       const response = await fetch(`/api/users/${userId}/follow/${session.user.id}`, {
         method: "POST",
       });
 
-      if (!response.ok) return false;
+      if (response.ok) {
+        // おすすめユーザーリストのキャッシュを更新
+        await mutate("/api/users/recommended");
 
-      // 成功したら、ユーザーリストを更新してUIに反映
-      const updatedUsers = recommendedUsers.map((user) => (user.id === userId ? { ...user, isFollowing: true } : user));
+        // フォローされたユーザーのプロフィールを更新
+        await mutate(`/api/users/${userId}`);
 
-      // ローカル状態とキャッシュの両方を更新
-      setRecommendedUsers(updatedUsers);
-      cachedRecommendedUsers = updatedUsers;
+        // 自分のプロフィールのフォロー数も更新
+        await mutate((key) => typeof key === "string" && key.includes("/api/users/") && !key.includes(userId));
 
-      return true;
+        // ユーザーの統計情報も更新
+        await mutate((key) => typeof key === "string" && key.includes(`/api/users/${userId}/stats`));
+        await mutate((key) => typeof key === "string" && key.includes(`/api/users/${session.user.id}/stats`));
+
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error("フォロー処理に失敗しました:", error);
+      console.error("フォローエラー:", error);
       return false;
     }
   };
 
-  const unfollowUser = async (userId: string) => {
-    if (!session?.user?.id) return false;
+  const unfollowUser = async (userId: string): Promise<boolean> => {
+    // セッション・ユーザーIDチェック
+    if (!session?.user?.id) {
+      console.error("フォロー解除操作を実行できません: ユーザーがログインしていません");
+      return false;
+    }
 
     try {
       const response = await fetch(`/api/users/${userId}/follow/${session.user.id}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) return false;
+      if (response.ok) {
+        // おすすめユーザーリストのキャッシュを更新
+        await mutate("/api/users/recommended");
 
-      // 成功したら、ユーザーリストを更新してUIに反映
-      const updatedUsers = recommendedUsers.map((user) =>
-        user.id === userId ? { ...user, isFollowing: false } : user,
-      );
+        // フォロー解除されたユーザーのプロフィールを更新
+        await mutate(`/api/users/${userId}`);
 
-      // ローカル状態とキャッシュの両方を更新
-      setRecommendedUsers(updatedUsers);
-      cachedRecommendedUsers = updatedUsers;
+        // 自分のプロフィールのフォロー数も更新
+        await mutate((key) => typeof key === "string" && key.includes("/api/users/") && !key.includes(userId));
 
-      return true;
+        // ユーザーの統計情報も更新
+        await mutate((key) => typeof key === "string" && key.includes(`/api/users/${userId}/stats`));
+        await mutate((key) => typeof key === "string" && key.includes(`/api/users/${session.user.id}/stats`));
+
+        return true;
+      }
+      return false;
     } catch (error) {
-      console.error("フォロー解除処理に失敗しました:", error);
+      console.error("フォロー解除エラー:", error);
       return false;
     }
   };
 
-  // セッションが変わった時だけデータを取得
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (session?.user?.id) {
@@ -117,6 +136,6 @@ export function useRecommendUser() {
     error,
     followUser,
     unfollowUser,
-    refetch: () => fetchRecommendedUsers(true), // 強制的に再取得する場合
+    refreshRecommendations: () => fetchRecommendedUsers(true),
   };
 }
