@@ -38,6 +38,7 @@ const app = new Hono()
               },
             })
             .then((follows) => follows.map((follow) => follow.followingId));
+
           // getTypeごとに取得条件を変える
           if (getType === "sameCategory") {
             whereGetTypeCondition = {
@@ -55,10 +56,24 @@ const app = new Hono()
               ],
             };
           } else if (getType === "following") {
+            console.info("followedUserIds", followedUserIds);
             whereGetTypeCondition = {
-              visibility: $Enums.Visibility.FOLLOWERS,
-              user: { isPrivate: false },
-              userId: { in: followedUserIds },
+              OR: [
+                // フォローしているユーザーのPUBLIC投稿
+                {
+                  visibility: $Enums.Visibility.PUBLIC,
+                  user: { isPrivate: false },
+                  userId: { in: followedUserIds },
+                },
+                // フォローしているユーザーのFOLLOWER限定投稿
+                {
+                  visibility: $Enums.Visibility.FOLLOWERS,
+                  user: { isPrivate: false },
+                  userId: { in: followedUserIds },
+                },
+                // 自分の投稿
+                { userId: session.user.id },
+              ],
             };
           } else if (getType === "own") {
             whereGetTypeCondition = {
