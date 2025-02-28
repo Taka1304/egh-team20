@@ -25,36 +25,19 @@ export function TimelineView({
   viewMode,
   onChangeViewMode,
 }: TimelineViewProps) {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const reportVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      },
-    },
+  // シンプルな個別アニメーション設定
+  const fadeIn = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    transition: { duration: 0.3 },
   };
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      {/* フィルターボタン */}
       <motion.div
         className="flex justify-between mb-4 p-2 bg-card rounded-md"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
         <Button
@@ -84,44 +67,37 @@ export function TimelineView({
       <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar">
         {/* ローディング中は中央に表示 */}
         {isLoading ? (
-          <motion.div
-            className="flex items-center justify-center h-full"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-          >
+          <motion.div className="flex items-center justify-center h-full" {...fadeIn}>
             <Loading />
           </motion.div>
         ) : reports.length > 0 ? (
-          <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-4">
+          <div className="space-y-4">
             {reports.map((report, index) => (
-              <motion.div key={report.id} variants={reportVariants} custom={index}>
+              <motion.div
+                key={report.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.2,
+                  ease: "easeOut",
+                  delay: Math.min(index * 0.05, 0.5),
+                }}
+              >
                 <ReportCard report={report} />
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            className="text-center py-8 text-muted-foreground"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
+          <motion.div className="text-center py-8 text-muted-foreground" {...fadeIn}>
             <p>表示できる投稿がありません</p>
           </motion.div>
         )}
 
         {/* ローダー（無限スクロール用）*/}
         {!isLoading && (
-          <motion.div
-            ref={loaderRef}
-            className="py-4 text-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.3 }}
-          >
+          <div ref={loaderRef} className="py-4 text-center">
             {!hasMore && reports.length > 0 && <p className="text-muted-foreground">これ以上のレポートはありません</p>}
-          </motion.div>
+          </div>
         )}
       </div>
     </div>
