@@ -7,6 +7,9 @@ type UserStats = {
   postsCount: number;
   reactionsCount: number;
   badgesCount: number;
+  continuityData: { date: string; days: number }[];
+  postsData: { month: string; count: number }[];
+  reactionData: { name: string; value: number }[];
 };
 
 export function useUserStats(userId?: string) {
@@ -22,17 +25,21 @@ export function useUserStats(userId?: string) {
 
     try {
       setIsLoading(true);
-      // Todo Honoを使う
+      setError(null);
+
       const response = await fetch(`/api/users/${userId}/stats`);
 
       if (!response.ok) {
-        throw new Error("統計情報の取得に失敗しました");
+        const errorText = await response.text();
+        throw new Error(errorText || "統計情報の取得に失敗しました");
       }
 
       const data = await response.json();
       setStats(data);
     } catch (err) {
+      console.error("統計情報取得エラー:", err);
       setError(err instanceof Error ? err : new Error("Unknown error"));
+      setStats(null);
     } finally {
       setIsLoading(false);
     }
