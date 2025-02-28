@@ -19,6 +19,7 @@ type TimelineViewProps = {
   onReportDeleted?: () => Promise<void>;
   style?: CSSProperties;
   isNested?: boolean;
+  userId?: string;
 };
 
 export function TimelineView({
@@ -31,9 +32,13 @@ export function TimelineView({
   onReportDeleted,
   style,
   isNested,
+  userId,
 }: TimelineViewProps) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
+
+  // ユーザーIDが指定されている場合は、モード切り替えボタンを表示しない
+  const showModeButtons = !userId;
 
   // シンプルな個別アニメーション設定
   const fadeIn = {
@@ -44,34 +49,37 @@ export function TimelineView({
 
   return (
     <div className="w-full max-w-2xl mx-auto">
-      <motion.div
-        className="flex justify-between mb-4 p-2 bg-card rounded-md"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <Button
-          variant={viewMode === "category" ? "default" : "outline"}
-          onClick={() => onChangeViewMode("category")}
-          className="flex-1 mx-1 text-primary-foreground"
+      {showModeButtons && (
+        <motion.div
+          className="flex justify-between mb-4 p-2 bg-card rounded-md"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3 }}
         >
-          カテゴリー
-        </Button>
-        <Button
-          variant={viewMode === "following" ? "default" : "outline"}
-          onClick={() => onChangeViewMode("following")}
-          className="flex-1 mx-1 text-primary-foreground"
-        >
-          フォロー中
-        </Button>
-        <Button
-          variant={viewMode === "mine" ? "default" : "outline"}
-          onClick={() => onChangeViewMode("mine")}
-          className="flex-1 mx-1 text-primary-foreground"
-        >
-          自分の投稿
-        </Button>
-      </motion.div>
+          <Button
+            variant={viewMode === "category" ? "default" : "outline"}
+            onClick={() => onChangeViewMode("category")}
+            className="flex-1 mx-1 text-primary-foreground"
+          >
+            カテゴリー
+          </Button>
+          <Button
+            variant={viewMode === "following" ? "default" : "outline"}
+            onClick={() => onChangeViewMode("following")}
+            className="flex-1 mx-1 text-primary-foreground"
+          >
+            フォロー中
+          </Button>
+          <Button
+            variant={viewMode === "mine" ? "default" : "outline"}
+            onClick={() => onChangeViewMode("mine")}
+            className="flex-1 mx-1 text-primary-foreground"
+          >
+            自分の投稿
+          </Button>
+        </motion.div>
+      )}
+
       <div
         className="overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar"
         style={{
@@ -79,6 +87,7 @@ export function TimelineView({
           height: "100%",
         }}
       >
+        {userId && <div className="text-lg font-semibold p-2 border-b">投稿一覧</div>}
         {/* ローディング中は中央に表示 */}
         {isLoading ? (
           <motion.div className="flex items-center justify-center h-full" {...fadeIn}>

@@ -20,7 +20,7 @@ const VIEW_MODE_TO_API_TYPE: Record<ViewMode, "sameCategory" | "following" | "ow
   mine: "own",
 };
 
-export function useReports(viewMode: ViewMode = "category") {
+export function useReports(viewMode: ViewMode = "category", userId?: string) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
 
@@ -35,8 +35,10 @@ export function useReports(viewMode: ViewMode = "category") {
       // ViewMode に応じた type パラメータを設定
       const type = VIEW_MODE_TO_API_TYPE[viewMode];
 
+      const queryParams = userId ? { userId } : { type };
+
       const response = await client.api.reports.$get({
-        query: { type },
+        query: queryParams,
       });
 
       if (!response.ok) {
@@ -50,8 +52,6 @@ export function useReports(viewMode: ViewMode = "category") {
       }
 
       const data = await response.json();
-      // biome-ignore lint/suspicious/noConsoleLog: <explanation>
-      console.log(`Received ${data.reports?.length || 0} reports`);
 
       setReports(
         data.reports.map((r) => ({
@@ -96,7 +96,7 @@ export function useReports(viewMode: ViewMode = "category") {
     } finally {
       setIsLoading(false);
     }
-  }, [currentUserId, viewMode]);
+  }, [currentUserId, viewMode, userId]);
 
   useEffect(() => {
     refetchReports();

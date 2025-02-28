@@ -18,6 +18,7 @@ const app = new Hono()
       z
         .object({
           type: z.enum(["sameCategory", "following", "own"]).optional(),
+          userId: z.string().optional(),
         })
         .default({}),
     ),
@@ -28,8 +29,35 @@ const app = new Hono()
       try {
         let followedUserIds: string[] = [];
         let whereGetTypeCondition: object = {};
+        const userId = c.req.valid("query").userId;
 
-        if (session) {
+        // userId が指定されている場合、そのユーザーの投稿のみを取得
+        if (userId) {
+          whereGetTypeCondition = {
+            userId,
+            OR: [
+              // パブリックな投稿
+              { visibility: $Enums.Visibility.PUBLIC },
+              // ログインユーザーがそのユーザーをフォローしている場合、FOLLOWERS投稿も表示
+              ...(session
+                ? [
+                    {
+                      visibility: $Enums.Visibility.FOLLOWERS,
+                      user: {
+                        followedBy: {
+                          some: {
+                            followerId: session.user.id,
+                          },
+                        },
+                      },
+                    },
+                  ]
+                : []),
+              // 自分自身の投稿は全て表示
+              ...(session && session.user.id === userId ? [{}] : []),
+            ],
+          };
+        } else if (session) {
           followedUserIds = await prisma.follow
             .findMany({
               where: {

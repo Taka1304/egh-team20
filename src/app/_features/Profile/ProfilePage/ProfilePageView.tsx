@@ -185,7 +185,7 @@ export default function ProfilePageView({
                   }}
                 >
                   {/* isNested=trueを指定して、プロフィールページ内に埋め込まれていることを伝える */}
-                  <Timeline isNested={true} />
+                  <Timeline isNested={true} userId={user.id} />
                 </div>
               </div>
             </Card>
