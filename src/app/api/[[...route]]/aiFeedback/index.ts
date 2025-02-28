@@ -1,7 +1,7 @@
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { type Context, Hono } from "hono";
+import { Hono } from "hono";
 
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
@@ -23,7 +23,7 @@ const app = new Hono().get("/:reportId", async (c) => {
     return c.json({ error: "Reportがありません" }, 404);
   }
 
-  const { responseJson, responseText } = await geminiRun(c, report.title, report.text);
+  const { responseJson, responseText } = await geminiRun(report.title, report.text);
   prisma.aIFeedback.create({
     data: {
       reportId: report.id,
@@ -35,7 +35,7 @@ const app = new Hono().get("/:reportId", async (c) => {
 });
 export default app;
 
-async function geminiRun(c: Context, reportTitle: string, reportText: string) {
+async function geminiRun(reportTitle: string, reportText: string) {
   // The Gemini 1.5 models are versatile and work with both text-only and multimodal prompts
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
