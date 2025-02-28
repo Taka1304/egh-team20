@@ -27,7 +27,7 @@ export function PostCreationButton({ className }: PostCreationButtonProps) {
   };
 
   const handleEditDraft = (draftId: string) => {
-    router.push(`/reports/new?id=${draftId}`);
+    router.push(`/reports/${draftId}/edit`);
     setIsOpen(false);
   };
 
