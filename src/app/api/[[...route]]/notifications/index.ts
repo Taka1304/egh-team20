@@ -1,47 +1,78 @@
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import type { $Enums, Notification, NotificationType } from "@prisma/client";
+import type { $Enums, NotificationType } from "@prisma/client";
 import { Hono } from "hono";
-import { upgradeWebSocket } from "hono/cloudflare-workers";
-import type { WSContext } from "hono/ws";
+import { getServerSession } from "next-auth";
 
-const clients = new Map<string, WSContext<WebSocket>>();
-
-const app = new Hono().get(
-
-).get(
-  "/ws/:userId",
-  upgradeWebSocket((c) => {
-    const { userId } = c.req.param();
-    return {
-      onMessage: (_evt, ws) => {
-        console.log("Connection opened");
-        clients.set(userId, ws);
+const app = new Hono()
+  .get("/", async (c) => {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+    const data = await prisma.notification.findMany({
+      where: {
+        userId: session.user.id,
       },
-      onClose: () => {
-        console.log("Connection closed");
+      include: {
+        sourceUser: {
+          select: {
+            displayName: true,
+            image: true,
+          }
+        }
       },
-    };
-  }),
-);
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+    return c.json(data);
+  })
+  .post("/:id/read", async (c) => {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+    const { id } = c.req.param();
+    try {
 
-const sendNotification = async (userId: string, data: Notification) => {
-  if (clients.has(userId)) {
-    clients.get(userId)?.send(JSON.stringify(data));
-  }
-};
+      const data = await prisma.notification.update({
+        where: {
+          id,
+          userId: session.user.id,
+        },
+        data: {
+          isRead: true,
+        },
+      });
+      if (!data) {
+        return c.json({ error: "対象の通知がありません" }, 404);
+      }
+
+      return c.json(data);
+    } catch (e) {
+      console.error(e);
+      return c.json({ error: "通知の既読化に失敗しました" }, 500);
+    }
+  });
 
 export type NotificationResponse = {
+  sourceUser: {
+      image: string | null;
+      displayName: string | null;
+  } | null;
+} & {
+  message: string;
   type: $Enums.NotificationType;
   id: string;
-  message: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   userId: string;
   communityId: string | null;
   sourceUserId: string | null;
   badgeId: string | null;
   isRead: boolean;
-}
+};
 
 export const createNotification = async (
   userId: string,
@@ -72,7 +103,7 @@ export const createNotification = async (
       break;
   }
 
-  const data = await prisma.notification.create({
+  await prisma.notification.create({
     data: {
       userId,
       sourceUserId,
@@ -82,8 +113,6 @@ export const createNotification = async (
       type,
     },
   });
-
-  sendNotification(userId, data);
 };
 
 export default app;
