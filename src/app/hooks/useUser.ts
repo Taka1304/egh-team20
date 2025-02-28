@@ -30,8 +30,10 @@ type UpdateProfileData = {
   bio?: string;
   isPrivate?: boolean;
   image?: string;
+  email?: string;
+  interests?: string[];
+  goals?: string[];
 };
-
 type UseUserReturn = {
   user: ProfileUser | null;
   isLoading: boolean;

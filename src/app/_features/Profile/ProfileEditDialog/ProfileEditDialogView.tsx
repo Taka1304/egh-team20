@@ -1,10 +1,16 @@
 "use client";
 
+import { InterestsCategoryDropdown } from "@/app/_features/Profile/ProfileEditDialog/InterestsCategoryDropdown";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, X } from "lucide-react";
 import { ProfileEditTextarea } from "./ProfileEditTextarea";
+
+type Interest = {
+  id: string;
+  name: string;
+};
 
 type ProfileEditDialogViewProps = {
   avatar: string;
@@ -14,8 +20,10 @@ type ProfileEditDialogViewProps = {
   setDisplayName: (value: string) => void;
   bio: string;
   setBio: (value: string) => void;
-  interests: string;
-  setInterests: (value: string) => void;
+  selectedInterests: string[];
+  availableInterests: Interest[];
+  isLoadingInterests: boolean;
+  onInterestToggle: (interestName: string) => void;
   goals: string;
   setGoals: (value: string) => void;
   isPrivate: boolean;
@@ -33,8 +41,10 @@ export function ProfileEditDialogView({
   setDisplayName,
   bio,
   setBio,
-  interests,
-  setInterests,
+  selectedInterests,
+  availableInterests,
+  isLoadingInterests,
+  onInterestToggle,
   goals,
   setGoals,
   isPrivate,
@@ -84,22 +94,21 @@ export function ProfileEditDialogView({
           </div>
         </div>
 
-        {/* 興味・カテゴリー*/}
-        <ProfileEditTextarea
-          title="興味・カテゴリー"
-          value={interests}
-          onChange={setInterests}
-          placeholder="現在変更できません"
-          disabled={true}
+        {/* 興味・カテゴリー (バッジ選択方式) */}
+        <InterestsCategoryDropdown
+          availableInterests={availableInterests}
+          selectedInterests={selectedInterests}
+          onInterestToggle={onInterestToggle}
+          isLoading={isLoadingInterests}
         />
 
-        {/* 目標 (読み取り専用) */}
+        {/* 目標 */}
         <ProfileEditTextarea
           title="学習目標"
           value={goals}
           onChange={setGoals}
-          placeholder="現在変更できません"
-          disabled={true}
+          placeholder="複数の場合はカンマで区切ってください（例：Reactの習得, TOEICスコアアップ）"
+          disabled={isLoading}
         />
 
         {/* 自己紹介 */}

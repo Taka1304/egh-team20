@@ -2,8 +2,13 @@
 
 import { ProfileEditDialogView } from "@/app/_features/Profile/ProfileEditDialog/ProfileEditDialogView";
 import type { ProfileUser } from "@/app/hooks/useUser";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
+
+type Interest = {
+  id: string;
+  name: string;
+};
 
 type ProfileEditDialogProps = {
   user: ProfileUser;
@@ -12,18 +17,48 @@ type ProfileEditDialogProps = {
 };
 
 export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogProps) {
+  // 利用可能な興味カテゴリのリスト
+  const [availableInterests, setAvailableInterests] = useState<Interest[]>([]);
+  const [isLoadingInterests, setIsLoadingInterests] = useState(false);
+
+  // 編集用の状態を初期化
   const [isLoading, setIsLoading] = useState(false);
   const [editedProfile, setEditedProfile] = useState({
     displayName: user.displayName || user.name || "",
     bio: user.bio || "",
     isPrivate: user.isPrivate || false,
+    interests: user.UserInterest ? user.UserInterest.map((ui) => ui.interest.name) : [],
+    goals: user.goals ? user.goals.map((g) => g.text) : [],
     // 以下はAPIで更新しない項目だが、UIのために必要
     following: user.followingCount,
     followers: user.followerCount,
     avatar: user.image || "",
   });
 
-  // フィールド1つを更新する共通関数
+  // カテゴリ一覧を取得
+  useEffect(() => {
+    const fetchInterests = async () => {
+      setIsLoadingInterests(true);
+      try {
+        const response = await fetch("/api/interests/interests");
+        if (!response.ok) {
+          throw new Error("興味カテゴリの取得に失敗しました");
+        }
+
+        const data = await response.json();
+        setAvailableInterests(data.interests);
+      } catch (error) {
+        console.error("興味カテゴリの取得エラー:", error);
+        toast.error("興味カテゴリの取得に失敗しました");
+      } finally {
+        setIsLoadingInterests(false);
+      }
+    };
+
+    fetchInterests();
+  }, []);
+
+  // フィールド1つを更新する関数
   const setField = useCallback(<K extends keyof typeof editedProfile>(key: K, value: (typeof editedProfile)[K]) => {
     setEditedProfile((prev) => ({ ...prev, [key]: value }));
   }, []);
@@ -44,6 +79,8 @@ export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogPr
           bio: editedProfile.bio,
           isPrivate: editedProfile.isPrivate,
           email: user.email,
+          interests: editedProfile.interests,
+          goals: editedProfile.goals,
         }),
       });
 
@@ -51,7 +88,6 @@ export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogPr
         let errorMessage = "プロフィールの更新に失敗しました";
         try {
           const errorData = await response.json();
-          // エラーメッセージがオブジェクトの場合は適切に処理
           if (typeof errorData.error === "string") {
             errorMessage = errorData.error;
           } else if (errorData.message) {
@@ -76,11 +112,27 @@ export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogPr
     }
   };
 
-  // 興味・カテゴリーを文字列に変換
-  const interests = user.UserInterest ? user.UserInterest.map((ui) => ui.interest.name).join(", ") : "";
+  // 興味・カテゴリの選択を処理する関数
+  const handleInterestToggle = (interestName: string) => {
+    setField(
+      "interests",
+      editedProfile.interests.includes(interestName)
+        ? editedProfile.interests.filter((name) => name !== interestName)
+        : [...editedProfile.interests, interestName],
+    );
+  };
 
   // 目標を文字列に変換
-  const goals = user.goals ? user.goals.map((g) => g.text).join(", ") : "";
+  const goalsString = editedProfile.goals.join(", ");
+
+  // 学習目標編集用の関数
+  const setGoals = (value: string) => {
+    const goalsArray = value
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    setField("goals", goalsArray);
+  };
 
   return (
     <ProfileEditDialogView
@@ -91,10 +143,12 @@ export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogPr
       setDisplayName={(val) => setField("displayName", val)}
       bio={editedProfile.bio}
       setBio={(val) => setField("bio", val)}
-      interests={interests}
-      setInterests={() => {}}
-      goals={goals}
-      setGoals={() => {}}
+      selectedInterests={editedProfile.interests}
+      availableInterests={availableInterests}
+      isLoadingInterests={isLoadingInterests}
+      onInterestToggle={handleInterestToggle}
+      goals={goalsString}
+      setGoals={setGoals}
       isPrivate={editedProfile.isPrivate}
       setIsPrivate={(val) => setField("isPrivate", val)}
       isLoading={isLoading}

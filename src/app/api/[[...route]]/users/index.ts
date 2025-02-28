@@ -16,6 +16,8 @@ const userScheme = z.object({
   displayName: z.string().optional(),
   bio: z.string().optional(),
   isPrivate: z.boolean().optional(),
+  interests: z.array(z.string()).optional(),
+  goals: z.array(z.string()).optional(),
 });
 
 // ユーザー情報を取得するエンドポイント
@@ -122,12 +124,103 @@ app
     const body = c.req.valid("json");
 
     try {
+      // リクエストから興味カテゴリと学習目標を抽出
+      const { interests, goals, ...userData } = body;
+
+      // 基本的なユーザー情報を更新
       const user = await prisma.user.update({
-        where: { id: id },
-        data: body,
+        where: { id },
+        data: userData,
       });
-      return c.json({ message: "User updated", user: user });
+
+      // 興味カテゴリの処理
+      if (interests && Array.isArray(interests)) {
+        // 既存の興味カテゴリをすべて削除
+        await prisma.userInterest.deleteMany({
+          where: { userId: id },
+        });
+
+        // 新しい興味カテゴリを追加
+        for (const interestName of interests) {
+          // 既存のカテゴリを検索、なければ作成
+          let interest = await prisma.interest.findUnique({
+            where: { name: interestName },
+          });
+
+          if (!interest) {
+            interest = await prisma.interest.create({
+              data: { name: interestName },
+            });
+          }
+
+          // ユーザーとカテゴリを関連付け
+          await prisma.userInterest.create({
+            data: {
+              userId: id,
+              interestId: interest.id,
+            },
+          });
+        }
+      }
+
+      // 学習目標の処理
+      if (goals && Array.isArray(goals)) {
+        // 既存の目標をすべて削除
+        await prisma.goal.deleteMany({
+          where: { userId: id },
+        });
+
+        // 新しい目標を追加
+        if (goals.length > 0) {
+          await prisma.goal.createMany({
+            data: goals.map((text) => ({
+              userId: id,
+              text,
+              isPublic: true, // デフォルトで公開に設定
+            })),
+          });
+        }
+      }
+
+      // 更新後のユーザー情報を取得
+      const updatedUser = await prisma.user.findUnique({
+        where: { id },
+        include: {
+          goals: {
+            select: {
+              id: true,
+              isPublic: true,
+              text: true,
+            },
+          },
+          UserInterest: {
+            select: {
+              interest: true,
+            },
+          },
+          _count: {
+            select: {
+              followedBy: true,
+              following: true,
+            },
+          },
+        },
+      });
+
+      if (!updatedUser) {
+        return c.json({ error: "ユーザー情報の取得に失敗しました" }, 500);
+      }
+
+      const { _count, ...userData2 } = updatedUser;
+      const formattedData = {
+        ...userData2,
+        followerCount: _count.followedBy,
+        followingCount: _count.following,
+      };
+
+      return c.json({ message: "User updated", user: formattedData });
     } catch (error) {
+      console.error("ユーザー更新エラー:", error);
       if (error instanceof Error) {
         return c.json({ error: error.message }, 500);
       }
