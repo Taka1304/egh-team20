@@ -73,7 +73,7 @@ export function NotificationModalView({
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 15, stiffness: 300 }}
-        className="bg-card p-6 rounded-lg shadow-lg w-[500px] max-w-full text-card-foreground relative max-h-[80vh] overflow-y-auto"
+        className="bg-card p-6 rounded-lg shadow-lg w-[500px] max-w-full text-card-foreground relative max-h-[80vh] overflow-y-auto custom-scrollbar"
       >
         {/* 閉じるボタン */}
         <button
