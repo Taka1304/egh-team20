@@ -18,11 +18,11 @@ export default function ProfileCard({ user }: ProfileCardProps) {
       <div className="mt-2 flex space-x-4">
         <div className="text-center">
           {/* Todo フォロー中とフォロワーが逆 */}
-          <p className="font-semibold text-lg text-primary-foreground">{user.followerCount}</p>
+          <p className="font-semibold text-lg text-primary-foreground">{user.followingCount}</p>
           <p className="text-sm text-muted-foreground">フォロー中</p>
         </div>
         <div className="text-center">
-          <p className="font-semibold text-lg text-primary-foreground">{user.followingCount}</p>
+          <p className="font-semibold text-lg text-primary-foreground">{user.followerCount}</p>
           <p className="text-sm text-muted-foreground">フォロワー</p>
         </div>
       </div>

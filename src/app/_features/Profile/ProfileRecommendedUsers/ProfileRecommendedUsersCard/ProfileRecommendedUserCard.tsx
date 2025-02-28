@@ -2,7 +2,6 @@ import type { RecommendedUser } from "@/app/hooks/useRecommendUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react"; // 閉じるボタン用アイコン
 import { useState } from "react";
 
 type ProfileRecommendedUserCardProps = {
@@ -12,7 +11,7 @@ type ProfileRecommendedUserCardProps = {
 };
 
 export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: ProfileRecommendedUserCardProps) {
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(user.isFollowing);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFollowClick = async () => {
@@ -32,11 +31,6 @@ export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: Profi
 
   return (
     <div className="relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex-shrink-0">
-      {/* 閉じるボタン */}
-      <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary-foreground">
-        <X size={16} className="text-gray-600" />
-      </Button>
-
       {/* プロフィール画像 */}
       <div className="w-full h-24 bg-primary-foreground flex items-center justify-center">
         <Avatar className="w-16 h-16 rounded-full border border-gray-300">

@@ -11,7 +11,7 @@ type RecommendedUserCardProps = {
 };
 
 export function RecommendedUserCard({ user, onFollow, onUnfollow }: RecommendedUserCardProps) {
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(user.isFollowing);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFollow = async () => {

@@ -8,118 +8,115 @@ export type RecommendedUser = {
   displayName?: string;
   image?: string;
   interests: string[];
+  isFollowing: boolean;
 };
 
-type UseRecommendUserReturn = {
-  recommendedUsers: RecommendedUser[];
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
-  followUser: (userId: string) => Promise<boolean>;
-  unfollowUser: (userId: string) => Promise<boolean>;
-};
+// キャッシュ
+let cachedRecommendedUsers: RecommendedUser[] = [];
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5分間キャッシュ
 
-export function useRecommendUser(userId?: string, recommendedUserNum = 5): UseRecommendUserReturn {
+export function useRecommendUser() {
   const { data: session } = useSession();
-  const [recommendedUsers, setRecommendedUsers] = useState<RecommendedUser[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [recommendedUsers, setRecommendedUsers] = useState<RecommendedUser[]>(cachedRecommendedUsers);
+  const [isLoading, setIsLoading] = useState(cachedRecommendedUsers.length === 0);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchRecommendedUsers = async () => {
+  const fetchRecommendedUsers = async (forceRefresh = false) => {
+    if (!session?.user?.id) return;
+
+    // キャッシュが有効な場合はフェッチしない
+    const currentTime = Date.now();
+    if (!forceRefresh && cachedRecommendedUsers.length > 0 && currentTime - lastFetchTime < CACHE_DURATION) {
+      setRecommendedUsers(cachedRecommendedUsers);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      // biome-ignore lint/style/useConst: <explanation>
-      let targetUserId = userId || session?.user?.id;
-
-      if (!targetUserId) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch(
-        `/api/users/${targetUserId}/recommended?recommendedUserNum=${recommendedUserNum.toString()}`,
-      );
-
+      const response = await fetch(`/api/users/${session.user.id}/recommended?recommendedUserNum=5`);
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "おすすめユーザーの取得に失敗しました");
+        throw new Error("Failed to fetch recommended users");
       }
-
       const data = await response.json();
-      setRecommendedUsers(data.recommendedUsers || []);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error("Unknown error occurred"));
-      }
+
+      // モジュールレベルのキャッシュを更新
+      cachedRecommendedUsers = data.recommendedUsers || [];
+      lastFetchTime = Date.now();
+
+      setRecommendedUsers(cachedRecommendedUsers);
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Unknown error"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // フォロー処理
-  const followUser = async (targetUserId: string): Promise<boolean> => {
+  const followUser = async (userId: string) => {
     if (!session?.user?.id) return false;
 
     try {
-      const response = await fetch(`/api/users/${targetUserId}/follow/${session.user.id}`, {
+      const response = await fetch(`/api/users/${userId}/follow/${session.user.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("フォロー失敗:", errorText);
-        return false;
-      }
+      if (!response.ok) return false;
 
-      // 成功したら推奨リストを更新
-      await fetchRecommendedUsers();
+      // 成功したら、ユーザーリストを更新してUIに反映
+      const updatedUsers = recommendedUsers.map((user) => (user.id === userId ? { ...user, isFollowing: true } : user));
+
+      // ローカル状態とキャッシュの両方を更新
+      setRecommendedUsers(updatedUsers);
+      cachedRecommendedUsers = updatedUsers;
+
       return true;
-    } catch (err) {
-      console.error("フォロー処理でエラーが発生しました:", err);
+    } catch (error) {
+      console.error("フォロー処理に失敗しました:", error);
       return false;
     }
   };
 
-  // フォロー解除処理
-  const unfollowUser = async (targetUserId: string): Promise<boolean> => {
+  const unfollowUser = async (userId: string) => {
     if (!session?.user?.id) return false;
 
     try {
-      const response = await fetch(`/api/users/${targetUserId}/follow/${session.user.id}`, {
+      const response = await fetch(`/api/users/${userId}/follow/${session.user.id}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("フォロー解除失敗:", errorText);
-        return false;
-      }
+      if (!response.ok) return false;
 
-      // 成功したら推奨リストを更新
-      await fetchRecommendedUsers();
+      // 成功したら、ユーザーリストを更新してUIに反映
+      const updatedUsers = recommendedUsers.map((user) =>
+        user.id === userId ? { ...user, isFollowing: false } : user,
+      );
+
+      // ローカル状態とキャッシュの両方を更新
+      setRecommendedUsers(updatedUsers);
+      cachedRecommendedUsers = updatedUsers;
+
       return true;
-    } catch (err) {
-      console.error("フォロー解除処理でエラーが発生しました:", err);
+    } catch (error) {
+      console.error("フォロー解除処理に失敗しました:", error);
       return false;
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 依存する値だけを指定
+  // セッションが変わった時だけデータを取得
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    fetchRecommendedUsers();
-  }, [userId, session, recommendedUserNum]);
+    if (session?.user?.id) {
+      fetchRecommendedUsers();
+    }
+  }, [session?.user?.id]);
 
   return {
     recommendedUsers,
     isLoading,
     error,
-    refetch: fetchRecommendedUsers,
     followUser,
     unfollowUser,
+    refetch: () => fetchRecommendedUsers(true), // 強制的に再取得する場合
   };
 }
