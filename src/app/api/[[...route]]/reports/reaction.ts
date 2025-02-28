@@ -7,6 +7,15 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { CheckReportAccessPermission } from "./utils";
 
+// TODO:
+type ReactionType = "HEART" | "FIRE" | "CHECK";
+
+const REACTION_TYPE_MAP: Record<string, ReactionType> = {
+  cm7k363aj0001r0ux0ff4361n: "HEART",
+  cm7n45ua20000ksuxdbbi597c: "FIRE",
+  cm7n45ua40001ksux1x3lbq2m: "CHECK",
+};
+
 const app = new Hono()
   .post(
     "/:id/reaction/:typeId",
@@ -37,6 +46,19 @@ const app = new Hono()
             typeId: typeId,
             userId: session.user.id,
             reportId,
+          },
+        });
+
+        const report = await result.json();
+
+        //通知を送信
+        await prisma.notification.create({
+          data: {
+            userId: report.user.id,
+            sourceUserId: session.user.id,
+            reportId,
+            message: `${session.user.displayName}さんがあなたの投稿に${REACTION_TYPE_MAP[typeId]}を付けました`,
+            type: `REACTION_${REACTION_TYPE_MAP[typeId]}`,
           },
         });
 
