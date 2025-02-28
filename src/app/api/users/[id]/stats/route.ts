@@ -1,13 +1,13 @@
-// src/app/api/users/[id]/stats/route.ts
 import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const userId = params.id;
+    const resolvedParams = await params;
+    const userId = resolvedParams.id;
 
     // ユーザーとその登録日を取得
     const user = await prisma.user.findUnique({
