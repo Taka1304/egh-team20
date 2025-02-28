@@ -33,12 +33,6 @@ export const themes = [
     reactionChartColors: ["#3498db", "#5dade2", "#aed6f1", "#eaf2f8"],
   },
   {
-    name: "pink",
-    label: "ローズクォーツ",
-    colors: ["#ef76a7", "#afe065", "#f396c3", "#6bcacc"],
-    reactionChartColors: ["#f396c3", "#e170ac", "#f7b7d3", "#fcddec"],
-  },
-  {
     name: "brown",
     label: "ココア",
     colors: ["#ded8d2", "#948585", "#3d312e", "#564a4d"],
