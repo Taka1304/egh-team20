@@ -10,16 +10,25 @@ type RecommendedArticleCardProps = {
 };
 
 export function RecommendedArticlesCard({ article }: RecommendedArticleCardProps) {
+  const imageWidth = 160;
+  const imageHeight = 120;
+
   return (
     <motion.div whileHover={{ scale: 0.99 }} whileTap={{ scale: 0.98 }} className="w-full">
       <Link href={article.url} passHref className="w-full">
-        <Card className="overflow-hidden cursor-pointer h-auto sm:h-36 w-full flex flex-col sm:flex-row">
-          <div className="relative w-full h-40 sm:h-full sm:w-1/3 sm:min-w-[120px] sm:max-w-[180px]">
+        <Card className="overflow-hidden cursor-pointer w-full flex flex-col sm:flex-row">
+          <div className="relative min-w-[120px] sm:min-w-[160px] w-full sm:w-[160px] h-[120px] overflow-hidden">
             <Image
-              src={article.thumbnail || ""}
+              src={article.thumbnail || "/images/default-article-image.png"}
               alt={article.title || "記事のサムネイル"}
-              fill
-              style={{ objectFit: "cover" }}
+              width={imageWidth}
+              height={imageHeight}
+              style={{
+                objectFit: "cover",
+                objectPosition: "center",
+                width: "100%",
+                height: "100%",
+              }}
             />
           </div>
           <div className="p-4 flex flex-col flex-grow">
