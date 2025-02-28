@@ -1,6 +1,8 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
+import reportReview from "./aiFeedback";
 import assets from "./assets";
+
 import badges from "./badges";
 import interests from "./interests";
 import reactions from "./reactions";
@@ -18,7 +20,8 @@ const app = new Hono()
   .route("/interests", interests)
   .route("/reports", reports)
   .route("/reactions", reactions)
-  .route("/users", users);
+  .route("/users", users)
+  .route("/reportReview", reportReview);
 
 export type HonoAppType = typeof app;
 

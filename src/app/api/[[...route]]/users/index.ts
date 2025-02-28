@@ -6,8 +6,6 @@ import { Hono } from "hono";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
 
-const app = new Hono();
-
 const userScheme = z.object({
   name: z.string().optional(),
   email: z.string(),
@@ -19,7 +17,7 @@ const userScheme = z.object({
 });
 
 // ユーザー情報を取得するエンドポイント
-app
+const app = new Hono()
   .get("/:id", async (c) => {
     const id = c.req.param("id");
     try {
