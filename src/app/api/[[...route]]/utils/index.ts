@@ -1,3 +1,5 @@
+import { env } from "@/lib/env";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Prisma } from "@prisma/client";
 import type { LearningContribution } from "@prisma/client";
 
@@ -55,4 +57,61 @@ export function calculateStreakDays(contributions: LearningContribution[]): numb
   }
 
   return streak;
+}
+
+export async function geminiRun(prompt: string) {
+  try {
+    const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+      },
+    });
+
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+
+    // レスポンスからJSON部分を抽出する
+    let jsonText = text;
+
+    // JSONマークダウンブロックを検出して除去
+    const jsonMarkdownMatch = text.match(/```(?:json)?\s*(\{[\s\S]*?\})\s*```/);
+    // biome-ignore lint/complexity/useOptionalChain: <explanation>
+    if (jsonMarkdownMatch && jsonMarkdownMatch[1]) {
+      jsonText = jsonMarkdownMatch[1];
+    }
+
+    // JSON部分のみを取り出す (最初の{から最後の}まで)
+    const jsonMatch = jsonText.match(/(\{[\s\S]*\})/);
+    // biome-ignore lint/complexity/useOptionalChain: <explanation>
+    if (jsonMatch && jsonMatch[1]) {
+      jsonText = jsonMatch[1];
+    }
+
+    try {
+      const responseJson = JSON.parse(jsonText);
+      return { responseJson, responseText: text };
+    } catch (parseError) {
+      console.error("JSON解析エラー:", parseError);
+      console.info("解析しようとした文字列:", jsonText);
+
+      // フォールバック: エラー時のデフォルト応答
+      const fallbackJson = {
+        analysisSections: {
+          configuration: "レポートの構造評価を行えませんでした。",
+          fulfilling: "内容の充実度評価を行えませんでした。",
+          comprehensive: ["AI処理中にエラーが発生しました。", "もう一度試してみてください。"],
+        },
+        score: 0,
+        comment: "申し訳ありません。レポートの分析中にエラーが発生しました。",
+      };
+
+      return { responseJson: fallbackJson, responseText: text };
+    }
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    throw new Error("Gemini API Error");
+  }
 }
