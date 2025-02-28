@@ -306,4 +306,115 @@ app
     },
   );
 
+// フォロー中のユーザーを取得するエンドポイント
+app.get("/:id/following", async (c) => {
+  const id = c.req.param("id");
+
+  try {
+    // ユーザーがフォローしているユーザー一覧を取得
+    const followingRelations = await prisma.follow.findMany({
+      where: { followerId: id },
+      include: {
+        following: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            displayName: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    // 認証情報から直接ユーザーIDを取得
+    const session = await getServerSession(authOptions);
+    const currentUserId = session?.user?.id;
+
+    // ユーザー情報を整形
+    const users = await Promise.all(
+      followingRelations.map(async (relation) => {
+        const user = relation.following;
+
+        // 現在のユーザーがこのユーザーをフォローしているか
+        let isFollowing = false;
+        if (currentUserId) {
+          const followRelation = await prisma.follow.findFirst({
+            where: {
+              followerId: currentUserId,
+              followingId: user.id,
+            },
+          });
+          isFollowing = !!followRelation;
+        }
+
+        return {
+          ...user,
+          isFollowing,
+        };
+      }),
+    );
+
+    return c.json({ users });
+  } catch (error) {
+    console.error("フォロー中ユーザーの取得に失敗しました:", error);
+    return c.json({ error: "フォロー中ユーザーの取得に失敗しました", details: error as string }, 500);
+  }
+});
+
+// フォロワーを取得するエンドポイント
+app.get("/:id/followers", async (c) => {
+  const id = c.req.param("id");
+
+  try {
+    // ユーザーをフォローしているユーザー一覧を取得
+    const followerRelations = await prisma.follow.findMany({
+      where: { followingId: id },
+      include: {
+        follower: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            displayName: true,
+            image: true,
+          },
+        },
+      },
+    });
+
+    // 認証情報から直接ユーザーIDを取得
+    const session = await getServerSession(authOptions);
+    const currentUserId = session?.user?.id;
+
+    const users = await Promise.all(
+      followerRelations.map(async (relation) => {
+        const user = relation.follower;
+
+        // 現在のユーザーがこのユーザーをフォローしているか
+        let isFollowing = false;
+        if (currentUserId) {
+          const followRelation = await prisma.follow.findFirst({
+            where: {
+              followerId: currentUserId,
+              followingId: user.id,
+            },
+          });
+          isFollowing = !!followRelation;
+        }
+
+        return {
+          ...user,
+          isFollowing,
+        };
+      }),
+    );
+
+    return c.json({ users });
+  } catch (error) {
+    console.error("フォロワーの取得に失敗しました:", error);
+    return c.json({ error: "フォロワーの取得に失敗しました", details: error as string }, 500);
+  }
+});
+
 export default app;
