@@ -17,6 +17,7 @@ const app = new Hono()
       include: {
         sourceUser: {
           select: {
+            id: true,
             displayName: true,
             image: true,
           }
