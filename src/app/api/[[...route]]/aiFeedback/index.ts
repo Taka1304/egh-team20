@@ -54,7 +54,7 @@ const app = new Hono().get("/:reportId", async (c) => {
 
     return c.json({ message: "success", feedbackCount: feedbackCount + 1, responseJson });
   } catch (error) {
-    console.error(error);
+    console.error("AIフィードバックの生成中にエラーが発生しました:", error);
     return c.json({ error: "AIフィードバックの生成中にエラーが発生しました" }, 500);
   }
 });
@@ -111,12 +111,12 @@ async function geminiRun(reportTitle: string, reportText: string) {
   `;
 
     const result = await model.generateContent(prompt);
-    const response = await result.response;
+    const response = result.response;
     const text = response.text();
     const responseJson = JSON.parse(text);
     return { responseJson: responseJson, responseText: text };
   } catch (error) {
-    console.error(error);
+    console.error("Gemini API Error:", error);
     throw new Error("Gemini API Error");
   }
 }
