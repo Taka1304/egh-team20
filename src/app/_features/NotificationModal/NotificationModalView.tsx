@@ -38,9 +38,11 @@ function formatDate(isoDate: string): string {
 
 export function NotificationModalView({
   notifications,
+  markAsRead,
   onClose,
 }: {
   notifications: NotificationResType;
+  markAsRead: (notificationId: string) => void;
   onClose: () => void;
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -96,6 +98,8 @@ export function NotificationModalView({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
+                onClick={() => markAsRead(notification.id)}
+                className="cursor-pointer"
               >
                 <div className="flex items-start space-x-4 bg-muted p-4 rounded-lg border border-primary-foreground hover:bg-accent transition-colors">
                   {/* Avatarと未読インジケーター */}
