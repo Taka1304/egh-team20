@@ -5,6 +5,7 @@ import assets from "./assets";
 
 import badges from "./badges";
 import interests from "./interests";
+import notifications from "./notifications";
 import reactions from "./reactions";
 import reports from "./reports";
 import sample from "./sample";
@@ -18,6 +19,7 @@ const app = new Hono()
   .route("/badges", badges)
   .route("/sample", sample)
   .route("/interests", interests)
+  .route("/notifications", notifications)
   .route("/reports", reports)
   .route("/reactions", reactions)
   .route("/users", users)
