@@ -14,14 +14,14 @@ const app = new Hono()
   .get(
     "/",
     zValidator(
-      "param",
+      "query",
       z.object({
         type: z.enum(["sameCategory", "following", "own"]).default("sameCategory"),
       }),
     ),
     async (c) => {
       const session = await getServerSession(authOptions);
-      const getType = c.req.param("type");
+      const getType = c.req.valid("query").type;
 
       try {
         let followedUserIds: string[] = [];
