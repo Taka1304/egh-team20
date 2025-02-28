@@ -100,9 +100,7 @@ const app = new Hono()
         orderBy: { activityDate: "asc" },
       });
 
-      // 継続日数を計算するロジック
-      // biome-ignore lint/style/useConst: <explanation>
-      let streakDays = calculateStreakDays(contributions);
+      const streakDays = calculateStreakDays(contributions);
 
       return c.json({
         postsCount,
@@ -120,6 +118,14 @@ const app = new Hono()
   .patch("/:id", zValidator("json", userScheme), async (c) => {
     const id = c.req.param("id");
     const body = c.req.valid("json");
+
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+    if (session.user.id !== id) {
+      return c.json({ error: "他のユーザーの情報は更新できません" }, 403);
+    }
 
     try {
       // リクエストから興味カテゴリと学習目標を抽出
@@ -234,6 +240,10 @@ const app = new Hono()
       return c.json({ error: "ログインしていないユーザーです" }, 401);
     }
 
+    if (session.user.id !== followerId) {
+      return c.json({ error: "他のユーザーをフォローすることはできません" }, 403);
+    }
+
     try {
       const follow = await recoverFromNotFound(
         prisma.follow.create({
@@ -274,6 +284,9 @@ const app = new Hono()
     const session = await getServerSession(authOptions);
     if (!session) {
       return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+    if (session.user.id !== followerId) {
+      return c.json({ error: "他のユーザーのフォロー解除はできません" }, 403);
     }
 
     try {
