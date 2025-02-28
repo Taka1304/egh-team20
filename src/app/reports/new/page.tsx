@@ -91,21 +91,51 @@ export default function page() {
   /**
    * AI添削処理
    */
-  const handleAIReview = () => {
+  const handleAIReview = async () => {
     setIsAIReviewDialogOpen(true);
-    // 仮のAI添削結果をセット
-    setAIReviewResult({
-      analysisSections: {
-        configuration: "タスクの進捗と日常の記録が整理されており、明確です。",
-        fulfilling: "ポモドーロ数が多く、集中した作業量が伝わります。",
-        comprehensive: [
-          "タスクの具体的な課題や解決策を記述すると、成長の記録が深まります。",
-          "翌日の予定に目標を加えると、計画性が向上します。",
-        ],
-      },
-      score: 8.0,
-      comment: "高い集中力で作業を進めており、継続力が素晴らしいです！",
-    });
+    setAIReviewResult(undefined);
+
+    try {
+      // レポートIDがない場合は、まず下書き保存する
+      if (!draftId) {
+        const toastId = toast.loading("下書き保存中...");
+        const result = await client.api.reports.$post({
+          json: {
+            title,
+            text: content,
+            visibility: "PRIVATE",
+            pomodoroCount: 0,
+            learningTime: 0,
+          },
+        });
+
+        if (!result.ok) {
+          toast.error("下書き保存に失敗しました", { id: toastId });
+          setIsAIReviewDialogOpen(false);
+          return;
+        }
+
+        const { report } = await result.json();
+        setDraftId(report.id);
+        toast.success("下書き保存しました", { id: toastId });
+      }
+
+      // Honoクライアントを使用してAPIを呼び出す
+      const response = await fetch(`/api/aiFeedback/${draftId}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || "AI添削の取得に失敗しました");
+        return;
+      }
+
+      const data = await response.json();
+      setAIReviewResult(data.responseJson);
+    } catch (error) {
+      console.error("AI添削エラー:", error);
+      toast.error("AI添削の実行中にエラーが発生しました");
+      setIsAIReviewDialogOpen(false);
+    }
   };
 
   return (
