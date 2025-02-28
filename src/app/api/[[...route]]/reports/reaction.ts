@@ -49,7 +49,7 @@ const app = new Hono()
           },
         });
 
-        const report = await result.json();
+        const { report } = await result.json();
 
         //通知を送信
         await prisma.notification.create({

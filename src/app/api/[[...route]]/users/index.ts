@@ -250,7 +250,7 @@ const app = new Hono()
 
       await prisma.notification.create({
         data: {
-          userId: followerId,
+          userId: id,
           sourceUserId: session.user.id,
           message: `${session.user.displayName}さんがあなたをフォローしました。`,
           type: "FOLLOW",
