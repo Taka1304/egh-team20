@@ -7,9 +7,10 @@ import { useEffect, useRef, useState } from "react";
 export type ViewMode = "category" | "following" | "mine";
 
 export function Timeline() {
-  // 表示モードの状態管理
   const [viewMode, setViewMode] = useState<ViewMode>("category");
-  const { reports, isLoading, hasMore } = useReports();
+  // ローディング状態を個別に管理
+  const [isChangingMode, setIsChangingMode] = useState(false);
+  const { reports, isLoading, hasMore } = useReports(viewMode);
 
   // 監視対象の要素
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -33,16 +34,28 @@ export function Timeline() {
     };
   }, []);
 
+  // データロード状態の監視
+  useEffect(() => {
+    if (!isLoading) {
+      setIsChangingMode(false);
+    }
+  }, [isLoading]);
+
   // 表示モード切り替え
   const handleChangeViewMode = (mode: ViewMode) => {
-    setViewMode(mode);
+    if (mode !== viewMode) {
+      setIsChangingMode(true);
+      setViewMode(mode);
+    }
   };
+
+  const combinedIsLoading = isLoading || isChangingMode;
 
   return (
     <TimelineView
       reports={reports}
       loaderRef={loaderRef}
-      isLoading={isLoading}
+      isLoading={combinedIsLoading}
       hasMore={hasMore}
       viewMode={viewMode}
       onChangeViewMode={handleChangeViewMode}
