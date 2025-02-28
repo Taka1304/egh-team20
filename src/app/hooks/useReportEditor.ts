@@ -26,7 +26,8 @@ export function useReportEditor({ initialDraftId }: ReportEditorProps = {}) {
   const searchParams = useSearchParams();
 
   // 編集モードかどうかを判定（URLパラメータまたは初期値から）
-  const reportId = (params?.id as string) || initialDraftId || searchParams?.get("id") || null;
+  const reportId =
+    initialDraftId || (params?.reportId as string) || (params?.id as string) || searchParams?.get("id") || null;
   const [draftId, setDraftId] = useState<string | null>(reportId);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -92,11 +93,6 @@ export function useReportEditor({ initialDraftId }: ReportEditorProps = {}) {
     }
   }, []);
 
-  /**
-   * 保存処理
-   * @param isDraft 下書きとして保存するかどうか
-   * @returns 保存されたレポートのID
-   */
   const saveReport = async (isDraft: boolean) => {
     if (!title.trim()) {
       toast.error("タイトルを入力してください");

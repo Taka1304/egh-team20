@@ -15,13 +15,16 @@ import { Button } from "@/components/ui/button";
 
 type ReportPublishConfirmDialogProps = {
   onConfirm: () => void;
+  disabled?: boolean;
 };
 
-export function ReportPublishConfirmDialog({ onConfirm }: ReportPublishConfirmDialogProps) {
+export function ReportPublishConfirmDialog({ onConfirm, disabled }: ReportPublishConfirmDialogProps) {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="bg-card text-foreground border">公開する</Button>
+        <Button className="bg-card text-foreground border" disabled={disabled}>
+          公開する
+        </Button>
       </AlertDialogTrigger>
 
       <AlertDialogContent>
