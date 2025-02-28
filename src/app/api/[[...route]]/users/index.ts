@@ -1,4 +1,4 @@
-import { getRecommendedArticles } from "@/app/api/[[...route]]/recommendedArticle/utils";
+import { getRecommendedArticles, isUrlAlive } from "@/app/api/[[...route]]/recommendedArticle/utils";
 import { calculateStreakDays, recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -588,26 +588,43 @@ const app = new Hono()
 
       // すでに最新の日報に対しておすすめ記事が作成されていれば、何もしない
       if (latestRecommendedArticle && latestRecommendedArticle.createdAt >= latestReport.createdAt) {
-        return c.json({ message: "最新の日報に対するおすすめ記事はすでに作成済みです" }, 200);
+        return c.json(
+          { message: "最新の日報に対するおすすめ記事はすでに作成済みです．過去のおすすめ記事を返します．" },
+          200,
+        );
       }
 
       // Gemini に記事をリクエスト
-      const recommendedUrls = await getRecommendedArticles(latestReport.text, RECOMMENDED_ARTICLE_COUNT);
+      const recommendedUrlsResult = await getRecommendedArticles(
+        latestReport.title,
+        latestReport.text,
+        RECOMMENDED_ARTICLE_COUNT,
+      );
 
-      if (!recommendedUrls || recommendedUrls.length === 0) {
+      if (recommendedUrlsResult.length === 0) {
         return c.json({ message: "おすすめ記事が見つかりませんでした" }, 200);
       }
 
+      const checkedRecommendedUrlsPromise = recommendedUrlsResult.map(async (url) => {
+        const isUrlAlivePromise = await isUrlAlive(url);
+        return { url: url, isAlive: isUrlAlivePromise };
+      });
+      const recommendedUrlsJudge = await Promise.all(checkedRecommendedUrlsPromise);
+      const recommendedUrls = recommendedUrlsJudge.filter((url) => url.isAlive).map((url) => url.url);
+
+      if (recommendedUrls.length < RECOMMENDED_ARTICLE_COUNT) {
+        return c.json({ message: "おすすめ記事の取得に失敗しました" }, 200);
+      }
       // おすすめ記事を保存
-      const recommendedArticles = await prisma.aIRecommendedArticle.createMany({
-        data: recommendedUrls.map((url) => ({
+      const recommendedArticles = await prisma.recommendedArticle.createMany({
+        data: recommendedUrls.slice(0, 2).map((url) => ({
           userId,
           url,
           createdAt: new Date(),
         })),
       });
 
-      return c.json({ message: "おすすめ記事を作成しました", recommendedArticles }, 201);
+      return c.json({ message: "新規におすすめ記事を作成しました", recommendedArticles }, 201);
     } catch (error) {
       console.error(error);
       return c.json({ error: "おすすめ記事の作成に失敗しました" }, 500);
