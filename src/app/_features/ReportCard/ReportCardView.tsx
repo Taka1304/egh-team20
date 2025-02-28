@@ -1,8 +1,6 @@
 "use client";
-
 import MarkdownContent from "@/app/_features/MarkdownContent/MarkdownContent";
 import ActionButton from "@/app/_features/ReportCard/ActionButton/ActionButton";
-
 import type { Report } from "@/app/types/reports";
 import { ReportDate } from "@/components/ui/ReportDate";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { CheckCircle, ChevronDown, Flame, Heart, MessageCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 type ReportCardViewProps = {
   report: Report;
@@ -25,15 +24,13 @@ type ReportCardViewProps = {
   hasLiked: boolean;
   hasFlamed: boolean;
   hasChecked: boolean;
-  likes: number; // ← 追加
-  flames: number; // ← 追加
-  checks: number; // ← 追加
+  likes: number;
+  flames: number;
+  checks: number;
 };
 
 export function ReportCardView({
   report,
-  displayedContent,
-  shouldShowMoreButton,
   onShowMore,
   onLike,
   onFlame,
@@ -47,6 +44,27 @@ export function ReportCardView({
   flames,
   checks,
 }: ReportCardViewProps) {
+  // コンテンツの高さを計測するための ref
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [shouldShowMoreButton, setShouldShowMoreButton] = useState(false);
+  const contentHeightThreshold = 160; // px 単位の閾値
+
+  // コンテンツの高さを測定し、閾値を超えるかを判断する
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    if (contentRef.current) {
+      const height = contentRef.current.scrollHeight;
+      setShouldShowMoreButton(height > contentHeightThreshold);
+    }
+  }, [contentRef.current, report.text]);
+
+  // 文字数が多い場合も「続きを読む」ボタンを表示
+  useEffect(() => {
+    // 文字数が多い場合は「続きを読む」ボタンを表示
+    const shouldShowMoreByLength = report.text.length > 300;
+    setShouldShowMoreButton(shouldShowMoreByLength);
+  }, [report.text]);
+
   return (
     <Card
       className={cn(
@@ -78,8 +96,11 @@ export function ReportCardView({
 
       {/* 投稿内容 */}
       <div className="mt-2 relative">
-        <div className={cn("transition-all duration-300", !isExpanded && "max-h-[160px] overflow-hidden")}>
-          <MarkdownContent content={displayedContent} />
+        <div
+          ref={contentRef}
+          className={cn("transition-all duration-300", !isExpanded && "max-h-[160px] overflow-hidden")}
+        >
+          <MarkdownContent content={report.text} />
         </div>
 
         {shouldShowMoreButton && !isExpanded && (

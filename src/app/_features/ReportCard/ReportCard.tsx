@@ -89,20 +89,14 @@ export function ReportCard({ report }: ReportCardProps) {
   };
 
   // 表示する本文の処理
-  const maxLength = 100;
-  const isLongContent = report.text.length > maxLength;
-  const displayedContent = showFullContent
-    ? report.text
-    : report.text.slice(0, maxLength) + (isLongContent ? "..." : "");
 
   return (
     <ReportCardView
       report={report}
-      displayedContent={displayedContent}
-      shouldShowMoreButton={isLongContent && !showFullContent}
       onShowMore={() => setShowFullContent(true)}
       isExpanded={showFullContent}
-      // リアクションボタンの処理
+      displayedContent={showFullContent ? report.text : report.text.slice(0, 200)}
+      shouldShowMoreButton={report.text.length > 200}
       onLike={() => handleToggleReaction("LIKE")}
       onFlame={() => handleToggleReaction("FLAME")}
       onCheck={() => handleToggleReaction("CHECK")}
