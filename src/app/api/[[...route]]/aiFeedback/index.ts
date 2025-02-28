@@ -8,30 +8,35 @@ const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 const app = new Hono().get("/:reportId", async (c) => {
   const reportId = c.req.param("reportId");
 
-  const report = await prisma.dailyReport.findUnique({
-    where: {
-      id: reportId,
-    },
-    select: {
-      id: true,
-      title: true,
-      text: true,
-      userId: true,
-    },
-  });
-  if (!report) {
-    return c.json({ error: "Reportがありません" }, 404);
-  }
+  try {
+    const report = await prisma.dailyReport.findUnique({
+      where: {
+        id: reportId,
+      },
+      select: {
+        id: true,
+        title: true,
+        text: true,
+        userId: true,
+      },
+    });
+    if (!report) {
+      return c.json({ error: "Reportがありません" }, 404);
+    }
 
-  const { responseJson, responseText } = await geminiRun(report.title, report.text);
-  prisma.aIFeedback.create({
-    data: {
-      reportId: report.id,
-      sentiment: "まだ実装されていません",
-      feedbackText: responseText,
-    },
-  });
-  return c.json({ message: "success", responseJson });
+    const { responseJson, responseText } = await geminiRun(report.title, report.text);
+    prisma.aIFeedback.create({
+      data: {
+        reportId: report.id,
+        sentiment: "まだ実装されていません",
+        feedbackText: responseText,
+      },
+    });
+    return c.json({ message: "success", responseJson });
+  } catch (error) {
+    console.error(error);
+    return c.json({ error: "AIフィードバックの生成に失敗しました" }, 500);
+  }
 });
 export default app;
 
