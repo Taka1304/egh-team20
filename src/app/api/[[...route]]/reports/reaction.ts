@@ -51,10 +51,11 @@ const app = new Hono()
 
         const { report } = await result.json();
 
+        
         // 自分でリアクションを付けた場合は通知を送信しない
-        // if (report.user.id === session.user.id) {
-        //   return c.json({ reaction }, 201);
-        // }
+        if (report.user.id === session.user.id) {
+          return c.json({ reaction }, 201);
+        }
         
         //通知を送信
         await prisma.notification.create({
