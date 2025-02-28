@@ -25,7 +25,7 @@ const app = new Hono()
 
       try {
         let followedUserIds: string[] = [];
-        let whereCondition: object = {};
+        let whereGetTypeCondition: object = {};
 
         if (session) {
           followedUserIds = await prisma.follow
@@ -38,8 +38,9 @@ const app = new Hono()
               },
             })
             .then((follows) => follows.map((follow) => follow.followingId));
+          // getTypeごとに取得条件を変える
           if (getType === "sameCategory") {
-            whereCondition = {
+            whereGetTypeCondition = {
               OR: [
                 // 全ユーザーのパブリックな投稿
                 { visibility: $Enums.Visibility.PUBLIC, user: { isPrivate: false } },
@@ -54,17 +55,26 @@ const app = new Hono()
               ],
             };
           } else if (getType === "following") {
-            whereCondition = {
+            whereGetTypeCondition = {
               visibility: $Enums.Visibility.FOLLOWERS,
               user: { isPrivate: false },
               userId: { in: followedUserIds },
             };
           } else if (getType === "own") {
-            whereCondition = {
+            whereGetTypeCondition = {
               userId: session.user.id,
             };
           }
+        } else {
+          // ログインしていない場合は全ユーザーのパブリックな投稿のみ表示
+          whereGetTypeCondition = {
+            visibility: $Enums.Visibility.PUBLIC,
+            user: {
+              isPrivate: false,
+            },
+          };
         }
+
         const reports = await prisma.dailyReport.findMany({
           include: {
             user: {
@@ -93,14 +103,7 @@ const app = new Hono()
               },
             },
           },
-          where: !session
-            ? {
-                visibility: $Enums.Visibility.PUBLIC,
-                user: {
-                  isPrivate: false,
-                },
-              }
-            : whereCondition,
+          where: whereGetTypeCondition,
           orderBy: {
             createdAt: "desc",
           },
