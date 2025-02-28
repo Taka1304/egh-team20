@@ -39,7 +39,7 @@ const app = new Hono().get("/:reportId", async (c) => {
       },
     });
     if (feedbackCount >= 3) {
-      return c.json({ error: "AIフィードバックの上限に達しました" }, 400);
+      return c.json({ error: "AIフィードバックの上限に達しました（上限1日3回）" }, 400);
     }
 
     const { responseJson, responseText } = await geminiRun(report.title, report.text);
