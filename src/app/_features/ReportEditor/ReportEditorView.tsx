@@ -20,6 +20,7 @@ type ReportEditorViewProps = {
   onAIReview: () => void;
   onAssetsUpload: (file: File, toastId?: string | number) => Promise<{ url: string } | undefined>;
   onBack: () => void;
+  initialContent?: string;
 };
 
 export function ReportEditorView({
@@ -36,6 +37,7 @@ export function ReportEditorView({
   onAIReview,
   onAssetsUpload,
   onBack,
+  initialContent,
 }: ReportEditorViewProps) {
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +82,7 @@ export function ReportEditorView({
             />
           </div>
 
-          <RichEditor onChange={onSetContent} onAssetsUpload={onAssetsUpload} />
+          <RichEditor onChange={onSetContent} onAssetsUpload={onAssetsUpload} initialContent={initialContent} />
         </div>
       </main>
       <AIReviewDialog open={isAIReviewDialogOpen} onOpenChange={onOpenAIReviewDialog} result={aiReviewResult} />
