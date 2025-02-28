@@ -1,12 +1,12 @@
 import { geminiRun } from "@/app/api/aiFeedback/[reportId]/geminiRun";
 import { prisma } from "@/lib/prisma";
-
 import dayjs from "dayjs";
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { reportId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ reportId: string }> }) {
   const DAILY_FEEDBACK_LIMIT = 3;
-  const reportId = params.reportId;
+  const { reportId } = await params;
 
   try {
     const report = await prisma.dailyReport.findUnique({
