@@ -35,7 +35,7 @@ export function useRecommendUser() {
 
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/users/${session.user.id}/recommended?recommendedUserNum=5`);
+      const response = await fetch(`/api/users/${session.user.id}/recommended?recommendedUserNum=6`);
       if (!response.ok) {
         throw new Error("Failed to fetch recommended users");
       }

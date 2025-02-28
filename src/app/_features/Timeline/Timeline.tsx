@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 export type ViewMode = "category" | "following" | "mine";
 
-export function Timeline() {
+export function Timeline({ isNested = false }) {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   // ローディング状態を個別に管理
   const [isChangingMode, setIsChangingMode] = useState(false);
@@ -60,6 +60,7 @@ export function Timeline() {
       viewMode={viewMode}
       onChangeViewMode={handleChangeViewMode}
       onReportDeleted={refetchReports}
+      isNested={isNested}
     />
   );
 }

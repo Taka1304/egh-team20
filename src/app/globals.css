@@ -202,20 +202,25 @@
 }
 
 @layer utilities {
-  .custom-scrollbar::-webkit-scrollbar {
+  .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: var(--ring) var(--background);
+    scrollbar-color: var(--ring) transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: thin;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background-color: var(--ring);
     border-radius: var(--radius);
-    &:hover {
-      background-color: var(--primary);
-    }
   }
 
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background-color: var(--background);
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
   }
 }

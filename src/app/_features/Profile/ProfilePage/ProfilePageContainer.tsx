@@ -1,6 +1,9 @@
 "use client";
 
 import ProfilePageView from "@/app/_features/Profile/ProfilePage/ProfilePageView";
+import ContinuityChart from "@/app/_features/Profile/UserCharts/ContinuityChart/ContinuityChart";
+import PostsChart from "@/app/_features/Profile/UserCharts/PostsChart/PostsChart";
+import ReactionChart from "@/app/_features/Profile/UserCharts/ReactionChart/ReactionChart";
 import { useUser } from "@/app/hooks/useUser";
 import { useUserStats } from "@/app/hooks/useUserStats";
 import { useParams } from "next/navigation";
@@ -10,7 +13,7 @@ export default function ProfilePageContainer() {
   const username = params?.username;
 
   const { user, isLoading, error, refetch, isOwnProfile } = useUser(username);
-  const { stats } = useUserStats(user?.id);
+  const { stats, isLoading: statsLoading, error: statsError } = useUserStats(user?.id);
 
   // UserInterestからinterests配列に変換
   const interests = user?.UserInterest?.map((ui) => ui.interest.name) || [];
@@ -25,15 +28,25 @@ export default function ProfilePageContainer() {
       ]
     : [];
 
+  // チャートコンポーネント
+  const chartsComponents = stats
+    ? {
+        continuityChart: <ContinuityChart continuityData={stats.continuityData} />,
+        postsChart: <PostsChart postsData={stats.postsData} />,
+        reactionChart: <ReactionChart reactionData={stats.reactionData} />,
+      }
+    : null;
+
   return (
     <ProfilePageView
       user={user}
-      isLoading={isLoading}
-      error={error}
+      isLoading={isLoading || statsLoading}
+      error={error || statsError}
       interests={interests}
       userStats={userStats}
       isOwnProfile={isOwnProfile}
       onProfileUpdate={refetch}
+      chartsComponents={chartsComponents}
     />
   );
 }
