@@ -104,10 +104,10 @@ export function NotificationModalView({
                 <div className="flex items-start space-x-4 bg-muted p-4 rounded-lg border border-primary-foreground hover:bg-accent transition-colors">
                   {/* Avatarと未読インジケーター */}
                   <div className="relative flex-shrink-0">
-                    {notification.sourceUser?.image && notification.sourceUser?.displayName ? (
+                    {notification.sourceUser?.displayName ? (
                       <Avatar className="h-12 w-12">
                         <AvatarImage
-                          src={notification.sourceUser.image}
+                          src={notification.sourceUser.image ?? undefined}
                           alt={`${notification.sourceUser.displayName}のアイコン`}
                         />
                         <AvatarFallback className="bg-muted text-muted-foreground">
