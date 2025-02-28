@@ -80,6 +80,7 @@ export const createNotification = async (
   sourceUserId?: string,
   badgeId?: string,
   communityId?: string,
+  reportId?: string,
 ) => {
   let message = "新しい通知が届きました";
   switch (type) {
@@ -109,6 +110,7 @@ export const createNotification = async (
       sourceUserId,
       badgeId,
       communityId,
+      reportId,
       message,
       type,
     },
