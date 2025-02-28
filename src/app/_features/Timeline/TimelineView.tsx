@@ -7,7 +7,7 @@ import type { Report } from "@/app/types/reports";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
-import type { ForwardedRef } from "react";
+import type { CSSProperties, ForwardedRef } from "react";
 
 type TimelineViewProps = {
   reports: Report[];
@@ -17,6 +17,8 @@ type TimelineViewProps = {
   viewMode: ViewMode;
   onChangeViewMode: (mode: ViewMode) => void;
   onReportDeleted?: () => Promise<void>;
+  style?: CSSProperties;
+  isNested?: boolean;
 };
 
 export function TimelineView({
@@ -27,6 +29,8 @@ export function TimelineView({
   viewMode,
   onChangeViewMode,
   onReportDeleted,
+  style,
+  isNested,
 }: TimelineViewProps) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
@@ -68,9 +72,13 @@ export function TimelineView({
           自分の投稿
         </Button>
       </motion.div>
-
-      {/* タイムライン表示エリア */}
-      <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar">
+      <div
+        className="overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar"
+        style={{
+          ...style,
+          height: "100%",
+        }}
+      >
         {/* ローディング中は中央に表示 */}
         {isLoading ? (
           <motion.div className="flex items-center justify-center h-full" {...fadeIn}>
