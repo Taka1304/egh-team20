@@ -1,6 +1,7 @@
 import { env } from "@/lib/env";
 import { prisma } from "@/lib/prisma";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import dayjs from "dayjs";
 import { Hono } from "hono";
 
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
@@ -24,6 +25,23 @@ const app = new Hono().get("/:reportId", async (c) => {
       return c.json({ error: "Reportがありません" }, 404);
     }
 
+    const startOfDay = dayjs().startOf("day").toDate(); // 今日の00:00:00
+    const endOfDay = dayjs().endOf("day").toDate(); // 今日の23:59:59
+    const feedbackCount = await prisma.aIFeedback.count({
+      where: {
+        report: {
+          userId: report.userId, // DailyReport 経由で userId を参照
+        },
+        createdAt: {
+          gte: startOfDay, // 今日の開始時間以降
+          lte: endOfDay, // 今日の終了時間以前
+        },
+      },
+    });
+    if (feedbackCount >= 3) {
+      return c.json({ error: "AIフィードバックの上限に達しました" }, 400);
+    }
+
     const { responseJson, responseText } = await geminiRun(report.title, report.text);
     await prisma.aIFeedback.create({
       data: {
@@ -32,7 +50,8 @@ const app = new Hono().get("/:reportId", async (c) => {
         feedbackText: responseText,
       },
     });
-    return c.json({ message: "success", responseJson });
+
+    return c.json({ message: "success", feedbackCount: feedbackCount + 1, responseJson });
   } catch (error) {
     console.error(error);
     return c.json({ error: "AIフィードバックの生成に失敗しました" }, 500);
