@@ -13,7 +13,7 @@ export default function FollowPageContainer() {
   const params = useParams<{ username: string }>();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<"following" | "followers">("following");
-  const { users, isLoading, error, follow, unfollow } = useFollowUsers(params.username, activeTab);
+  const { users, counts, isLoading, error, follow, unfollow } = useFollowUsers(params.username, activeTab);
 
   const handleFollowAction = async (userId: string, isFollowing: boolean) => {
     if (isFollowing) {
@@ -32,12 +32,7 @@ export default function FollowPageContainer() {
       <Header />
       <div className="container max-w-3xl mx-auto px-4 pt-20">
         <Card className="overflow-hidden">
-          <FollowTabs
-            activeTab={activeTab}
-            setActiveTab={setActiveTab}
-            userCount={users.length}
-            isLoading={isLoading}
-          />
+          <FollowTabs activeTab={activeTab} setActiveTab={setActiveTab} counts={counts} isLoading={isLoading} />
 
           {isLoading ? (
             <FollowSkeleton />

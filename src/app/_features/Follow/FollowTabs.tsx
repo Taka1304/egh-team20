@@ -1,27 +1,34 @@
+import type { FollowCounts } from "@/app/hooks/useFollowUsers";
 import { Button } from "@/components/ui/button";
 
 type FollowTabsProps = {
   activeTab: "following" | "followers";
   setActiveTab: (tab: "following" | "followers") => void;
-  userCount: number;
+  counts: FollowCounts;
   isLoading: boolean;
 };
 
-export default function FollowTabs({ activeTab, setActiveTab, userCount, isLoading }: FollowTabsProps) {
+export default function FollowTabs({ activeTab, setActiveTab, counts, isLoading }: FollowTabsProps) {
   return (
     <div className="flex border-b">
-      {["following", "followers"].map((tab) => (
-        <Button
-          key={tab}
-          className={`flex-1 py-4 rounded-none ${
-            activeTab === tab ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground"
-          }`}
-          onClick={() => setActiveTab(tab as "following" | "followers")}
-        >
-          {tab === "following" ? "フォロー中" : "フォロワー"}
-          {!isLoading && <span className="ml-2 text-sm font-normal">({userCount})</span>}
-        </Button>
-      ))}
+      <Button
+        className={`flex-1 py-4 rounded-none ${
+          activeTab === "following" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground"
+        }`}
+        onClick={() => setActiveTab("following")}
+      >
+        フォロー中
+        {!isLoading && <span className="ml-2 text-sm font-normal">({counts.followingCount})</span>}
+      </Button>
+      <Button
+        className={`flex-1 py-4 rounded-none ${
+          activeTab === "followers" ? "bg-primary text-primary-foreground" : "bg-background text-muted-foreground"
+        }`}
+        onClick={() => setActiveTab("followers")}
+      >
+        フォロワー
+        {!isLoading && <span className="ml-2 text-sm font-normal">({counts.followerCount})</span>}
+      </Button>
     </div>
   );
 }
