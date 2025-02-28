@@ -11,58 +11,39 @@ import { CheckReportAccessPermission } from "./utils";
 
 const app = new Hono()
   .route("/", reaction)
-  .get("/", async (c) => {
-    const session = await getServerSession(authOptions);
-    try {
-      let followedUserIds: string[] = [];
-      if (session) {
-        followedUserIds = await prisma.follow
-          .findMany({
-            where: {
-              followerId: session.user.id,
-            },
-            select: {
-              followingId: true,
-            },
-          })
-          .then((follows) => follows.map((follow) => follow.followingId));
-      }
-      const reports = await prisma.dailyReport.findMany({
-        include: {
-          user: {
-            select:{
-              id: true,
-              displayName: true,
-              image: true,
-              isPrivate: true,
-            },
-          },
-          reactions: {
-            select: {
-              type: {
-                select: {
-                  id: true,
-                  name: true,
-                },
+  .get(
+    "/",
+    zValidator(
+      "query",
+      z
+        .object({
+          type: z.enum(["sameCategory", "following", "own"]).optional(),
+        })
+        .default({}),
+    ),
+    async (c) => {
+      const session = await getServerSession(authOptions);
+      const getType = c.req.valid("query").type ?? "sameCategory";
+
+      try {
+        let followedUserIds: string[] = [];
+        let whereGetTypeCondition: object = {};
+
+        if (session) {
+          followedUserIds = await prisma.follow
+            .findMany({
+              where: {
+                followerId: session.user.id,
               },
-              user: {
-                select: {
-                  id: true,
-                  displayName: true,
-                  image: true,
-                },
+              select: {
+                followingId: true,
               },
-            },
-          }
-        },
-        where: !session
-          ? {
-              visibility: $Enums.Visibility.PUBLIC,
-              user: {
-                isPrivate: false,
-              }
-            }
-          : {
+            })
+            .then((follows) => follows.map((follow) => follow.followingId));
+
+          // getTypeごとに取得条件を変える
+          if (getType === "sameCategory") {
+            whereGetTypeCondition = {
               OR: [
                 // 全ユーザーのパブリックな投稿
                 { visibility: $Enums.Visibility.PUBLIC, user: { isPrivate: false } },
@@ -73,28 +54,89 @@ const app = new Hono()
                   userId: { in: followedUserIds },
                 },
                 // 自分の投稿
-                {
-                  userId: session.user.id,
-                  visibility: $Enums.Visibility.FOLLOWERS || $Enums.Visibility.PUBLIC,
-                }
+                { userId: session.user.id },
               ],
+            };
+          } else if (getType === "following") {
+            whereGetTypeCondition = {
+              OR: [
+                // フォローしているユーザーのPUBLIC投稿
+                {
+                  visibility: $Enums.Visibility.PUBLIC,
+                  user: { isPrivate: false },
+                  userId: { in: followedUserIds },
+                },
+                // フォローしているユーザーのFOLLOWER限定投稿
+                {
+                  visibility: $Enums.Visibility.FOLLOWERS,
+                  user: { isPrivate: false },
+                  userId: { in: followedUserIds },
+                },
+                // 自分の投稿
+                { userId: session.user.id },
+              ],
+            };
+          } else if (getType === "own") {
+            whereGetTypeCondition = {
+              userId: session.user.id,
+            };
+          }
+        } else {
+          // ログインしていない場合は全ユーザーのパブリックな投稿のみ表示
+          whereGetTypeCondition = {
+            visibility: $Enums.Visibility.PUBLIC,
+            user: {
+              isPrivate: false,
             },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 30,
-      });
+          };
+        }
 
-      if (reports.length === 0) {
-        return c.json({ error: "日報が見つかりません" }, 404);
+        const reports = await prisma.dailyReport.findMany({
+          include: {
+            user: {
+              select: {
+                id: true,
+                displayName: true,
+                image: true,
+                isPrivate: true,
+              },
+            },
+            reactions: {
+              select: {
+                type: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+                user: {
+                  select: {
+                    id: true,
+                    displayName: true,
+                    image: true,
+                  },
+                },
+              },
+            },
+          },
+          where: whereGetTypeCondition,
+          orderBy: {
+            createdAt: "desc",
+          },
+          take: 30,
+        });
+
+        if (reports.length === 0) {
+          return c.json({ error: "日報が見つかりません" }, 404);
+        }
+
+        return c.json({ reports }, 200);
+      } catch (error) {
+        console.error(error);
+        return c.json({ error: "日報の取得に失敗しました" }, 500);
       }
-
-      return c.json({ reports }, 200);
-    } catch (error) {
-      console.error(error);
-      return c.json({ error: "日報の取得に失敗しました" }, 500);
-    }
-  })
+    },
+  )
   .get("/drafts", async (c) => {
     const session = await getServerSession(authOptions);
     if (!session) {
