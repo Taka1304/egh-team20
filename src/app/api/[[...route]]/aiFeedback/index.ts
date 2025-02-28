@@ -54,7 +54,7 @@ const app = new Hono().get("/:reportId", async (c) => {
     return c.json({ message: "success", feedbackCount: feedbackCount + 1, responseJson });
   } catch (error) {
     console.error(error);
-    return c.json({ error: "AIフィードバックの生成に失敗しました" }, 500);
+    return c.json({ error: "AIフィードバックの生成中にエラーが発生しました" }, 500);
   }
 });
 export default app;
