@@ -20,6 +20,6 @@ declare module "next-auth/jwt" {
     id: string;
     displayName: string;
     isPrivate: boolean;
-    image: string;
+    // image: string | null | undefined;
   }
 }
