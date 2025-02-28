@@ -248,6 +248,15 @@ const app = new Hono()
         return c.json({ error: "既にフォローしています" }, 500);
       }
 
+      await prisma.notification.create({
+        data: {
+          userId: followerId,
+          sourceUserId: session.user.id,
+          message: `${session.user.displayName}さんがあなたをフォローしました。`,
+          type: "FOLLOW",
+        },
+      });
+
       return c.json({ message: "フォロー完了", follow: follow });
     } catch (error) {
       if (!error) {

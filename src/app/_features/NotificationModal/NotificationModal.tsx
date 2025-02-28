@@ -9,7 +9,7 @@ import { useNotifications } from "@/app/_features/NotificationModal/useNotificat
 
 export function NotificationModal() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { notifications, isLoading } = useNotifications();
+  const { notifications, isLoading, markAsRead } = useNotifications();
   const handleOpen = () => setIsOpen(true);
   const handleClose = () => setIsOpen(false);
 
@@ -24,7 +24,9 @@ export function NotificationModal() {
         <Bell className="h-5 w-5" />
       </Button>
 
-      {isOpen && !isLoading && <NotificationModalView notifications={notifications} onClose={handleClose} />}
+      {isOpen && !isLoading && (
+        <NotificationModalView notifications={notifications} onClose={handleClose} markAsRead={markAsRead} />
+      )}
     </>
   );
 }

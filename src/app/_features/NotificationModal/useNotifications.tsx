@@ -1,89 +1,40 @@
+import { client } from "@/lib/hono";
+import { supabaseClient } from "@/lib/supabaseClient";
+import type { InferResponseType } from "hono";
+import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
-export type NotificationType = "LIKE" | "BADGE" | "FOLLOW" | "COMMENT" | "MENTION";
-
-export type Notification = {
-  id: string;
-  sourceUser: {
-    name: string;
-    image: string;
-  };
-  type: NotificationType;
-  message: string;
-  createdAt: string;
-  isRead: boolean;
-};
+export type NotificationResType = InferResponseType<typeof client.api.notifications.$get, 200>;
 
 export function useNotifications() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<NotificationResType>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
+    const channel = supabaseClient
+      .channel("supabase_realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "Notification", filter: `userId=eq.${session?.user.id}` },
+        (payload) => {
+          // ゆるして
+          setNotifications((prev) => [payload.new as NotificationResType[0], ...prev]);
+        },
+      )
+      .subscribe();
+
     const fetchNotifications = async () => {
       setIsLoading(true);
 
       try {
-        // TODO: 実際のAPIエンドポイントに置き換え
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // ダミーデータ（実際のデータ構造に近いもの）
-        setNotifications([
-          {
-            id: "1",
-            sourceUser: {
-              name: "あぎりさんぽ",
-              image: "/user1.jpg",
-            },
-            type: "LIKE",
-            message: "あなたの日報「Next.jsの学習」にいいねしました",
-            createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-            isRead: false,
-          },
-          {
-            id: "2",
-            sourceUser: {
-              name: "システム",
-              image: "/badge.jpg",
-            },
-            type: "BADGE",
-            message: "新しいバッジ「7日連続投稿」を獲得しました！",
-            createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString(),
-            isRead: true,
-          },
-          {
-            id: "3",
-            sourceUser: {
-              name: "ずんだもんさん",
-              image: "https://picsum.photos/200/200",
-            },
-            type: "FOLLOW",
-            message: "あなたをフォローしました",
-            createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
-            isRead: false,
-          },
-          {
-            id: "4",
-            sourceUser: {
-              name: "わやわやさん",
-              image: "/user2.jpg",
-            },
-            type: "FOLLOW",
-            message: "あなたをフォローしました",
-            createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
-            isRead: false,
-          },
-          {
-            id: "5",
-            sourceUser: {
-              name: "わやわや2さん",
-              image: "/user2.jpg",
-            },
-            type: "FOLLOW",
-            message: "あなたをフォローしました",
-            createdAt: new Date(Date.now() - 72 * 60 * 60 * 1000).toISOString(),
-            isRead: false,
-          },
-        ]);
+        // 初期通知
+        const res = await client.api.notifications.$get();
+        if (!res.ok) {
+          return;
+        }
+        const data = await res.json();
+        setNotifications(data);
       } catch (error) {
         console.error("通知の取得に失敗しました", error);
       } finally {
@@ -92,14 +43,23 @@ export function useNotifications() {
     };
 
     fetchNotifications();
-  }, []);
+    return () => {
+      channel.unsubscribe();
+    };
+  }, [session]);
 
   const markAsRead = async (notificationId: string) => {
-    // TODO: 実際のAPI呼び出しを実装
-    setNotifications(
-      notifications.map((notification) =>
-        notification.id === notificationId ? { ...notification, isRead: true } : notification,
-      ),
+    await client.api.notifications[":id"].read.$post({
+      param: { id: notificationId },
+    });
+
+    setNotifications((prev) =>
+      prev.map((notification) => {
+        if (notification.id === notificationId) {
+          return { ...notification, isRead: true };
+        }
+        return notification;
+      }),
     );
   };
 
