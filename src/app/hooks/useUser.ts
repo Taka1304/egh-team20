@@ -21,6 +21,7 @@ export type ProfileUser = {
   }[];
   UserInterest?: {
     interest: {
+      id: string;
       name: string;
     };
   }[];

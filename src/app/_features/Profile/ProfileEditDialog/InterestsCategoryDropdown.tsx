@@ -70,11 +70,11 @@ export function InterestsCategoryDropdown({
                       {availableInterests.map((interest) => (
                         <motion.button
                           key={interest.id}
-                          whileHover={{ scale: 1.05 }}
+                          whileHover={{ scale: 0.95 }}
                           whileTap={{ scale: 0.95 }}
-                          onClick={() => onInterestToggle(interest.name)}
+                          onClick={() => onInterestToggle(interest.id)}
                           className={`relative p-2 rounded-lg border transition-colors ${
-                            selectedInterests.includes(interest.name)
+                            selectedInterests.includes(interest.id)
                               ? "border-primary bg-primary/10"
                               : "border-transparent hover:border-primary/50"
                           }`}
