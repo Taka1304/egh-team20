@@ -202,7 +202,7 @@ model ReportFormat {
 
 // ユーザーが作成する日報
 model DailyReport {
-  id            String        @id @default(cuid()) // 日報ID
+  id            String         @id @default(cuid()) // 日報ID
   userId        String // ユーザーID
   goalId        String? // 目標ID（任意）
   formatId      String? // フォーマットID
@@ -211,12 +211,13 @@ model DailyReport {
   visibility    Visibility // 公開状態（PUBLIC, FOLLOWERS, PRIVATE）
   learningTime  Int // 学習時間（分）
   pomodoroCount Int // ポモドーロ回数
-  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  goal          Goal?         @relation(fields: [goalId], references: [id], onDelete: SetNull)
-  format        ReportFormat? @relation(fields: [formatId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal          Goal?          @relation(fields: [goalId], references: [id], onDelete: SetNull)
+  format        ReportFormat?  @relation(fields: [formatId], references: [id], onDelete: Cascade)
   attachments   Attachment[]
   reactions     Reaction[]
   aiFeedbacks   AIFeedback[]
+  Notification  Notification[]
 
   createdAt DateTime @default(now()) // 作成日時
   updatedAt DateTime @updatedAt // 更新日時
@@ -422,14 +423,16 @@ model Notification {
   sourceUserId String? // 通知元ユーザーID (FK)
   badgeId      String? // バッジID (FK)
   communityId  String? // コミュニティID (FK)
+  reportId     String? // 日報ID (FK)
   type         NotificationType // 通知タイプ
   message      String // 通知メッセージ
   isRead       Boolean          @default(false) // 既読/未読フラグ
 
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  sourceUser User?      @relation("SourceUser", fields: [sourceUserId], references: [id], onDelete: SetNull)
-  badge      Badge?     @relation(fields: [badgeId], references: [id], onDelete: SetNull)
-  community  Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sourceUser User?        @relation("SourceUser", fields: [sourceUserId], references: [id], onDelete: SetNull)
+  badge      Badge?       @relation(fields: [badgeId], references: [id], onDelete: SetNull)
+  community  Community?   @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  report     DailyReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) // 作成日時
   updatedAt DateTime @updatedAt // 更新日時
