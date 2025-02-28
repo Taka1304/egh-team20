@@ -68,7 +68,7 @@ export default function Header() {
             />
           ) : (
             // 未ログインの場合はログインボタンのみを表示
-            <Button variant="ghost" className="text-primary-foreground" onClick={() => signIn()}>
+            <Button variant="outline" className="text-primary-foreground border-secondary" onClick={() => signIn()}>
               ログイン
             </Button>
           )}
