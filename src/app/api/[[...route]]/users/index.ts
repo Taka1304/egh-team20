@@ -132,60 +132,8 @@ const app = new Hono()
       const { interests, goals, ...userData } = body;
 
       // 基本的なユーザー情報を更新
-      const _user = await prisma.user.update({
-        where: { id },
-        include: {
-          goals: {
-            select: {
-              id: true,
-              isPublic: true,
-              text: true,
-            },
-          },
-          UserInterest: {
-            select: {
-              interest: true,
-            },
-          },
-        },
-        data: {
-          ...userData,
-          UserInterest: {
-            deleteMany: {
-              userId: id,
-            },
-            createMany: {
-              data: interests?.map((interestId) => ({
-                interestId,
-              })) ?? [],
-            }
-          }
-        },
-      });
-
-
-
-      // 学習目標の処理
-      if (goals && Array.isArray(goals)) {
-        // 既存の目標をすべて削除
-        await prisma.goal.deleteMany({
-          where: { userId: id },
-        });
-
-        // 新しい目標を追加
-        if (goals.length > 0) {
-          await prisma.goal.createMany({
-            data: goals.map((text) => ({
-              userId: id,
-              text,
-              isPublic: true, // デフォルトで公開に設定
-            })),
-          });
-        }
-      }
-
-      // 更新後のユーザー情報を取得
-      const updatedUser = await prisma.user.findUnique({
+      const user = await recoverFromNotFound(
+        prisma.user.update({
         where: { id },
         include: {
           goals: {
@@ -207,15 +155,39 @@ const app = new Hono()
             },
           },
         },
-      });
+        data: {
+          ...userData,
+          UserInterest: {
+            deleteMany: {
+              userId: id,
+            },
+            createMany: {
+              data: interests?.map((interestId) => ({
+                interestId,
+              })) ?? [],
+            }
+          },
+          goals: {
+            deleteMany: {
+              userId: id,
+            },
+            createMany: {
+              data: goals?.map((text) => ({
+                text,
+                isPublic: true,
+              })) ?? [],
+            }
+          }
+        },
+      }));
 
-      if (!updatedUser) {
+      if (!user) {
         return c.json({ error: "ユーザー情報の取得に失敗しました" }, 500);
       }
 
-      const { _count, ...userData2 } = updatedUser;
+      const { _count, ...updatedUserData } = user;
       const formattedData = {
-        ...userData2,
+        ...updatedUserData,
         followerCount: _count.followedBy,
         followingCount: _count.following,
       };
