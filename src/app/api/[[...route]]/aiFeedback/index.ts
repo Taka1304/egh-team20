@@ -7,6 +7,7 @@ import { Hono } from "hono";
 const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
 
 const app = new Hono().get("/:reportId", async (c) => {
+  const DAILY_FEEDBACK_LIMIT = 3;
   const reportId = c.req.param("reportId");
 
   try {
@@ -38,7 +39,7 @@ const app = new Hono().get("/:reportId", async (c) => {
         },
       },
     });
-    if (feedbackCount >= 3) {
+    if (feedbackCount >= DAILY_FEEDBACK_LIMIT) {
       return c.json({ error: "AIフィードバックの上限に達しました（上限1日3回）" }, 400);
     }
 
