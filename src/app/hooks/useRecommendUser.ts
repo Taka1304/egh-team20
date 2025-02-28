@@ -8,118 +8,90 @@ export type RecommendedUser = {
   displayName?: string;
   image?: string;
   interests: string[];
+  isFollowing: boolean; // フォロー状態を追加
 };
 
-type UseRecommendUserReturn = {
-  recommendedUsers: RecommendedUser[];
-  isLoading: boolean;
-  error: Error | null;
-  refetch: () => Promise<void>;
-  followUser: (userId: string) => Promise<boolean>;
-  unfollowUser: (userId: string) => Promise<boolean>;
-};
-
-export function useRecommendUser(userId?: string, recommendedUserNum = 5): UseRecommendUserReturn {
+export function useRecommendUser() {
   const { data: session } = useSession();
   const [recommendedUsers, setRecommendedUsers] = useState<RecommendedUser[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   const fetchRecommendedUsers = async () => {
+    if (!session?.user?.id) return;
+
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      // biome-ignore lint/style/useConst: <explanation>
-      let targetUserId = userId || session?.user?.id;
-
-      if (!targetUserId) {
-        setIsLoading(false);
-        return;
-      }
-
-      const response = await fetch(
-        `/api/users/${targetUserId}/recommended?recommendedUserNum=${recommendedUserNum.toString()}`,
-      );
-
+      const response = await fetch(`/api/users/${session.user.id}/recommended?recommendedUserNum=5`);
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "おすすめユーザーの取得に失敗しました");
+        throw new Error("Failed to fetch recommended users");
       }
-
       const data = await response.json();
       setRecommendedUsers(data.recommendedUsers || []);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err);
-      } else {
-        setError(new Error("Unknown error occurred"));
-      }
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error("Unknown error"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // フォロー処理
-  const followUser = async (targetUserId: string): Promise<boolean> => {
+  const followUser = async (userId: string) => {
     if (!session?.user?.id) return false;
 
     try {
-      const response = await fetch(`/api/users/${targetUserId}/follow/${session.user.id}`, {
+      const response = await fetch(`/api/users/${userId}/follow/${session.user.id}`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("フォロー失敗:", errorText);
-        return false;
-      }
+      if (!response.ok) return false;
 
-      // 成功したら推奨リストを更新
-      await fetchRecommendedUsers();
+      // 成功したら、ユーザーリストを更新してUIに反映
+      setRecommendedUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === userId ? { ...user, isFollowing: true } : user)),
+      );
+
       return true;
-    } catch (err) {
-      console.error("フォロー処理でエラーが発生しました:", err);
+    } catch (error) {
+      console.error("フォロー処理に失敗しました:", error);
       return false;
     }
   };
 
-  // フォロー解除処理
-  const unfollowUser = async (targetUserId: string): Promise<boolean> => {
+  const unfollowUser = async (userId: string) => {
     if (!session?.user?.id) return false;
 
     try {
-      const response = await fetch(`/api/users/${targetUserId}/follow/${session.user.id}`, {
+      const response = await fetch(`/api/users/${userId}/follow/${session.user.id}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("フォロー解除失敗:", errorText);
-        return false;
-      }
+      if (!response.ok) return false;
 
-      // 成功したら推奨リストを更新
-      await fetchRecommendedUsers();
+      // 成功したら、ユーザーリストを更新してUIに反映
+      setRecommendedUsers((prevUsers) =>
+        prevUsers.map((user) => (user.id === userId ? { ...user, isFollowing: false } : user)),
+      );
+
       return true;
-    } catch (err) {
-      console.error("フォロー解除処理でエラーが発生しました:", err);
+    } catch (error) {
+      console.error("フォロー解除処理に失敗しました:", error);
       return false;
     }
   };
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 依存する値だけを指定
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
-    fetchRecommendedUsers();
-  }, [userId, session, recommendedUserNum]);
+    if (session?.user?.id) {
+      fetchRecommendedUsers();
+    }
+  }, [session]);
 
   return {
     recommendedUsers,
     isLoading,
     error,
-    refetch: fetchRecommendedUsers,
     followUser,
     unfollowUser,
+    refetch: fetchRecommendedUsers,
   };
 }
