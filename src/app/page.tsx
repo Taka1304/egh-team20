@@ -1,4 +1,5 @@
 import Header from "@/app/_features/Navigate/Header/Header";
+import { Onboarding } from "@/app/_features/OnboardingDialog";
 import { ProfileRecommendedUsers } from "@/app/_features/Profile/ProfileRecommendedUsers/ProfileRecommendedUsers";
 import { RecommendedArticles } from "@/app/_features/RecommendedArticles/RecommendedArticles";
 import { Timeline } from "@/app/_features/Timeline/Timeline";
@@ -13,6 +14,7 @@ export default function Home() {
           <div className="flex flex-col gap-4">
             <ProfileRecommendedUsers />
             <RecommendedArticles />
+            <Onboarding />
           </div>
         </div>
       </div>
