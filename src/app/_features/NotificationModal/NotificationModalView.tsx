@@ -1,23 +1,25 @@
 "use client";
-
-import type { Notification, NotificationType } from "@/app/_features/NotificationModal/useNotifications";
+import type { NotificationResType } from "@/app/_features/NotificationModal/useNotifications";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { NotificationType } from "@prisma/client";
 import { motion } from "framer-motion";
-import { AtSign, Award, Heart, MessageSquare, UserPlus, X } from "lucide-react";
+import { Award, Bot, Check, Flame, Heart, MessageSquare, UserPlus, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 function getNotificationIcon(type: NotificationType) {
   switch (type) {
-    case "LIKE":
+    case "REACTION_HEART":
       return <Heart className="h-5 w-5 text-red-500" />;
+    case "REACTION_FIRE":
+      return <Flame className="h-5 w-5 text-red-500" />;
+    case "REACTION_CHECK":
+      return <Check className="h-5 w-5 text-green-500" />;
     case "BADGE":
       return <Award className="h-5 w-5 text-yellow-500" />;
     case "FOLLOW":
       return <UserPlus className="h-5 w-5 text-blue-500" />;
     case "COMMENT":
       return <MessageSquare className="h-5 w-5 text-green-500" />;
-    case "MENTION":
-      return <AtSign className="h-5 w-5 text-purple-500" />;
     default:
       return <span />;
   }
@@ -38,7 +40,7 @@ export function NotificationModalView({
   notifications,
   onClose,
 }: {
-  notifications: Notification[];
+  notifications: NotificationResType;
   onClose: () => void;
 }) {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -98,15 +100,19 @@ export function NotificationModalView({
                 <div className="flex items-start space-x-4 bg-muted p-4 rounded-lg border border-primary-foreground hover:bg-accent transition-colors">
                   {/* Avatarと未読インジケーター */}
                   <div className="relative flex-shrink-0">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage
-                        src={notification.sourceUser.image}
-                        alt={`${notification.sourceUser.name}のアイコン`}
-                      />
-                      <AvatarFallback className="bg-muted text-muted-foreground">
-                        {notification.sourceUser.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    {notification.sourceUser?.image && notification.sourceUser?.displayName ? (
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage
+                          src={notification.sourceUser.image}
+                          alt={`${notification.sourceUser.displayName}のアイコン`}
+                        />
+                        <AvatarFallback className="bg-muted text-muted-foreground">
+                          {notification.sourceUser.displayName.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                    ) : (
+                      <Bot className="h-12 w-12" />
+                    )}
                     {!notification.isRead && (
                       <span className="absolute top-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-card" />
                     )}
@@ -116,7 +122,8 @@ export function NotificationModalView({
                     <div className="flex items-center space-x-2 mb-1">
                       {getNotificationIcon(notification.type)}
                       <p className="text-sm font-medium">
-                        <span className="font-semibold">{notification.sourceUser.name}</span> {notification.message}
+                        <span className="font-semibold">{notification.sourceUser?.displayName}</span>{" "}
+                        {notification.message}
                       </p>
                     </div>
                     <p className="text-xs text-muted-foreground">{formatDate(notification.createdAt)}</p>
