@@ -73,7 +73,7 @@ export function NotificationModalView({
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: "spring", damping: 15, stiffness: 300 }}
-        className="bg-card p-6 rounded-lg shadow-lg w-[500px] max-w-full text-card-foreground relative max-h-[80vh] overflow-y-auto"
+        className="bg-card p-6 rounded-lg shadow-lg w-[500px] max-w-full text-card-foreground relative max-h-[80vh] overflow-y-auto custom-scrollbar"
       >
         {/* 閉じるボタン */}
         <button
@@ -104,10 +104,10 @@ export function NotificationModalView({
                 <div className="flex items-start space-x-4 bg-muted p-4 rounded-lg border border-primary-foreground hover:bg-accent transition-colors">
                   {/* Avatarと未読インジケーター */}
                   <div className="relative flex-shrink-0">
-                    {notification.sourceUser?.image && notification.sourceUser?.displayName ? (
+                    {notification.sourceUser?.displayName ? (
                       <Avatar className="h-12 w-12">
                         <AvatarImage
-                          src={notification.sourceUser.image}
+                          src={notification.sourceUser.image ?? undefined}
                           alt={`${notification.sourceUser.displayName}のアイコン`}
                         />
                         <AvatarFallback className="bg-muted text-muted-foreground">
@@ -125,7 +125,10 @@ export function NotificationModalView({
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
                       {getNotificationIcon(notification.type)}
-                      <p className="text-sm font-medium">{notification.message}</p>
+                      <p className="text-sm font-medium">
+                        <span className="font-semibold">{notification.sourceUser?.displayName}</span>{" "}
+                        {notification.message}
+                      </p>
                     </div>
                     <p className="text-xs text-muted-foreground">{formatDate(notification.createdAt)}</p>
                   </div>

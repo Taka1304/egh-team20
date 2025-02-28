@@ -12,14 +12,30 @@ export function useNotifications() {
   const { data: session } = useSession();
 
   useEffect(() => {
+    const fetchUser = async (userId: string) => {
+      const user = await client.api.users[":id"].$get({
+        param: { id: userId },
+      });
+      if (!user.ok) {
+        return null;
+      }
+      const userData = await user.json();
+      return userData;
+    };
+
     const channel = supabaseClient
       .channel("supabase_realtime")
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "Notification", filter: `userId=eq.${session?.user.id}` },
-        (payload) => {
-          // ゆるして
-          setNotifications((prev) => [payload.new as NotificationResType[0], ...prev]);
+        (payload: { new: NotificationResType[0] }) => {
+          const newNotification = payload.new;
+          // 関連ユーザーがある場合、ユーザー情報を取得して通知に追加
+          newNotification.sourceUserId
+            ? fetchUser(newNotification.sourceUserId).then((user) => {
+                setNotifications((prev) => [{ ...newNotification, sourceUser: user }, ...prev]);
+              })
+            : setNotifications((prev) => [newNotification, ...prev]);
         },
       )
       .subscribe();

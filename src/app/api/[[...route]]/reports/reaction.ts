@@ -51,13 +51,19 @@ const app = new Hono()
 
         const { report } = await result.json();
 
+        
+        // 自分でリアクションを付けた場合は通知を送信しない
+        if (report.user.id === session.user.id) {
+          return c.json({ reaction }, 201);
+        }
+        
         //通知を送信
         await prisma.notification.create({
           data: {
             userId: report.user.id,
             sourceUserId: session.user.id,
             reportId,
-            message: `${session.user.displayName}さんがあなたの投稿に${REACTION_TYPE_MAP[typeId]}を付けました`,
+            message: `さんが${report.title}に${REACTION_TYPE_MAP[typeId]}を付けました`,
             type: `REACTION_${REACTION_TYPE_MAP[typeId]}`,
           },
         });
