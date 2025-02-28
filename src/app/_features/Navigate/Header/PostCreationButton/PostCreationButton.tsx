@@ -14,6 +14,11 @@ type PostCreationButtonProps = {
   className?: string;
 };
 
+const truncateTitle = (title: string, maxLength: number) => {
+  if (!title) return "無題の文書";
+  return title.length > maxLength ? `${title.slice(0, maxLength)}...` : title;
+};
+
 export function PostCreationButton({ className }: PostCreationButtonProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -106,7 +111,7 @@ export function PostCreationButton({ className }: PostCreationButtonProps) {
                               <div className="flex items-start gap-2 text-left">
                                 <FileText className="h-4 w-4 mt-1 flex-shrink-0" />
                                 <div>
-                                  <p className="font-medium line-clamp-1">{draft.title || "無題の文書"}</p>
+                                  <p className="font-medium line-clamp-1">{truncateTitle(draft.title, 10)}</p>
                                   <p className="text-xs text-muted-foreground">
                                     {formatDistanceToNow(new Date(draft.updatedAt), { addSuffix: true, locale: ja })}
                                   </p>
