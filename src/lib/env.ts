@@ -13,6 +13,7 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: z.string(),
     SUPABASE_URL: z.string().url(),
     SUPABASE_KEY: z.string(),
+    GEMINI_API_KEY: z.string(),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url(),
@@ -29,5 +30,6 @@ export const env = createEnv({
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_KEY: process.env.SUPABASE_KEY,
+    GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   },
 });
