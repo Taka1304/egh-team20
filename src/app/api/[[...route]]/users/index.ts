@@ -308,12 +308,12 @@ const app = new Hono()
     zValidator(
       "query",
       z.object({
-        recommendedUserNum: z.coerce.number().optional(),
+        recommendedUserNum: z.coerce.number().default(5),
       }),
     ),
     async (c) => {
       const id = c.req.param("id");
-      const recommendedUserNum = c.req.valid("query").recommendedUserNum ?? 5;
+      const recommendedUserNum = c.req.valid("query").recommendedUserNum;
 
       try {
         // 現在のユーザーがフォローしているカテゴリーを取得
