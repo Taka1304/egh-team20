@@ -1,11 +1,11 @@
 import { Hono } from "hono";
 import { handle } from "hono/vercel";
+import reportReview from "./aiFeedback";
 import assets from "./assets";
 
 import badges from "./badges";
 import interests from "./interests";
 import reactions from "./reactions";
-import reportReview from "./reportReview";
 import reports from "./reports";
 import sample from "./sample";
 import users from "./users";
