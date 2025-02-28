@@ -60,6 +60,7 @@ export function useReports(viewMode: ViewMode = "category") {
             text: r.text,
             createdAt: r.createdAt,
             user: {
+              id: r.user.id,
               name: r.user.displayName || "Anonymous",
               handle: `@user${r.user.id.substring(0, 5)}`,
               avatar: r.user.image || "/avatar.jpg",
@@ -96,7 +97,7 @@ export function useReports(viewMode: ViewMode = "category") {
     };
 
     fetchReports();
-  }, [currentUserId, viewMode]); // viewModeの変更を監視
+  }, [currentUserId, viewMode]);
 
   return {
     reports,

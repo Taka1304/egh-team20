@@ -1,16 +1,22 @@
 "use client";
 import { ReportCardView } from "@/app/_features/ReportCard/ReportCardView";
+import { ReportDeleteDialog } from "@/app/_features/ReportCard/ReportDeleteDialog/ReportDeleteDialog";
 import { useReaction } from "@/app/hooks/useReaction";
 import type { Report } from "@/app/types/reports";
+import { client } from "@/lib/hono";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 type ReportCardProps = {
   report: Report;
+  isOwner?: boolean;
 };
 
-export function ReportCard({ report }: ReportCardProps) {
+export function ReportCard({ report, isOwner }: ReportCardProps) {
+  const router = useRouter();
   const [showFullContent, setShowFullContent] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // 「続きを読む」ボタン表示のためのロジック
   const contentRef = useRef<HTMLDivElement>(null);
@@ -28,12 +34,10 @@ export function ReportCard({ report }: ReportCardProps) {
 
   // 文字数が多い場合も「続きを読む」ボタンを表示
   useEffect(() => {
-    // 文字数が多い場合は「続きを読む」ボタンを表示
     const shouldShowMoreByLength = report.text.length > 300;
     setShouldShowMoreButton(shouldShowMoreByLength);
   }, [report.text]);
 
-  // useReaction フック
   const { addReaction, removeReaction, isLoading } = useReaction(report.id, {
     LIKE: report.likes ?? 0,
     FLAME: report.flames ?? 0,
@@ -108,24 +112,57 @@ export function ReportCard({ report }: ReportCardProps) {
       toast.error("リアクションの更新に失敗しました");
     }
   };
+  const handleDelete = async () => {
+    try {
+      const response = await client.api.reports[":id"].$delete({
+        param: { id: report.id },
+      });
+
+      if (response.ok) {
+        toast.success("投稿を削除しました");
+        // 必要に応じてページを更新するロジックを追加
+        router.refresh();
+      } else {
+        toast.error("削除に失敗しました");
+      }
+    } catch (error) {
+      console.error("削除エラー:", error);
+      toast.error("削除処理中にエラーが発生しました");
+    }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsDeleteDialogOpen(true);
+  };
 
   return (
-    <ReportCardView
-      report={report}
-      onShowMore={() => setShowFullContent(true)}
-      isExpanded={showFullContent}
-      shouldShowMoreButton={shouldShowMoreButton}
-      contentRef={contentRef}
-      onLike={() => handleToggleReaction("LIKE")}
-      onFlame={() => handleToggleReaction("FLAME")}
-      onCheck={() => handleToggleReaction("CHECK")}
-      onComment={() => toast("コメント機能は後日実装予定…")}
-      hasLiked={hasLiked}
-      hasFlamed={hasFlamed}
-      hasChecked={hasChecked}
-      likes={likes}
-      flames={flames}
-      checks={checks}
-    />
+    <>
+      <ReportCardView
+        report={report}
+        isOwner={isOwner}
+        onShowMore={() => setShowFullContent(true)}
+        isExpanded={showFullContent}
+        shouldShowMoreButton={shouldShowMoreButton}
+        contentRef={contentRef}
+        onLike={() => handleToggleReaction("LIKE")}
+        onFlame={() => handleToggleReaction("FLAME")}
+        onCheck={() => handleToggleReaction("CHECK")}
+        onComment={() => toast("コメント機能は後日実装予定…")}
+        onDelete={handleDeleteClick}
+        hasLiked={hasLiked}
+        hasFlamed={hasFlamed}
+        hasChecked={hasChecked}
+        likes={likes}
+        flames={flames}
+        checks={checks}
+      />
+      <ReportDeleteDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        title={report.title}
+      />
+    </>
   );
 }

@@ -8,15 +8,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { CheckCircle, ChevronDown, Flame, Heart, MessageCircle } from "lucide-react";
+import { CheckCircle, ChevronDown, Flame, Heart, MessageCircle, Trash } from "lucide-react";
 
 type ReportCardViewProps = {
   report: Report;
+  isOwner?: boolean;
   onShowMore: () => void;
   onLike: () => void;
   onFlame: () => void;
   onCheck: () => void;
   onComment: () => void;
+  onDelete?: (e: React.MouseEvent) => void;
   isExpanded: boolean;
   hasLiked: boolean;
   hasFlamed: boolean;
@@ -25,16 +27,18 @@ type ReportCardViewProps = {
   flames: number;
   checks: number;
   shouldShowMoreButton: boolean;
-  contentRef: React.RefObject<HTMLDivElement>;
+  contentRef: React.RefObject<HTMLDivElement | null>;
 };
 
 export function ReportCardView({
   report,
+  isOwner,
   onShowMore,
   onLike,
   onFlame,
   onCheck,
   onComment,
+  onDelete,
   isExpanded,
   hasLiked,
   hasFlamed,
@@ -64,7 +68,9 @@ export function ReportCardView({
             <p className="text-sm text-muted-foreground">{report.user.handle}</p>
           </div>
         </div>
-        <ReportDate createdAt={report.createdAt} />
+        <div className="flex items-center space-x-2">
+          <ReportDate createdAt={report.createdAt} />
+        </div>
       </div>
 
       {/* 投稿タイトル */}
@@ -122,6 +128,17 @@ export function ReportCardView({
           <ActionButton icon={Heart} label="いいね" count={likes} onClick={onLike} active={hasLiked} />
           <ActionButton icon={Flame} label="ファイト" count={flames} onClick={onFlame} active={hasFlamed} />
           <ActionButton icon={CheckCircle} label="チェック" count={checks} onClick={onCheck} active={hasChecked} />
+          {isOwner && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-destructive"
+              onClick={onDelete}
+            >
+              <Trash className="h-4 w-4 text-destructive" />
+              <span className="sr-only">削除</span>
+            </Button>
+          )}
         </div>
       </div>
     </Card>

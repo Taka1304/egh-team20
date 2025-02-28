@@ -1,6 +1,7 @@
 export type Report = {
   id: string;
   user: {
+    id: string;
     name: string;
     handle: string;
     avatar: string;
