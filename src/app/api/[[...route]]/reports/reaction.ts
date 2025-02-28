@@ -57,7 +57,7 @@ const app = new Hono()
             userId: report.user.id,
             sourceUserId: session.user.id,
             reportId,
-            message: `${session.user.displayName}さんがあなたの投稿に${REACTION_TYPE_MAP[typeId]}を付けました`,
+            message: `さんが${report.title0}に${REACTION_TYPE_MAP[typeId]}を付けました`,
             type: `REACTION_${REACTION_TYPE_MAP[typeId]}`,
           },
         });

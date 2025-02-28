@@ -232,7 +232,7 @@ const app = new Hono()
         data: {
           userId: id,
           sourceUserId: session.user.id,
-          message: `${session.user.displayName ?? session.user.id}さんがあなたをフォローしました。`,
+          message: "さんがあなたをフォローしました",
           type: "FOLLOW",
         },
       });
