@@ -2,6 +2,7 @@
 
 import { client } from "@/lib/hono";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,6 +11,7 @@ export function useOnboardingDialog(onClose: () => void) {
   const [name, setName] = useState<string | null>(null);
   const [interests, setInterests] = useState<string[]>([]);
   const { data: session } = useSession();
+  const router = useRouter();
 
   const handleNext = async () => {
     if (currentStep < 3) {
@@ -32,6 +34,7 @@ export function useOnboardingDialog(onClose: () => void) {
         return;
       }
       toast.success("保存しました", { id: toastId });
+      router.replace("/");
       onClose();
     }
   };
