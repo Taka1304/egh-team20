@@ -16,7 +16,7 @@ export default function TopPage() {
           </div>
         </div>
 
-        {/* 右側の「おすすめの人」リスト */}
+        {/* 右側の「おすすめのユーザー」リスト */}
         <div className="md:col-span-1 h-full overflow-y-auto hidden-scrollbar">
           <RecommendedUsers />
         </div>

@@ -11,7 +11,7 @@ export function ProfileRecommendedUsers() {
   if (isLoading) {
     return (
       <div className="p-4 border border-primary-foreground bg-card rounded-[var(--radius)] w-full">
-        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの人</h2>
+        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめのユーザー</h2>
         <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar">
           {[1, 2, 3, 4, 5].map((index) => (
             <Skeleton
@@ -29,7 +29,7 @@ export function ProfileRecommendedUsers() {
   if (error) {
     return (
       <div className="p-4 border border-primary-foreground bg-card rounded-[var(--radius)] w-full">
-        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの人</h2>
+        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめのユーザー</h2>
         <p className="text-red-500">エラーが発生しました</p>
       </div>
     );
@@ -37,7 +37,7 @@ export function ProfileRecommendedUsers() {
 
   return (
     <div className="p-4 border border-primary-foreground bg-card rounded-[var(--radius)] w-full">
-      <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの人</h2>
+      <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめのユーザー</h2>
 
       {/* 横並びのカードレイアウト */}
       <div className="flex space-x-3 overflow-x-auto pb-2 custom-scrollbar">
