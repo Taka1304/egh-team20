@@ -122,16 +122,8 @@ export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogPr
     );
   };
 
-  // 目標を文字列に変換
-  const goalsString = editedProfile.goals.join(", ");
-
-  // 学習目標編集用の関数
-  const setGoals = (value: string) => {
-    const goalsArray = value
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => s.length > 0);
-    setField("goals", goalsArray);
+  const handleGoalsChange = (newGoals: string[]) => {
+    setField("goals", newGoals);
   };
 
   return (
@@ -147,8 +139,8 @@ export function ProfileEditDialog({ user, onClose, onSave }: ProfileEditDialogPr
       availableInterests={availableInterests}
       isLoadingInterests={isLoadingInterests}
       onInterestToggle={handleInterestToggle}
-      goals={goalsString}
-      setGoals={setGoals}
+      goals={editedProfile.goals}
+      onGoalsChange={handleGoalsChange}
       isPrivate={editedProfile.isPrivate}
       setIsPrivate={(val) => setField("isPrivate", val)}
       isLoading={isLoading}

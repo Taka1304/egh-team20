@@ -1,16 +1,12 @@
 "use client";
 
-import { InterestsCategoryDropdown } from "@/app/_features/Profile/ProfileEditDialog/InterestsCategoryDropdown";
+import { GoalInputFiled } from "@/app/_features/Profile/ProfileEditDialog/GoalInputFiled";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, X } from "lucide-react";
+import { InterestsCategoryDropdown } from "./InterestsCategoryDropdown";
 import { ProfileEditTextarea } from "./ProfileEditTextarea";
-
-type Interest = {
-  id: string;
-  name: string;
-};
 
 type ProfileEditDialogViewProps = {
   avatar: string;
@@ -21,11 +17,11 @@ type ProfileEditDialogViewProps = {
   bio: string;
   setBio: (value: string) => void;
   selectedInterests: string[];
-  availableInterests: Interest[];
+  availableInterests: { id: string; name: string }[];
   isLoadingInterests: boolean;
   onInterestToggle: (interestName: string) => void;
-  goals: string;
-  setGoals: (value: string) => void;
+  goals: string[];
+  onGoalsChange: (goals: string[]) => void;
   isPrivate: boolean;
   setIsPrivate: (value: boolean) => void;
   isLoading: boolean;
@@ -46,7 +42,7 @@ export function ProfileEditDialogView({
   isLoadingInterests,
   onInterestToggle,
   goals,
-  setGoals,
+  onGoalsChange,
   isPrivate,
   setIsPrivate,
   isLoading,
@@ -94,22 +90,21 @@ export function ProfileEditDialogView({
           </div>
         </div>
 
-        {/* 興味・カテゴリー (バッジ選択方式) */}
-        <InterestsCategoryDropdown
-          availableInterests={availableInterests}
-          selectedInterests={selectedInterests}
-          onInterestToggle={onInterestToggle}
-          isLoading={isLoadingInterests}
-        />
+        {/* 興味カテゴリー */}
+        <div className="mt-4">
+          <InterestsCategoryDropdown
+            availableInterests={availableInterests}
+            selectedInterests={selectedInterests}
+            onInterestToggle={onInterestToggle}
+            isLoading={isLoadingInterests}
+          />
+        </div>
 
         {/* 目標 */}
-        <ProfileEditTextarea
-          title="学習目標"
-          value={goals}
-          onChange={setGoals}
-          placeholder="複数の場合はカンマで区切ってください（例：Reactの習得, TOEICスコアアップ）"
-          disabled={isLoading}
-        />
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold mb-1">学習目標</h3>
+          <GoalInputFiled goals={goals} onChange={onGoalsChange} disabled={isLoading} />
+        </div>
 
         {/* 自己紹介 */}
         <ProfileEditTextarea
