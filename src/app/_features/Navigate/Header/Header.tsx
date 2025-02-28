@@ -6,7 +6,7 @@ import { NotificationModal } from "@/app/_features/NotificationModal/Notificatio
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Home, LandPlot, Search, Timer } from "lucide-react";
+import { Home, LandPlot, Timer } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -59,7 +59,6 @@ export default function Header() {
 
         <div className="flex items-center space-x-4">
           <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="検索"
               className="pl-8 bg-muted text-primary-foreground border-muted-foreground focus:border-primary focus:ring-ring"
@@ -76,7 +75,7 @@ export default function Header() {
             />
           ) : (
             // 未ログインの場合はログインボタンのみを表示
-            <Button variant="ghost" onClick={() => signIn()}>
+            <Button variant="ghost" className="text-primary-foreground" onClick={() => signIn()}>
               ログイン
             </Button>
           )}
