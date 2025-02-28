@@ -5,8 +5,7 @@ import { UserMenu } from "@/app/_features/Navigate/Header/UserMenu/UserMenu";
 import { NotificationModal } from "@/app/_features/NotificationModal/NotificationModal";
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Home, LandPlot, Search, Timer } from "lucide-react";
+import { Home, LandPlot, Timer } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -58,13 +57,6 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <div className="relative w-64">
-            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="検索"
-              className="pl-8 bg-muted text-primary-foreground border-muted-foreground focus:border-primary focus:ring-ring"
-            />
-          </div>
           <ThemeSwitcher />
           {session?.user ? (
             // ユーザーがログインしている場合は UserMenu を表示
@@ -76,7 +68,7 @@ export default function Header() {
             />
           ) : (
             // 未ログインの場合はログインボタンのみを表示
-            <Button variant="ghost" onClick={() => signIn()}>
+            <Button variant="outline" className="text-primary-foreground border-secondary" onClick={() => signIn()}>
               ログイン
             </Button>
           )}

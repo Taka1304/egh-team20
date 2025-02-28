@@ -13,7 +13,7 @@ export function RecommendedArticles() {
   }
 
   return (
-    <section className="px-5 py-4 border-primary-foreground bg-card rounded-lg">
+    <section className="px-5 py-4 border border-primary-foreground bg-card rounded-lg">
       <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの記事</h2>
       <div className={cn("flex flex-col gap-6", !isLoading && "h-fit w-fit")}>
         {isLoading ? (

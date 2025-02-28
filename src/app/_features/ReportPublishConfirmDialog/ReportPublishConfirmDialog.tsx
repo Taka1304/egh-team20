@@ -22,9 +22,7 @@ export function ReportPublishConfirmDialog({ onConfirm, disabled }: ReportPublis
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="bg-card text-foreground border" disabled={disabled}>
-          公開する
-        </Button>
+        <Button disabled={disabled}>公開する</Button>
       </AlertDialogTrigger>
 
       <AlertDialogContent>

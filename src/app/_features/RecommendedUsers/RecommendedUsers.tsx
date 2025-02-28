@@ -9,7 +9,7 @@ export function RecommendedUsers() {
   if (isLoading) {
     return (
       <div className="p-4 border border-border bg-card rounded-[var(--radius)] w-full">
-        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの人</h2>
+        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめのユーザー</h2>
         <p className="text-muted-foreground">ユーザーを読み込み中...</p>
       </div>
     );
@@ -18,7 +18,7 @@ export function RecommendedUsers() {
   if (error) {
     return (
       <div className="p-4 border border-border bg-card rounded-[var(--radius)] w-full">
-        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの人</h2>
+        <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめのユーザー</h2>
         <p className="text-red-500">エラーが発生しました: {error.message}</p>
       </div>
     );
@@ -26,7 +26,7 @@ export function RecommendedUsers() {
 
   return (
     <div className="p-4 border border-border bg-card rounded-[var(--radius)] w-full">
-      <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめの人</h2>
+      <h2 className="text-lg font-bold text-card-foreground mb-3">おすすめのユーザー</h2>
       {recommendedUsers.length > 0 ? (
         <div className="space-y-3">
           {recommendedUsers.map((user) => (
