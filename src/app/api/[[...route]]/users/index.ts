@@ -557,6 +557,10 @@ const app = new Hono()
   .get("/:id/recommendedArticles", async (c) => {
     const id = c.req.param("id");
     const RECOMMENDED_ARTICLE_COUNT = 2;
+    let recommendedArticles = [
+      "https://www.insource.co.jp/businessbunsho/dailyreport.html",
+      "https://column.nippoukun.bpsinc.jp/nippou-no-idea/",
+    ]; // デフォルトの記事
     const session = await getServerSession(authOptions);
     if (!session) {
       // 他ユーザーに表示された記事を表示する
@@ -581,15 +585,23 @@ const app = new Hono()
       }
 
       // 既存のおすすめ記事の最新の作成日時を取得
-      const latestRecommendedArticle = await prisma.recommendedArticle.findFirst({
+      const latestRecommendedArticle = await prisma.recommendedArticle.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
+        take: RECOMMENDED_ARTICLE_COUNT, // 取得する記事の数を制限
       });
 
       // すでに最新の日報に対しておすすめ記事が作成されていれば、何もしない
-      if (latestRecommendedArticle && latestRecommendedArticle.createdAt >= latestReport.createdAt) {
+      if (
+        latestRecommendedArticle.length >= RECOMMENDED_ARTICLE_COUNT &&
+        latestRecommendedArticle[0].createdAt >= latestReport.createdAt
+      ) {
+        const recommendedArticles = latestRecommendedArticle.map((article) => article.url);
         return c.json(
-          { message: "最新の日報に対するおすすめ記事はすでに作成済みです．過去のおすすめ記事を返します．" },
+          {
+            message: "最新の日報に対するおすすめ記事はすでに作成済みです．過去のおすすめ記事を返します．",
+            recommendedArticles,
+          },
           200,
         );
       }
@@ -610,14 +622,19 @@ const app = new Hono()
         return { url: url, isAlive: isUrlAlivePromise };
       });
       const recommendedUrlsJudge = await Promise.all(checkedRecommendedUrlsPromise);
-      const recommendedUrls = recommendedUrlsJudge.filter((url) => url.isAlive).map((url) => url.url);
+      const recommendedArticlesFilter = recommendedUrlsJudge.filter((url) => url.isAlive).map((url) => url.url);
 
-      if (recommendedUrls.length < RECOMMENDED_ARTICLE_COUNT) {
-        return c.json({ message: "おすすめ記事の取得に失敗しました" }, 200);
+      if (recommendedArticlesFilter.length < RECOMMENDED_ARTICLE_COUNT) {
+        return c.json(
+          { message: "おすすめ記事の取得に失敗しました．デフォルトの記事を2つ返します．", recommendedArticles },
+          200,
+        );
       }
+
       // おすすめ記事を保存
-      const recommendedArticles = await prisma.recommendedArticle.createMany({
-        data: recommendedUrls.slice(0, 2).map((url) => ({
+      recommendedArticles = recommendedArticlesFilter.slice(0, RECOMMENDED_ARTICLE_COUNT);
+      await prisma.recommendedArticle.createMany({
+        data: recommendedArticles.slice(0, 2).map((url) => ({
           userId,
           url,
           createdAt: new Date(),
