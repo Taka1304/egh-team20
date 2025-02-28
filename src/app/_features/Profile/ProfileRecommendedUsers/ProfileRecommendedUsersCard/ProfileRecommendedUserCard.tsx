@@ -43,10 +43,16 @@ export function ProfileRecommendedUserCard({
   };
 
   return (
-    // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
     <div
-      className={`relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex flex-col justify-between flex-shrink-0 hover:shadow-lg transition-shadow ${clickable && "cursor-pointer"}`}
-      onClick={() => clickable && navigateToProfile}
+      className={`relative w-48 bg-primary-foreground rounded-lg shadow-md border overflow-hidden flex flex-col justify-between flex-shrink-0 hover:shadow-lg transition-shadow ${clickable ? "cursor-pointer" : ""}`}
+      onClick={() => clickable && navigateToProfile()}
+      role={clickable ? "button" : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onKeyDown={(e) => {
+        if (clickable && (e.key === "Enter" || e.key === " ")) {
+          navigateToProfile();
+        }
+      }}
     >
       <div className="w-full">
         {/* プロフィール画像 */}
