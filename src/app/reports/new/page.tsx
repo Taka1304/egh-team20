@@ -133,7 +133,7 @@ export default function page() {
             <Input
               type="text"
               placeholder="記事タイトル"
-              className="!text-3xl font-bold border-0 px-0 focus-visible:ring-0"
+              className="!text-3xl font-bold border-0 px-0 focus-visible:ring-0 text-primary-foreground"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
