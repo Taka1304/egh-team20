@@ -107,6 +107,7 @@ export function OnboardingDialogView({
                     key={user.id}
                     onFollow={followUser}
                     onUnfollow={unfollowUser}
+                    clickable={false}
                   />
                 ))}
               </div>
