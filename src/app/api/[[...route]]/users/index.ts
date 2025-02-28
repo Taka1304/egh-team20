@@ -8,7 +8,7 @@ import { z } from "zod";
 
 const userScheme = z.object({
   name: z.string().optional(),
-  email: z.string(),
+  email: z.string().email().optional(),
   emailVerified: z.date().optional(),
   image: z.string().optional(),
   displayName: z.string().optional(),
