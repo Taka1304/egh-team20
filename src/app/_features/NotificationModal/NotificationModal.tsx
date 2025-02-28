@@ -22,6 +22,9 @@ export function NotificationModal() {
         onClick={handleOpen}
       >
         <Bell className="h-5 w-5" />
+        {notifications.filter((notification) => !notification.isRead).length > 0 && (
+          <span className="absolute top-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-card" />
+        )}
       </Button>
 
       {isOpen && !isLoading && (
