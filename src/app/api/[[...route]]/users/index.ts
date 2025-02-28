@@ -224,10 +224,10 @@ app
 
         // 既にフォローしているユーザーを省くため，現在のユーザーがフォローしているユーザーを取得
         const followingUsers = await prisma.follow.findMany({
-          where: { followingId: id },
-          select: { followerId: true },
+          where: { followerId: id },
+          select: { followingId: true },
         });
-        const followingUserIds = followingUsers.map((fu) => fu.followerId);
+        const followingUserIds = followingUsers.map((fu) => fu.followingId);
 
         // 同じカテゴリーをフォローしている他のユーザーを取得
         const recommendedUserProfilesResult = await prisma.user.findMany({
@@ -295,6 +295,7 @@ app
           displayName: user.displayName,
           image: user.image,
           interests: user.UserInterest.map((ui) => ui.interest.name),
+          isFollowing: false,
         }));
 
         return c.json({ recommendedUsers });
