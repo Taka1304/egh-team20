@@ -72,8 +72,9 @@ model User {
   UserBadge        UserBadge[]
   Notification     Notification[]         @relation("SourceUser")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  RecommendedArticle RecommendedArticle[]
 }
 
 model Account {
@@ -435,5 +436,14 @@ model Notification {
   report     DailyReport? @relation(fields: [reportId], references: [id], onDelete: SetNull)
 
   createdAt DateTime @default(now()) // 作成日時
+  updatedAt DateTime @updatedAt // 更新日時
+}
+
+model RecommendedArticle {
+  id        String   @id @default(cuid()) // 一意のID
+  userId    String // User モデルの ID
+  url       String // 記事のURL
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // ユーザーとのリレーション
+  createdAt DateTime @default(now()) // 登録日時
   updatedAt DateTime @updatedAt // 更新日時
 }
