@@ -28,6 +28,7 @@ export const Default: Story = {
     report: {
       id: "1",
       user: {
+        id: "1",
         name: "ヤマモト",
         handle: "@yamamotoVn",
         avatar: "/avatar.jpg",
