@@ -1,5 +1,6 @@
 "use client";
 
+import { PostCreationButton } from "@/app/_features/Navigate/Header/PostCreationButton/PostCreationButton";
 import { UserMenu } from "@/app/_features/Navigate/Header/UserMenu/UserMenu";
 import { NotificationModal } from "@/app/_features/NotificationModal/NotificationModal";
 import { ThemeSwitcher } from "@/app/_features/ThemeSwitcher/ThemeSwitcher";
@@ -12,10 +13,6 @@ import { useRouter } from "next/navigation";
 export default function Header() {
   const { data: session } = useSession();
   const router = useRouter();
-
-  const handlePostClick = () => {
-    router.push("/reports/new");
-  };
 
   const handleHomeClick = () => {
     router.push("/");
@@ -83,9 +80,7 @@ export default function Header() {
               ログイン
             </Button>
           )}
-          <Button className="bg-primary hover:bg-foreground" onClick={handlePostClick}>
-            投稿する
-          </Button>
+          <PostCreationButton />
         </div>
       </div>
     </div>
