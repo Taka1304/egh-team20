@@ -51,30 +51,30 @@ model User {
   bio           String? // 自己紹介文
   isPrivate     Boolean   @default(false) // 公開/非公開フラグ
 
-  accounts         Account[]
-  sessions         Session[]
-  Authenticator    Authenticator[]
-  goals            Goal[]
-  reports          DailyReport[]
-  reactions        Reaction[]
-  followedBy       Follow[]               @relation("FollowedBy")
-  following        Follow[]               @relation("Following")
-  communities      CommunityMember[]
-  threads          Thread[]
-  comments         Comment[]
-  matchesSent      Match[]                @relation("MatchesSent")
-  matchesReceived  Match[]                @relation("MatchesReceived")
-  pomodoroSessions PomodoroSession[]
-  futureMessages   FutureMessage[]
-  notifications    Notification[]
-  contributions    LearningContribution[]
-  UserInterest     UserInterest[]
-  UserBadge        UserBadge[]
-  Notification     Notification[]         @relation("SourceUser")
-
-  createdAt          DateTime             @default(now())
-  updatedAt          DateTime             @updatedAt
+  accounts           Account[]
+  sessions           Session[]
+  Authenticator      Authenticator[]
+  goals              Goal[]
+  reports            DailyReport[]
+  reactions          Reaction[]
+  followedBy         Follow[]               @relation("FollowedBy")
+  following          Follow[]               @relation("Following")
+  communities        CommunityMember[]
+  threads            Thread[]
+  comments           Comment[]
+  matchesSent        Match[]                @relation("MatchesSent")
+  matchesReceived    Match[]                @relation("MatchesReceived")
+  pomodoroSessions   PomodoroSession[]
+  futureMessages     FutureMessage[]
+  notifications      Notification[]
+  contributions      LearningContribution[]
+  UserInterest       UserInterest[]
+  UserBadge          UserBadge[]
+  Notification       Notification[]         @relation("SourceUser")
   RecommendedArticle RecommendedArticle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Account {
