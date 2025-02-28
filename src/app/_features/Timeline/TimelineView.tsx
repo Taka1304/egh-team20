@@ -53,23 +53,25 @@ export function TimelineView({
 
       {/* タイムライン表示エリア */}
       <div className="h-[80vh] overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar">
-        {reports.length > 0 ? (
+        {/* ローディング中は中央に表示 */}
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loading />
+          </div>
+        ) : reports.length > 0 ? (
           reports.map((report) => <ReportCard key={report.id} report={report} />)
         ) : (
           <div className="text-center py-8 text-muted-foreground">
-            {!isLoading && <p>表示できる投稿がありません</p>}
+            <p>表示できる投稿がありません</p>
           </div>
         )}
 
-        {/* ローダー */}
-        <div ref={loaderRef} className="py-4 text-center">
-          {isLoading && (
-            <div className=" flex items-center justify-center">
-              <Loading />
-            </div>
-          )}
-          {!hasMore && reports.length > 0 && <p className="text-muted-foreground">これ以上のレポートはありません</p>}
-        </div>
+        {/* ローダー（無限スクロール用）*/}
+        {!isLoading && (
+          <div ref={loaderRef} className="py-4 text-center">
+            {!hasMore && reports.length > 0 && <p className="text-muted-foreground">これ以上のレポートはありません</p>}
+          </div>
+        )}
       </div>
     </div>
   );

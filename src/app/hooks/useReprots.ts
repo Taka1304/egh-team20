@@ -1,11 +1,11 @@
+// src/app/hooks/useReprots.ts
 "use client";
 
+import type { ViewMode } from "@/app/_features/Timeline/Timeline";
 import type { Report } from "@/app/types/reports";
 import { client } from "@/lib/hono";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-
-type ReactionType = "LIKE" | "FLAME" | "CHECK";
 
 // `name` (LIKE, FLAME, CHECK) を `typeId` に変換するマッピング
 const REACTION_TYPE_MAP: Record<string, string> = {
@@ -14,9 +14,16 @@ const REACTION_TYPE_MAP: Record<string, string> = {
   CHECK: "cm7n45ua40001ksux1x3lbq2m",
 };
 
-export function useReports() {
-  const { data: session } = useSession(); // ログインユーザー情報
-  const currentUserId = session?.user?.id; // ログインユーザーのID
+// ViewMode を API のクエリパラメータにマッピング
+const VIEW_MODE_TO_API_TYPE: Record<ViewMode, "sameCategory" | "following" | "own"> = {
+  category: "sameCategory",
+  following: "following",
+  mine: "own",
+};
+
+export function useReports(viewMode: ViewMode = "category") {
+  const { data: session } = useSession();
+  const currentUserId = session?.user?.id;
 
   const [reports, setReports] = useState<Report[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,8 +34,14 @@ export function useReports() {
       setIsLoading(true);
 
       try {
-        // Hono クライアントを使って API を呼び出す
-        const response = await client.api.reports.$get({});
+        // ViewMode に応じた type パラメータを設定
+        const type = VIEW_MODE_TO_API_TYPE[viewMode];
+
+        const response = await client.api.reports.$get({
+          query: { type },
+        });
+
+        // レスポンスを確認するためのログ
 
         if (!response.ok) {
           console.error("Failed to fetch reports:", await response.text());
@@ -37,6 +50,8 @@ export function useReports() {
         }
 
         const data = await response.json();
+        // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+        console.log(`Received ${data.reports?.length || 0} reports`);
 
         setReports(
           data.reports.map((r) => ({
@@ -54,7 +69,6 @@ export function useReports() {
             flames: r.reactions?.filter((reaction) => reaction.type.id === REACTION_TYPE_MAP.FLAME)?.length || 0,
             checks: r.reactions?.filter((reaction) => reaction.type.id === REACTION_TYPE_MAP.CHECK)?.length || 0,
 
-            // ✅ 修正: `currentUserId` と比較する
             hasLiked:
               r.reactions?.some(
                 (reaction) => reaction.type.id === REACTION_TYPE_MAP.LIKE && reaction.user.id === currentUserId,
@@ -82,7 +96,7 @@ export function useReports() {
     };
 
     fetchReports();
-  }, [currentUserId]);
+  }, [currentUserId, viewMode]); // viewModeの変更を監視
 
   return {
     reports,
