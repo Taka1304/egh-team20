@@ -3,27 +3,24 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { ProfileEditTextarea } from "./ProfileEditTextarea";
 
 type ProfileEditDialogViewProps = {
   avatar: string;
   following: number;
   followers: number;
-  name: string;
-  setName: (value: string) => void;
-  age: number;
-  setAge: (value: number) => void;
-  gender: string;
-  setGender: (value: string) => void;
-  skills: string;
-  setSkills: (value: string) => void;
-  learningGoals: string;
-  setLearningGoals: (value: string) => void;
+  displayName: string;
+  setDisplayName: (value: string) => void;
   bio: string;
   setBio: (value: string) => void;
-  isPublic: boolean;
-  setIsPublic: (value: boolean) => void;
+  interests: string;
+  setInterests: (value: string) => void;
+  goals: string;
+  setGoals: (value: string) => void;
+  isPrivate: boolean;
+  setIsPrivate: (value: boolean) => void;
+  isLoading: boolean;
   onClose: () => void;
   onSave: () => void;
 };
@@ -32,31 +29,29 @@ export function ProfileEditDialogView({
   avatar,
   following,
   followers,
-  name,
-  setName,
-  age,
-  setAge,
-  gender,
-  setGender,
-  skills,
-  setSkills,
-  learningGoals,
-  setLearningGoals,
+  displayName,
+  setDisplayName,
   bio,
   setBio,
-  isPublic,
-  setIsPublic,
+  interests,
+  setInterests,
+  goals,
+  setGoals,
+  isPrivate,
+  setIsPrivate,
+  isLoading,
   onClose,
   onSave,
 }: ProfileEditDialogViewProps) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-      <div className="bg-card p-6 rounded-lg shadow-lg w-[600px] max-w-full text-card-foreground relative">
+      <div className="bg-card p-6 rounded-lg shadow-lg w-[600px] max-w-full text-card-foreground relative max-h-[90vh] overflow-y-auto">
         {/* 閉じるボタン */}
         <button
           type="button"
           onClick={onClose}
           className="absolute top-3 right-3 text-muted-foreground hover:text-foreground"
+          disabled={isLoading}
         >
           <X className="w-6 h-6" />
         </button>
@@ -67,15 +62,16 @@ export function ProfileEditDialogView({
         {/* アイコンと名前 */}
         <div className="flex items-center space-x-4">
           <Avatar className="h-16 w-16">
-            <AvatarImage src={avatar} alt={`${name}のアイコン`} />
-            <AvatarFallback>{name.charAt(0)}</AvatarFallback>
+            <AvatarImage src={avatar} alt={`${displayName}のアイコン`} />
+            <AvatarFallback>{displayName.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
             <Input
               className="border border-foreground"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="名前"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="表示名"
+              disabled={isLoading}
             />
           </div>
         </div>
@@ -88,70 +84,61 @@ export function ProfileEditDialogView({
           </div>
         </div>
 
-        {/* 年齢・性別を横並び */}
-        <div className="mt-4 flex space-x-4">
-          {/* 年齢 */}
-          <div className="flex flex-col">
-            <h3 className="text-lg font-semibold">年齢</h3>
-            <Input
-              className="w-24 border border-foreground"
-              type="number"
-              min="0"
-              value={age}
-              onChange={(e) => setAge(Math.max(0, Number(e.target.value)))}
-            />
-          </div>
-
-          {/* 性別 */}
-          <div className="flex flex-col">
-            <h3 className="text-lg font-semibold">性別</h3>
-            <select
-              className="border border-foreground bg-card text-card-foreground p-2 rounded-md w-40 text-sm"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="男性">男性</option>
-              <option value="女性">女性</option>
-              <option value="その他">その他</option>
-            </select>
-          </div>
-        </div>
-
-        {/* スキル */}
+        {/* 興味・カテゴリー*/}
         <ProfileEditTextarea
-          title="スキルセット"
-          value={skills}
-          onChange={setSkills}
-          placeholder="例: JavaScript, React, TypeScript"
+          title="興味・カテゴリー"
+          value={interests}
+          onChange={setInterests}
+          placeholder="現在変更できません"
+          disabled={true}
         />
-        {/* 学びたいジャンル */}
+
+        {/* 目標 (読み取り専用) */}
         <ProfileEditTextarea
-          title="学びたいジャンル・目指す分野"
-          value={learningGoals}
-          onChange={setLearningGoals}
-          placeholder="例: Web開発, AI, UXデザイン"
+          title="学習目標"
+          value={goals}
+          onChange={setGoals}
+          placeholder="現在変更できません"
+          disabled={true}
         />
+
         {/* 自己紹介 */}
-        <ProfileEditTextarea title="自己紹介" value={bio} onChange={setBio} placeholder="自己紹介を書いてください" />
+        <ProfileEditTextarea
+          title="自己紹介"
+          value={bio || ""}
+          onChange={setBio}
+          placeholder="自己紹介を書いてください"
+          disabled={isLoading}
+        />
 
         {/* 公開設定 */}
         <div className="mt-6 flex items-start space-x-3">
           <input
             type="checkbox"
-            id="privatePost"
-            checked={!isPublic}
-            onChange={(e) => setIsPublic(!e.target.checked)}
+            id="privateProfile"
+            checked={isPrivate}
+            onChange={(e) => setIsPrivate(e.target.checked)}
             className="w-5 h-5 border border-foreground rounded-md cursor-pointer"
+            disabled={isLoading}
           />
-          <label htmlFor="privatePost" className="cursor-pointer">
-            <p className="font-semibold">ポストを非公開にする</p>
+          <label htmlFor="privateProfile" className="cursor-pointer">
+            <p className="font-semibold">プロフィールを非公開にする</p>
+            <p className="text-sm text-muted-foreground">
+              非公開にすると、フォロワー以外にプロフィールが表示されなくなります
+            </p>
           </label>
         </div>
 
         {/* 保存ボタン */}
         <div className="mt-6 text-right">
-          <Button variant="default" onClick={onSave}>
-            保存
+          <Button variant="default" onClick={onSave} disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> 保存中...
+              </>
+            ) : (
+              "保存"
+            )}
           </Button>
         </div>
       </div>

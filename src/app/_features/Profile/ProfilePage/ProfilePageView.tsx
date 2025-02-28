@@ -12,10 +12,20 @@ type ProfilePageViewProps = {
   isLoading: boolean;
   error: Error | null;
   interests: string[];
+  isOwnProfile: boolean;
   userStats: { value: string; label: string }[];
+  onProfileUpdate?: () => void;
 };
 
-export default function ProfilePageView({ user, isLoading, error, interests, userStats }: ProfilePageViewProps) {
+export default function ProfilePageView({
+  user,
+  isLoading,
+  error,
+  interests,
+  userStats,
+  isOwnProfile,
+  onProfileUpdate,
+}: ProfilePageViewProps) {
   // ローディング状態の表示
   if (isLoading) {
     return (
@@ -58,7 +68,7 @@ export default function ProfilePageView({ user, isLoading, error, interests, use
       <div className="w-4/5 flex mx-auto flex-col gap-4">
         {/* プロフィールカード */}
         <div className="pl-4">
-          <ProfileCard user={user} />
+          <ProfileCard user={user} isOwnProfile={isOwnProfile} onProfileUpdate={onProfileUpdate} />
           {/* Todo ユーザーの累計投稿日数を受け取って、グラフとして表示 */}
           {/* <PostsChart postsData={} /> */}
         </div>

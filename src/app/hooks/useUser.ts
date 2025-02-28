@@ -25,12 +25,20 @@ export type ProfileUser = {
   }[];
 };
 
+type UpdateProfileData = {
+  displayName?: string;
+  bio?: string;
+  isPrivate?: boolean;
+  image?: string;
+};
+
 type UseUserReturn = {
   user: ProfileUser | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => Promise<void>;
   isOwnProfile: boolean;
+  updateProfile: (data: UpdateProfileData) => Promise<boolean>;
 };
 
 export function useUser(usernameParam?: string): UseUserReturn {
@@ -60,8 +68,7 @@ export function useUser(usernameParam?: string): UseUserReturn {
         return;
       }
 
-      // Honoクライアントを不使用(直接fetch)
-      /* Honoに置き換え？ */
+      // API呼び出し
       const response = await fetch(`/api/users/${userId}`);
 
       if (!response.ok) {
@@ -89,6 +96,38 @@ export function useUser(usernameParam?: string): UseUserReturn {
     }
   };
 
+  // プロフィール更新機能
+  const updateProfile = async (data: UpdateProfileData): Promise<boolean> => {
+    try {
+      if (!user) {
+        throw new Error("ユーザー情報が読み込まれていません");
+      }
+
+      const response = await fetch(`/api/users/${user.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "プロフィールの更新に失敗しました");
+      }
+
+      // 更新成功後にデータを再取得
+      await fetchUser();
+      return true;
+    } catch (err) {
+      console.error("プロフィール更新エラー:", err);
+      if (err instanceof Error) {
+        setError(err);
+      }
+      return false;
+    }
+  };
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     fetchUser();
@@ -100,5 +139,6 @@ export function useUser(usernameParam?: string): UseUserReturn {
     error,
     refetch: fetchUser,
     isOwnProfile,
+    updateProfile,
   };
 }

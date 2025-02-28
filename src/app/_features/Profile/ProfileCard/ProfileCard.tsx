@@ -1,15 +1,20 @@
+import { ProfileEditDialog } from "@/app/_features/Profile/ProfileEditDialog/ProfileEditDialog";
 import type { ProfileUser } from "@/app/hooks/useUser";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type ProfileCardProps = {
   user: ProfileUser;
+  isOwnProfile: boolean;
+  onProfileUpdate?: () => void;
 };
 
-export default function ProfileCard({ user }: ProfileCardProps) {
+export default function ProfileCard({ user, isOwnProfile, onProfileUpdate }: ProfileCardProps) {
   const router = useRouter();
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const userId = user.id;
 
@@ -35,6 +40,24 @@ export default function ProfileCard({ user }: ProfileCardProps) {
   const numberVariants = {
     initial: { color: "var(--primary-foreground)" },
     hover: { color: "var(--primary)" },
+  };
+
+  // 編集ダイアログを開く処理
+  const handleOpenEditDialog = () => {
+    setIsEditDialogOpen(true);
+  };
+
+  // 編集ダイアログを閉じる処理
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
+  };
+
+  // 編集後に更新が完了した時の処理
+  const handleProfileUpdated = () => {
+    setIsEditDialogOpen(false);
+    if (onProfileUpdate) {
+      onProfileUpdate();
+    }
   };
 
   return (
@@ -82,9 +105,18 @@ export default function ProfileCard({ user }: ProfileCardProps) {
           <p className="text-sm text-muted-foreground">フォロワー</p>
         </motion.div>
       </div>
-      <Button className="mt-4 text-foreground" variant="outline">
-        プロフィールを編集
-      </Button>
+
+      {/* 自分のプロフィールの場合のみ編集ボタンを表示 */}
+      {isOwnProfile && (
+        <Button className="mt-4 text-foreground" variant="outline" onClick={handleOpenEditDialog}>
+          プロフィールを編集
+        </Button>
+      )}
+
+      {/* 編集ダイアログ */}
+      {isEditDialogOpen && (
+        <ProfileEditDialog user={user} onClose={handleCloseEditDialog} onSave={handleProfileUpdated} />
+      )}
     </div>
   );
 }

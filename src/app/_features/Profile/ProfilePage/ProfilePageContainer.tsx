@@ -9,7 +9,7 @@ export default function ProfilePageContainer() {
   const params = useParams<{ username: string }>();
   const username = params?.username;
 
-  const { user, isLoading, error } = useUser(username);
+  const { user, isLoading, error, refetch, isOwnProfile } = useUser(username);
   const { stats } = useUserStats(user?.id);
 
   // UserInterestからinterests配列に変換
@@ -26,6 +26,14 @@ export default function ProfilePageContainer() {
     : [];
 
   return (
-    <ProfilePageView user={user} isLoading={isLoading} error={error} interests={interests} userStats={userStats} />
+    <ProfilePageView
+      user={user}
+      isLoading={isLoading}
+      error={error}
+      interests={interests}
+      userStats={userStats}
+      isOwnProfile={isOwnProfile}
+      onProfileUpdate={refetch}
+    />
   );
 }
