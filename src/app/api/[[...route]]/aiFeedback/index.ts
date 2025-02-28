@@ -16,12 +16,22 @@ const app = new Hono().get("/:reportId", async (c) => {
       id: true,
       title: true,
       text: true,
+      userId: true,
     },
   });
   if (!report) {
     return c.json({ error: "Reportがありません" }, 404);
   }
-  return geminiRun(c, report.title, report.text);
+
+  const { responseJson, responseText } = await geminiRun(c, report.title, report.text);
+  prisma.aIFeedback.create({
+    data: {
+      reportId: report.id,
+      sentiment: "まだ実装されていません",
+      feedbackText: responseText,
+    },
+  });
+  return c.json({ message: "success", responseJson });
 });
 export default app;
 
@@ -79,5 +89,6 @@ ${reportText}
   const result = await model.generateContent(prompt);
   const response = await result.response;
   const text = response.text();
-  return c.json({ text });
+  const responseJson = JSON.parse(text);
+  return { responseJson: responseJson, responseText: text };
 }
