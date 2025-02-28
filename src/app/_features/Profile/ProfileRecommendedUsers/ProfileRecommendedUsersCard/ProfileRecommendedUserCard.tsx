@@ -12,7 +12,7 @@ type ProfileRecommendedUserCardProps = {
 };
 
 export function ProfileRecommendedUserCard({ user, onFollow, onUnfollow }: ProfileRecommendedUserCardProps) {
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(user.isFollowing);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleFollowClick = async () => {

@@ -8,17 +8,30 @@ export type RecommendedUser = {
   displayName?: string;
   image?: string;
   interests: string[];
-  isFollowing: boolean; // フォロー状態を追加
+  isFollowing: boolean;
 };
+
+// キャッシュ
+let cachedRecommendedUsers: RecommendedUser[] = [];
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5分間キャッシュ
 
 export function useRecommendUser() {
   const { data: session } = useSession();
-  const [recommendedUsers, setRecommendedUsers] = useState<RecommendedUser[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [recommendedUsers, setRecommendedUsers] = useState<RecommendedUser[]>(cachedRecommendedUsers);
+  const [isLoading, setIsLoading] = useState(cachedRecommendedUsers.length === 0);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchRecommendedUsers = async () => {
+  const fetchRecommendedUsers = async (forceRefresh = false) => {
     if (!session?.user?.id) return;
+
+    // キャッシュが有効な場合はフェッチしない
+    const currentTime = Date.now();
+    if (!forceRefresh && cachedRecommendedUsers.length > 0 && currentTime - lastFetchTime < CACHE_DURATION) {
+      setRecommendedUsers(cachedRecommendedUsers);
+      setIsLoading(false);
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -27,7 +40,12 @@ export function useRecommendUser() {
         throw new Error("Failed to fetch recommended users");
       }
       const data = await response.json();
-      setRecommendedUsers(data.recommendedUsers || []);
+
+      // モジュールレベルのキャッシュを更新
+      cachedRecommendedUsers = data.recommendedUsers || [];
+      lastFetchTime = Date.now();
+
+      setRecommendedUsers(cachedRecommendedUsers);
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Unknown error"));
     } finally {
@@ -46,9 +64,11 @@ export function useRecommendUser() {
       if (!response.ok) return false;
 
       // 成功したら、ユーザーリストを更新してUIに反映
-      setRecommendedUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === userId ? { ...user, isFollowing: true } : user)),
-      );
+      const updatedUsers = recommendedUsers.map((user) => (user.id === userId ? { ...user, isFollowing: true } : user));
+
+      // ローカル状態とキャッシュの両方を更新
+      setRecommendedUsers(updatedUsers);
+      cachedRecommendedUsers = updatedUsers;
 
       return true;
     } catch (error) {
@@ -68,9 +88,13 @@ export function useRecommendUser() {
       if (!response.ok) return false;
 
       // 成功したら、ユーザーリストを更新してUIに反映
-      setRecommendedUsers((prevUsers) =>
-        prevUsers.map((user) => (user.id === userId ? { ...user, isFollowing: false } : user)),
+      const updatedUsers = recommendedUsers.map((user) =>
+        user.id === userId ? { ...user, isFollowing: false } : user,
       );
+
+      // ローカル状態とキャッシュの両方を更新
+      setRecommendedUsers(updatedUsers);
+      cachedRecommendedUsers = updatedUsers;
 
       return true;
     } catch (error) {
@@ -79,12 +103,13 @@ export function useRecommendUser() {
     }
   };
 
+  // セッションが変わった時だけデータを取得
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     if (session?.user?.id) {
       fetchRecommendedUsers();
     }
-  }, [session]);
+  }, [session?.user?.id]);
 
   return {
     recommendedUsers,
@@ -92,6 +117,6 @@ export function useRecommendUser() {
     error,
     followUser,
     unfollowUser,
-    refetch: fetchRecommendedUsers,
+    refetch: () => fetchRecommendedUsers(true), // 強制的に再取得する場合
   };
 }
