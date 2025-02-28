@@ -61,7 +61,7 @@ export function ProfileRecommendedUserCard({
 
         {/* ユーザー情報 */}
         <div className="p-2 text-center">
-          <p className="font-bold text-sm hover:underline">{user.displayName || "ユーザー"}</p>
+          <p className="font-bold text-sm text-card hover:underline">{user.displayName || "ユーザー"}</p>
           {/* 興味・関心エリア */}
           <div className="flex flex-wrap justify-center gap-1 mt-1">
             {user.interests.slice(0, 2).map((interest) => (
