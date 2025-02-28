@@ -16,6 +16,7 @@ type TimelineViewProps = {
   hasMore: boolean;
   viewMode: ViewMode;
   onChangeViewMode: (mode: ViewMode) => void;
+  onReportDeleted?: () => Promise<void>;
 };
 
 export function TimelineView({
@@ -25,6 +26,7 @@ export function TimelineView({
   hasMore,
   viewMode,
   onChangeViewMode,
+  onReportDeleted,
 }: TimelineViewProps) {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
@@ -87,7 +89,7 @@ export function TimelineView({
                   delay: Math.min(index * 0.05, 0.5),
                 }}
               >
-                <ReportCard report={report} isOwner={currentUserId === report.user.id} />
+                <ReportCard report={report} isOwner={currentUserId === report.user.id} onDeleted={onReportDeleted} />
               </motion.div>
             ))}
           </div>

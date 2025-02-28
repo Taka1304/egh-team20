@@ -10,7 +10,7 @@ export function Timeline() {
   const [viewMode, setViewMode] = useState<ViewMode>("category");
   // ローディング状態を個別に管理
   const [isChangingMode, setIsChangingMode] = useState(false);
-  const { reports, isLoading, hasMore } = useReports(viewMode);
+  const { reports, isLoading, hasMore, refetchReports } = useReports(viewMode);
 
   // 監視対象の要素
   const loaderRef = useRef<HTMLDivElement | null>(null);
@@ -59,6 +59,7 @@ export function Timeline() {
       hasMore={hasMore}
       viewMode={viewMode}
       onChangeViewMode={handleChangeViewMode}
+      onReportDeleted={refetchReports}
     />
   );
 }

@@ -11,9 +11,10 @@ import { toast } from "sonner";
 type ReportCardProps = {
   report: Report;
   isOwner?: boolean;
+  onDeleted?: () => Promise<void>;
 };
 
-export function ReportCard({ report, isOwner }: ReportCardProps) {
+export function ReportCard({ report, isOwner, onDeleted }: ReportCardProps) {
   const router = useRouter();
   const [showFullContent, setShowFullContent] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -122,6 +123,9 @@ export function ReportCard({ report, isOwner }: ReportCardProps) {
         toast.success("投稿を削除しました");
         // 必要に応じてページを更新するロジックを追加
         router.refresh();
+        if (onDeleted) {
+          await onDeleted();
+        }
       } else {
         toast.error("削除に失敗しました");
       }
