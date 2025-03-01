@@ -1,36 +1,52 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📖 キロクル - 日報SNSアプリ  
 
-## Getting Started
+## 🌟 アプリURL  
+👉 **[キロクルを開く](https://egh-team20.vercel.app/auth/signin?callbackUrl=https%3A%2F%2Fegh-team20.vercel.app%2F)**  
 
-First, run the development server:
+## 🚀 キロクルとは？  
+**「キロクル」**は、日報を手軽に記録・共有できるSNSアプリです。  
+日々の振り返りを習慣化し、他のユーザーと交流しながら成長を可視化できます！  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔥 主な機能  
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### ✏️ **日報投稿 & AIサポート**  
+- ツイッターのようにサクッと日報を投稿  
+- **AIが自動添削**して、わかりやすい文章にブラッシュアップ  
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 💬 **リアクション & つながり**  
+- 他のユーザーの日報に**いいね**や**コメント**で交流  
+- 興味が近い人をレコメンドする「**おすすめフォロワー機能**」  
 
-## Learn More
+### 📝 **コミュニティ機能**  
+- スレッドを立てて、特定のテーマについて議論や情報交換  
+- 他の人と意見を交わしながら、より深い学びを得られる  
 
-To learn more about Next.js, take a look at the following resources:
+### ⏳ **ポモドーロタイマー**  
+- 作業に集中できる**ポモドーロタイマー**を搭載  
+- 日報を書くだけでなく、**タスク管理もサポート**！  
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 🔔 **通知機能**  
+- **フォロー・リアクション・コメント**が届いたら通知  
+- 交流をスムーズにし、モチベーションをアップ  
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📊 **成長を可視化！**  
+- 投稿した日報のデータを**グラフ化**して振り返り  
+- どれだけ継続できたかを一目で確認！  
 
-## Deploy on Vercel
+### 🎨 **カスタマイズ & プロフィール**  
+- **カラーテーマ変更**で、お好みのデザインに切り替え  
+- プロフィールに自己紹介や興味のある分野を記入可能  
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠 使用技術  
+- **フロントエンド**: Next.js, Tailwind CSS  
+- **バックエンド**: Hono, Supabase  
+- **ホスティング**: Vercel  
+
+---
+
+## 📜 ライセンス  
+MIT License  
