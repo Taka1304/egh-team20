@@ -23,10 +23,11 @@ export default function MarkdownContent({ content }: MarkDownContentProps) {
       editor={editor}
       className="prose prose-sm max-w-none dark:prose-invert
         prose-headings:font-bold prose-headings:tracking-tight
-        prose-h1:text-xl prose-h1:text-card-foreground prose-h2:text-lg prose-h2:text-card-foreground prose-h3:text-base prose-h3:text-card-foreground
+        prose-h1:text-xl prose-h1:text-card-foreground prose-h2:text-lg prose-h2:text-card-foreground prose-h3:text-base prose-h3:text-card-foreground prose-h4:text-sm prose-h4:text-card-foreground prose-h5:text-xs prose-h5:text-card-foreground prose-h6:text-xs prose-h6:text-card-foreground
         prose-p:leading-relaxed prose-p:my-2
         prose-pre:bg-muted prose-pre:p-4 prose-pre:rounded-lg
         prose-code:text-primary prose-code:bg-muted/50 prose-code:rounded prose-code:px-1
+        prose-strong:text-primary prose-strong:font-extrabold
         prose-ul:my-2 prose-ol:my-2
         prose-li:my-0 text-card-foreground"
     />
