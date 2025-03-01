@@ -50,7 +50,7 @@
 ## 🔥 機能詳細 & ユースケース  
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/f7826a3f-219e-4902-aa8b-43a0747c11c7" width="45%">
+  <img src="https://github.com/user-attachments/assets/f9f39760-b7d7-48bf-9f49-45c030c61eca" width="45%">
 </p>
 
 ### ✏️ **日報投稿 & AIサポート**  
