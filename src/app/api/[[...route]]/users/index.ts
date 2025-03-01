@@ -1,3 +1,4 @@
+import { getRecommendedArticles, isUrlAlive } from "@/app/api/[[...route]]/recommendedArticle/utils";
 import { calculateStreakDays, recoverFromNotFound, shuffleArray } from "@/app/api/[[...route]]/utils";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -494,16 +495,19 @@ const app = new Hono()
       return c.json({ error: "フォロワーの取得に失敗しました", details: error as string }, 500);
     }
   })
-  .get("/:id/contributions",zValidator(
-    "param",
-    z.object({
-      id: z.string().cuid(),
-    }),
-  ), async (c) => {
-    const id = c.req.param("id");
+  .get(
+    "/:id/contributions",
+    zValidator(
+      "param",
+      z.object({
+        id: z.string().cuid(),
+      }),
+    ),
+    async (c) => {
+      const id = c.req.param("id");
 
-    const result = await prisma.$queryRaw<{ date: Date; count: number }[]>`
-      SELECT 
+      const result = await prisma.$queryRaw<{ date: Date; count: number }[]>`
+      SELECT
         DATE("createdAt") AS date,
         COUNT(*) AS count
       FROM "DailyReport"
@@ -512,12 +516,119 @@ const app = new Hono()
       ORDER BY DATE("createdAt") DESC;
     `;
 
-    const data = result.map((item) => ({
-      date: item.date,
-      count: Number(item.count), // bigint -> number
-    }));
+      const data = result.map((item) => ({
+        date: item.date,
+        count: Number(item.count), // bigint -> number
+      }));
 
-    return c.json({ data });
+      return c.json({ data });
+    },
+  )
+  .get("/:id/recommendedArticles", async (c) => {
+    const id = c.req.param("id");
+    const RECOMMENDED_ARTICLE_COUNT = 2;
+    let recommendedArticles = [
+      "https://www.insource.co.jp/businessbunsho/dailyreport.html",
+      "https://column.nippoukun.bpsinc.jp/nippou-no-idea/",
+    ]; // デフォルトの記事
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      // 他ユーザーに表示された記事を表示する
+      return c.json({ error: "ログインしていないユーザーです" }, 401);
+    }
+    if (session.user.id !== id) {
+      return c.json({ error: "他のユーザーの情報は更新できません" }, 403);
+    }
+
+    try {
+      const userId = session.user.id;
+
+      // 最新の日報を取得
+      const latestReport = await prisma.dailyReport.findFirst({
+        where: { userId },
+        include: {
+          user: {
+            select: {
+              UserInterest: {
+                include: {
+                  interest: {
+                    select: {
+                      name: true, // Interest の name を取得
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (!latestReport) {
+        // 非ログインユーザーと同様
+        return c.json({ message: "日報が存在しません" }, 200);
+      }
+
+      // 既存のおすすめ記事の最新の作成日時を取得
+      const latestRecommendedArticle = await prisma.recommendedArticle.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+        take: RECOMMENDED_ARTICLE_COUNT, // 取得する記事の数を制限
+      });
+
+      // すでに最新の日報に対しておすすめ記事が作成されていれば、何もしない
+      if (
+        latestRecommendedArticle.length >= RECOMMENDED_ARTICLE_COUNT &&
+        latestRecommendedArticle[0].createdAt >= latestReport.createdAt
+      ) {
+        const recommendedArticles = latestRecommendedArticle.map((article) => article.url);
+        return c.json(
+          {
+            message: "最新の日報に対するおすすめ記事はすでに作成済みです．過去のおすすめ記事を返します．",
+            recommendedArticles,
+          },
+          200,
+        );
+      }
+
+      // Gemini に記事をリクエスト
+      const userInterests = latestReport.user.UserInterest.map((userInterest) => userInterest.interest.name);
+      const recommendedUrlsResult = await getRecommendedArticles(
+        userInterests,
+        latestReport.title,
+        latestReport.text,
+        RECOMMENDED_ARTICLE_COUNT,
+      );
+
+      const checkedRecommendedUrlsPromise = recommendedUrlsResult.map(async (url) => {
+        const isUrlAlivePromise = await isUrlAlive(url);
+        return { url: url, isAlive: isUrlAlivePromise };
+      });
+      const recommendedUrlsJudge = await Promise.all(checkedRecommendedUrlsPromise);
+      const recommendedArticlesFilter = recommendedUrlsJudge.filter((url) => url.isAlive).map((url) => url.url);
+
+      if (recommendedUrlsResult.length < RECOMMENDED_ARTICLE_COUNT) {
+        return c.json(
+          { message: "おすすめ記事の取得に失敗しました．デフォルトの記事を2つ返します．", recommendedArticles },
+          200,
+        );
+      }
+
+      // おすすめ記事を保存
+      recommendedArticles = recommendedArticlesFilter.slice(0, RECOMMENDED_ARTICLE_COUNT);
+      await prisma.recommendedArticle.createMany({
+        data: recommendedArticles.slice(0, 2).map((url) => ({
+          userId,
+          url,
+          createdAt: new Date(),
+        })),
+      });
+
+      return c.json({ message: "新規におすすめ記事を作成しました", recommendedArticles }, 201);
+    } catch (error) {
+      console.error(error);
+      return c.json({ error: "おすすめ記事の作成に失敗しました" }, 500);
+    }
   });
 
 export default app;

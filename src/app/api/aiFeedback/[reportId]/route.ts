@@ -1,4 +1,4 @@
-import { geminiRun } from "@/app/api/aiFeedback/[reportId]/geminiRun";
+import { requestFeedbackGemini } from "@/app/api/aiFeedback/[reportId]/requestFeedbackGemini";
 import { prisma } from "@/lib/prisma";
 import dayjs from "dayjs";
 import { NextResponse } from "next/server";
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: "AIフィードバックの上限に達しました（上限1日3回）" }, { status: 400 });
     }
 
-    const { responseJson, responseText } = await geminiRun(report.title, report.text);
+    const { responseJson, responseText } = await requestFeedbackGemini(report.title, report.text);
     await prisma.aIFeedback.create({
       data: {
         reportId: report.id,
