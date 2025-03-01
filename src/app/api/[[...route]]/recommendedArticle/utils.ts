@@ -39,7 +39,7 @@ export async function isUrlAlive(url: string): Promise<boolean> {
     // ステータスコードが 404 以外なら有効と判断
     return response.status !== 404;
   } catch (error) {
-    console.error(`urlのチェックができませんでした: ${url}`);
+    console.error(`urlのチェックができませんでした: ${url}`, error as string);
     return false; // 例外が発生した場合は無効とみなす
   }
 }
