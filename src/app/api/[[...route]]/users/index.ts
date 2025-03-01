@@ -576,6 +576,21 @@ const app = new Hono()
       // 最新の日報を取得
       const latestReport = await prisma.dailyReport.findFirst({
         where: { userId },
+        include: {
+          user: {
+            select: {
+              UserInterest: {
+                include: {
+                  interest: {
+                    select: {
+                      name: true, // Interest の name を取得
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
         orderBy: { createdAt: "desc" },
       });
 
@@ -607,7 +622,9 @@ const app = new Hono()
       }
 
       // Gemini に記事をリクエスト
+      const userInterests = latestReport.user.UserInterest.map((userInterest) => userInterest.interest.name);
       const recommendedUrlsResult = await getRecommendedArticles(
+        userInterests,
         latestReport.title,
         latestReport.text,
         RECOMMENDED_ARTICLE_COUNT,

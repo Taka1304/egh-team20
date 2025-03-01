@@ -1,6 +1,11 @@
 import { geminiRun } from "@/app/api/[[...route]]/utils";
 
-export async function getRecommendedArticles(reportTitle: string, reportText: string, getNum: number) {
+export async function getRecommendedArticles(
+  userInterests: string[],
+  reportTitle: string,
+  reportText: string,
+  getNum: number,
+) {
   const prompt = `以下の内容は，とあるユーザーの日報です．発信したユーザーの成長につながるサイトを${getNum * 5}件おすすめ順に推薦してください。また，確実に存在する記事のURLを指定してください。
   フォーマット例:
 
@@ -8,11 +13,15 @@ export async function getRecommendedArticles(reportTitle: string, reportText: st
     "recommendationUrls": ["https://example.com/article1", "https://example.com/article2"]
   }
 
+  ユーザーの興味は以下の通りです:
+  ${userInterests.join(", ")}
+
   以下の内容は，とあるユーザーの日報です．
   ${reportTitle}
 
   ${reportText}
   `;
+  console.info(prompt);
   const response = await geminiRun(prompt);
   // console.info(response.responseJson);
   // return ["https://example.com/article1", "https://example.com/article2"];
