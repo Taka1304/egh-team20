@@ -34,12 +34,12 @@ export default function ReportEditorEditContainer({ reportId }: ReportEditorEdit
           setContent(report.text);
         } else {
           toast.error("レポートの取得に失敗しました");
-          router.push("/reports");
+          router.push("/");
         }
       } catch (error) {
         console.error("レポート取得エラー:", error);
         toast.error("レポートの読み込み中にエラーが発生しました");
-        router.push("/reports");
+        router.push("/");
       } finally {
         setIsLoading(false);
       }
@@ -92,7 +92,7 @@ export default function ReportEditorEditContainer({ reportId }: ReportEditorEdit
       if (result.ok) {
         toast.success("保存しました", { id: toastId });
         if (!isDraft) {
-          router.push("/reports");
+          router.push("/");
         }
       } else {
         toast.error("保存に失敗しました", { id: toastId });
