@@ -4,7 +4,7 @@
 👉 **[キロクルを開く](https://egh-team20.vercel.app/auth/signin?callbackUrl=https%3A%2F%2Fegh-team20.vercel.app%2F)**  
 
 ## 🚀 キロクルとは？  
-**「キロクル」**は、日報を手軽に記録・共有できるSNSアプリです。  
+**「キロクル」** は、日報を手軽に記録・共有できるSNSアプリです。  
 日々の振り返りを習慣化し、他のユーザーと交流しながら成長を可視化できます！  
 
 ---
