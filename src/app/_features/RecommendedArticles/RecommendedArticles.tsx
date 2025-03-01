@@ -3,9 +3,15 @@ import Loading from "@/app/Loading";
 import { RecommendedArticlesCard } from "@/app/_features/RecommendedArticles/RecommendedArticlesCard";
 import { useRecommendedArticles } from "@/app/_features/RecommendedArticles/useRecommendedArticles";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useSession } from "next-auth/react";
 
 export function RecommendedArticles() {
+  const { data: session } = useSession();
   const { articles, isLoading, error } = useRecommendedArticles();
+
+  if (!session) {
+    return null;
+  }
 
   if (error) {
     return <div className="text-red-500">エラーが発生しました: {error.message}</div>;
