@@ -6,7 +6,7 @@ import { RecommendedArticles } from "@/app/_features/RecommendedArticles/Recomme
 import { Timeline } from "@/app/_features/Timeline/Timeline";
 import { useEffect, useRef } from "react";
 
-export default function Home() {
+export default function page() {
   const timelineContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
