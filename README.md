@@ -44,6 +44,11 @@
 
 ## 🔥 機能詳細 & ユースケース  
 
+![image](https://github.com/user-attachments/assets/4fd5fbaa-e4c6-4818-a0fd-101f7b9491ff)
+![image](https://github.com/user-attachments/assets/a72ea6ab-0e4a-4ff1-ba78-006b216e31a7)
+
+
+
 ### ✏️ **日報投稿 & AIサポート**  
 - **日報を手軽に投稿** し、習慣化をサポート  
 - **AIが自動添削** し、文章を改善  
