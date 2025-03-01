@@ -6,6 +6,7 @@ import type { ViewMode } from "@/app/_features/Timeline/Timeline";
 import type { Report } from "@/app/types/reports";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { Tags, User, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import type { CSSProperties, ForwardedRef } from "react";
 
@@ -20,6 +21,21 @@ type TimelineViewProps = {
   style?: CSSProperties;
   isNested?: boolean;
   userId?: string;
+};
+
+const viewModeConfig = {
+  category: {
+    icon: <Tags className="h-4 w-4" />,
+    text: "カテゴリー",
+  },
+  following: {
+    icon: <Users className="h-4 w-4" />,
+    text: "フォロー中",
+  },
+  mine: {
+    icon: <User className="h-4 w-4" />,
+    text: "自分の投稿",
+  },
 };
 
 export function TimelineView({
@@ -51,35 +67,29 @@ export function TimelineView({
     <div className="w-full max-w-2xl mx-auto">
       {showModeButtons && (
         <motion.div
-          className="flex justify-between mb-4 p-2 bg-card rounded-md"
+          className="flex justify-between mb-4 py-2 bg-card rounded-md"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <Button
-            variant={viewMode === "category" ? "default" : "outline"}
-            onClick={() => onChangeViewMode("category")}
-            className="flex-1 mx-1 text-primary-foreground"
-          >
-            カテゴリー
-          </Button>
-          <Button
-            variant={viewMode === "following" ? "default" : "outline"}
-            onClick={() => onChangeViewMode("following")}
-            className="flex-1 mx-1 text-primary-foreground"
-          >
-            フォロー中
-          </Button>
-          <Button
-            variant={viewMode === "mine" ? "default" : "outline"}
-            onClick={() => onChangeViewMode("mine")}
-            className="flex-1 mx-1 text-primary-foreground"
-          >
-            自分の投稿
-          </Button>
+          {(Object.keys(viewModeConfig) as Array<keyof typeof viewModeConfig>).map((mode) => (
+            <Button
+              key={mode}
+              variant={viewMode === mode ? "default" : "outline"}
+              onClick={() => onChangeViewMode(mode)}
+              className="flex-1 mx-1 text-primary-foreground"
+            >
+              <span className="flex items-center justify-center">
+                {viewModeConfig[mode].icon}
+                {/* モバイルでは非アクティブの場合はアイコンのみ表示 */}
+                <span className={`ml-2 ${viewMode === mode ? "inline" : "hidden sm:inline"}`}>
+                  {viewModeConfig[mode].text}
+                </span>
+              </span>
+            </Button>
+          ))}
         </motion.div>
       )}
-
       <div
         className="overflow-y-auto border rounded-md p-2 space-y-4 custom-scrollbar"
         style={{
