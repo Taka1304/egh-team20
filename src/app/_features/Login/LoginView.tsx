@@ -9,7 +9,7 @@ import { useSearchParams } from "next/navigation";
 
 export function LoginView() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? env.NEXT_PUBLIC_APP_URL;
+  const callbackUrl = searchParams.get("callbackUrl")?.replace("about", "") ?? env.NEXT_PUBLIC_APP_URL;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
