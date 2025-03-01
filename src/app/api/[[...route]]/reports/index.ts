@@ -25,11 +25,11 @@ const app = new Hono()
     async (c) => {
       const session = await getServerSession(authOptions);
       const getType = c.req.valid("query").type ?? "sameCategory";
+      const userId = c.req.valid("query").userId;
 
       try {
         let followedUserIds: string[] = [];
         let whereGetTypeCondition: object = {};
-        const userId = c.req.valid("query").userId;
 
         // userId が指定されている場合、そのユーザーの投稿のみを取得
         if (userId) {
@@ -53,11 +53,20 @@ const app = new Hono()
                     },
                   ]
                 : []),
-              // 自分自身の投稿は全て表示
+              // 自分自身の投稿は全て表示 (自分のPRIVATEも含める)
               ...(session && session.user.id === userId ? [{}] : []),
             ],
+            // 下書きを除外（ただし自分自身の場合は含める）
+            ...(session && session.user.id === userId
+              ? {}
+              : {
+                  visibility: { not: $Enums.Visibility.PRIVATE },
+                }),
           };
         } else if (session) {
+          // 既存のフィルタリングロジック
+
+          // フォロー中のユーザー取得
           followedUserIds = await prisma.follow
             .findMany({
               where: {
@@ -74,15 +83,25 @@ const app = new Hono()
             whereGetTypeCondition = {
               OR: [
                 // 全ユーザーのパブリックな投稿
-                { visibility: $Enums.Visibility.PUBLIC, user: { isPrivate: false } },
-                // フォローしているユーザーの投稿
                 {
-                  visibility: $Enums.Visibility.FOLLOWERS,
+                  visibility: $Enums.Visibility.PUBLIC,
                   user: { isPrivate: false },
+                },
+                // フォローしているユーザーのPUBLIC投稿
+                {
+                  visibility: $Enums.Visibility.PUBLIC,
                   userId: { in: followedUserIds },
                 },
-                // 自分の投稿
-                { userId: session.user.id },
+                // フォローしているユーザーのFOLLOWER限定投稿
+                {
+                  visibility: $Enums.Visibility.FOLLOWERS,
+                  userId: { in: followedUserIds },
+                },
+                // 自分の投稿（PRIVATE含む全て）
+                {
+                  userId: session.user.id,
+                  visibility: { not: $Enums.Visibility.PRIVATE },
+                },
               ],
             };
           } else if (getType === "following") {
@@ -91,26 +110,30 @@ const app = new Hono()
                 // フォローしているユーザーのPUBLIC投稿
                 {
                   visibility: $Enums.Visibility.PUBLIC,
-                  user: { isPrivate: false },
                   userId: { in: followedUserIds },
                 },
                 // フォローしているユーザーのFOLLOWER限定投稿
                 {
                   visibility: $Enums.Visibility.FOLLOWERS,
-                  user: { isPrivate: false },
                   userId: { in: followedUserIds },
                 },
-                // 自分の投稿
-                { userId: session.user.id },
+                // 自分の投稿（PRIVATE含む全て）
+                {
+                  userId: session.user.id,
+                  visibility: { not: $Enums.Visibility.PRIVATE },
+                },
               ],
             };
           } else if (getType === "own") {
+            // 自分の投稿はすべて表示（PRIVATEも含む）
             whereGetTypeCondition = {
               userId: session.user.id,
+              visibility: { not: $Enums.Visibility.PRIVATE },
             };
           }
         } else {
           // ログインしていない場合は全ユーザーのパブリックな投稿のみ表示
+          // PRIVATEは除外
           whereGetTypeCondition = {
             visibility: $Enums.Visibility.PUBLIC,
             user: {
@@ -124,24 +147,17 @@ const app = new Hono()
             user: {
               select: {
                 id: true,
+                name: true,
                 displayName: true,
                 image: true,
-                isPrivate: true,
               },
             },
             reactions: {
-              select: {
-                type: {
-                  select: {
-                    id: true,
-                    name: true,
-                  },
-                },
+              include: {
+                type: true,
                 user: {
                   select: {
                     id: true,
-                    displayName: true,
-                    image: true,
                   },
                 },
               },
@@ -155,7 +171,7 @@ const app = new Hono()
         });
 
         if (reports.length === 0) {
-          return c.json({ error: "日報が見つかりません" }, 404);
+          return c.json({ reports: [] }, 200); // 空の配列を返す
         }
 
         return c.json({ reports }, 200);
