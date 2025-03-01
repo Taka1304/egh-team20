@@ -4,6 +4,7 @@ import { ReportDeleteDialog } from "@/app/_features/ReportCard/ReportDeleteDialo
 import { useReaction } from "@/app/hooks/useReaction";
 import type { Report } from "@/app/types/reports";
 import { client } from "@/lib/hono";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -18,6 +19,7 @@ export function ReportCard({ report, isOwner, onDeleted }: ReportCardProps) {
   const router = useRouter();
   const [showFullContent, setShowFullContent] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const { data: session } = useSession();
 
   // 「続きを読む」ボタン表示のためのロジック
   const contentRef = useRef<HTMLDivElement>(null);
@@ -65,6 +67,11 @@ export function ReportCard({ report, isOwner, onDeleted }: ReportCardProps) {
 
   const handleToggleReaction = async (type: "LIKE" | "FLAME" | "CHECK") => {
     if (isLoading) return;
+
+    if (!session) {
+      toast.error("リアクションをつけるにはログインが必要です");
+      return;
+    }
 
     let setHasReaction: (value: boolean) => void;
     let setCount: (value: number) => void;
