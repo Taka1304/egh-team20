@@ -44,8 +44,12 @@
 
 ## 🔥 機能詳細 & ユースケース  
 
-![image](https://github.com/user-attachments/assets/4fd5fbaa-e4c6-4818-a0fd-101f7b9491ff)
-![image](https://github.com/user-attachments/assets/a72ea6ab-0e4a-4ff1-ba78-006b216e31a7)
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/4fd5fbaa-e4c6-4818-a0fd-101f7b9491ff" width="50%">
+  <img src="https://github.com/user-attachments/assets/ba004e39-160d-42ca-a1dd-45c745b8296c" width="50%">
+</p>
+
+
 
 
 
